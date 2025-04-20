@@ -1,0 +1,67 @@
+import sric::*;
+import waseGraphics::*;
+
+struct BubbleStyle : WidgetStyle
+{
+  var arc : Int = 50;
+  static var topLeft : const Int = 0;
+  static var topRight : const Int = 1;
+  static var bottomLeft : const Int = 2;
+  static var bottomRight : const Int = 3;
+  
+  var position :Int= topLeft;
+  
+  fun new() {
+    background = color;
+  }
+
+  override fun doPaint(widget: *Widget , g:& Graphics)
+  {
+    var l = (5);
+    var top = l;//widget.paddingTop
+    var left = l;//widget.paddingLeft
+    var bottom = widget.height-l;//top + widget.contentHeight
+    var right =  widget.width-l;//left + widget.contentWidth
+    
+    var w = widget.width - l - l;
+    var h = widget.height - l - l;
+
+
+    var a = (arc);
+    g.setColor(background);
+    g.fillRoundRect(top, left, w, h, a);
+    
+    l = 7;
+    top = l;//widget.paddingTop
+    left = l;//widget.paddingLeft
+    bottom = widget.height-l;//top + widget.contentHeight
+    right =  widget.width-l;//left + widget.contentWidth
+
+    var cornerSize = a;
+    var pa = g.beginPath();
+
+    if (position == topLeft) {
+        pa.moveTo(left, top);
+        pa.lineTo(left, top+cornerSize);
+        pa.lineTo(left+cornerSize, top+cornerSize);
+    }
+    else if (position == topRight) {
+        pa.moveTo(right-cornerSize, top+cornerSize);
+        pa.lineTo(right, top+cornerSize);
+        pa.lineTo(right, top);
+    }
+    else if (position == bottomLeft) {
+        pa.moveTo(left, bottom-cornerSize);
+        pa.lineTo(left, bottom);
+        pa.lineTo(left+cornerSize, bottom-cornerSize);
+    }
+    else {
+        pa.moveTo(right-cornerSize, bottom);
+        pa.lineTo(right, bottom);
+        pa.lineTo(right-cornerSize, bottom-cornerSize);
+    }
+    
+    pa.close();
+    g.fillPath(pa);
+  }
+}

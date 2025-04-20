@@ -1,0 +1,6 @@
+
+
+Button = waseGui::RoundButtonStyle {
+    color = #C71585
+}
+

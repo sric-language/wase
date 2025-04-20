@@ -1,0 +1,107 @@
+import sric::*;
+import waseGraphics::*;
+import cstd::*;
+
+struct SpinnerStyle : WidgetStyle
+{
+  var drawCursor :Bool= false;
+  var cursorWidth : Int = -1;
+
+  override fun doPaint(widget: * Widget , g:& Graphics)
+  {
+    var lab = widget as * Spinner;
+    
+    var left = lab.paddingLeft();
+    var top = lab.paddingTop();
+    
+    //g.brush = Color.red
+    //g.drawRect(left+2, top+2, lab.contentWidth-4, lab.contentHeight-4)
+    
+    //to center
+    var cx = left + round(lab.contentWidth()/2.0) as Int;
+    var cy = top + round(lab.contentHeight()/2.0) as Int;
+    
+    g.setColor(fontColor);
+    g.setFont(font);
+    g.setFontSize(fontSize);
+    var metric: FontMetrics;
+    g.fontMetrics(metric);
+    var lineh = metric.height;
+
+    var fontOffset = metric.ascent;
+    cy += (fontOffset/2.0) as Int;
+    
+    var lineHeight = lineh as Int;
+    var index = round(lab.offsetIndex) as Int;
+    var viewOffset = (lab.offsetIndex - index) * lineHeight;
+    
+    var y = cy - (viewOffset as Int);
+    //echo("offsetIndex:${lab.offsetIndex}, y:${y}, cy:$y, viewOffset:$viewOffset")
+    
+    var r = 1f;
+    y -= lineHeight * 2;
+    var maxOffset = lineHeight * 1.2;
+    var curIndex = index - 2;
+    
+    g.clip(0, 0, lab.width, lab.height);
+    
+    var maxFontW = 0;
+    for (var i=0; i<5; ++i) {
+      r = ((y - cy)/(maxOffset as Float));
+      g.save();
+      var fontW = drawAt(lab, g, curIndex, cx, y, r);
+      if (fontW > maxFontW) maxFontW = fontW;
+      g.restore();
+      y += lineHeight;
+      curIndex += 1;
+    }
+
+    if (drawCursor) {
+      var cWidth = 0;
+      if (cursorWidth != -1) cWidth = (cursorWidth);
+      else if (cursorWidth == 0) {
+        cWidth = lab.contentWidth();
+      }
+      else {
+        var p20 = (30);
+        cWidth = maxFontW + p20;
+        if (cWidth < lineHeight+p20) cWidth = lineHeight + p20;
+      }
+
+        g.setColor(outlineColor);
+        g.strokeWidth(lineWidth);
+
+      var px = cx - cWidth/2;
+      var py = (top + (lab.contentHeight()/2.0) - (lineHeight/2.0) + 1) as Int;
+      var arc = (8);
+      g.drawRoundRect(px, py, cWidth, lineHeight, arc);
+    }
+  }
+  
+  private fun drawAt(widget: * Spinner ,  g: &Graphics,  i1: Int,  cx: Int,  y: Int,  r: Float): Int {
+    if (i1 >= 0 && i1 < widget.items.size()) {
+       
+       var fontSize = (this.fontSize - ((fabs(r)*10) as Int));
+       g.setFontSize(fontSize);
+       var fontW = g.textWidth(widget.items[i1].c_str(), widget.items[i1].size());
+       var w = fontW/2;
+       var x = cx-w;
+       
+       var alpha = ((1-fabs(r)));
+       if (alpha > 1) alpha = 1;
+       else if (alpha < 30/255.0) alpha = 30/255.0;
+       g.globalAlpha(alpha);
+       
+       //scale := (1-(r.abs*0.5))
+//       trans := Transform2D().
+//            translate(-x.toFloat, -y.toFloat).
+//            shear(0.3*r, 0.0).
+//            translate(x.toFloat, y.toFloat)
+//       g.transform(trans)
+
+       g.drawText(x, y, widget.items[i1].c_str(), widget.items[i1].size());
+       return fontW as Int;
+    }
+    return 0;
+  }
+}

@@ -1,0 +1,127 @@
+import sric::*;
+import waseGraphics::*;
+
+struct ScrollBarStyle : WidgetStyle
+{
+  var barWidth : Int = 8;
+
+  fun new()
+  {
+    background = Color { .rgba = 0xfafafaff; };
+    color = Color { .rgba = 0x7c7c7cff; };
+  }
+
+  override fun doPaint(widget: * Widget , g:& Graphics) {
+  
+    var bar = widget as * ScrollBar;
+
+    if  (bar.isActive()) {
+      g.setColor(background);
+      g.fillRect(0, 0, widget.width, widget.height);
+      //g.alpha = 100
+    }
+    else {
+      g.globalAlpha(100/255.0);
+    }
+    g.setColor(color);
+    var pos = bar.screenPos();
+    var thumb = bar.thumbSize();
+    var top = widget.paddingTop();
+    var left = widget.paddingLeft();
+
+    if (bar.vertical)
+    {
+      if  (bar.isActive())
+        g.fillRect(left, top+pos, widget.contentWidth(), thumb);
+      else {
+        var barW = (barWidth);
+        g.fillRect(left + widget.contentWidth() - barW, top+pos, barW, thumb);
+      }
+      //echo("doPaint: $left, ${top+pos}, $widget.contentWidth, $thumb")
+    }
+    else
+    {
+      if  (bar.isActive())
+        g.fillRect(left+pos, top, thumb, widget.contentHeight());
+      else {
+        var barW = (barWidth);
+        g.fillRect(left+pos, top+widget.contentHeight()-barW, thumb, barW);
+      }
+    }
+  }
+}
+
+struct SliderBarStyle : WidgetStyle
+{
+  //Float size := (100f)
+  var width :Int= 8;
+  var buttonColor :Color= Color::white;
+
+  fun new()
+  {
+    //outlineColor = Color(0x7c7c7c)
+    //foreground = Color(0x51d166)
+    outlineColor = Color { .rgba = 0xc0c0c0ff; };
+  }
+
+  override fun doPaint(widget: * Widget , g:& Graphics)
+  {
+    var bar = widget as * ScrollBar;
+    var top = widget.paddingTop();
+    var left = widget.paddingLeft();
+
+    var cx = widget.contentWidth()/2 + left;
+    var cy = widget.contentHeight()/2 + top;
+
+    var width = (this.width);
+    var size = bar.vertical ? widget.width : widget.height;
+
+    g.setColor(outlineColor);
+    g.strokeWidth(width);
+
+    if (bar.vertical) {
+      g.drawLine(cx, top, cx, top + widget.contentHeight());
+      g.setColor(color);
+      var pos = bar.screenPos();
+      g.drawLine(cx, top, cx, top + pos);
+    } else {
+      g.drawLine(left, cy, left + widget.contentWidth(), cy);
+      g.setColor(color);
+      var pos = bar.screenPos();
+      g.drawLine(left, cy, left + pos, cy);
+    }
+
+    //g.setColor(buttonColor);
+    var pos = bar.screenPos();
+    var r = size/2;
+    //cx -= r;
+    //cy -= r;
+    var circleX = cx;
+    var circleY = cy;
+    if (bar.vertical) {
+        circleY = pos + top;
+    }
+    else {
+        circleX = pos + left;
+    }
+    
+    g.setColor(outlineColor);
+    g.fillOval(circleX, circleY, r, r);
+    g.setColor(buttonColor);
+    var stroke = (lineWidth);
+    var r2 = r - stroke;
+    g.fillOval(circleX, circleY, r2, r2);
+
+    if (bar.isActive()) {
+    //   str := bar.curPos.toLocale(".0")
+    //   font := font(bar)
+    //   fw := font.width(str)
+      // var str = String::format("%f", bar.curPos);
+      // g.setFont(font);
+      // g.setFontSize(fontSize);
+      // var fw = g.textWidth(str.c_str(), str.size());
+      // g.setColor(fontColor);
+      // g.drawText(circleX-fw/2, cy, str.c_str(), str.size());
+    }
+  }
+}

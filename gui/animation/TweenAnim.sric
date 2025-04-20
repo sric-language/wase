@@ -1,0 +1,148 @@
+import sric::*;
+import waseGraphics::*;
+
+struct TweenAnimation : Animation {
+  var _widget: WeakPtr$<Widget>;
+
+  protected override fun onFinished() {
+    super.onFinished();
+    var widget = _widget.lock();
+    if (widget != null) {
+      widget.alpha = -1f;
+      widget.transformValid = false;
+    }
+  }
+
+  protected override fun onStart() {
+    var widget = _widget.lock();
+    if (widget != null) {
+      if (!widget.transformValid) {
+        widget.transform = Transform2D::makeIndentity();
+        widget.transformValid = true;
+      }
+      var root = widget.getRootView();
+      if (root != null) {
+        var self_ = rawToOwn(this);
+        root.animManager.add(share(self_));
+      }
+      widget.repaint();
+    }
+  }
+
+  fun bind(widget: * Widget) {
+    var w = rawToOwn(widget);
+    this._widget = toWeak(w);
+    for (var i=0; i<this.channelList.size(); ++i) {
+        (channelList[i] as * TweenAnimChannel)._widget = _widget;
+    }
+  }
+}
+
+abstract struct TweenAnimChannel : AnimChannel {
+  var _widget: WeakPtr$<Widget>;
+  //Interpolation interpolation := Interpolation()
+
+  override fun update(elapsedTime: Int , frameTime: Int , percent: Float32 , blendWeight: Float32 ) {
+    var p = percent;
+    onUpdate(p);
+    var widget = _widget.lock();
+    if (widget != null) {
+      widget.repaint();
+    }
+  }
+
+  abstract fun onUpdate(percent: Float32 );
+
+  override fun isFinish(): Bool { return false; }
+}
+
+struct TranslateAnimChannel : TweenAnimChannel {
+  var from : Point = Point{.x=0; .y=100;};
+  var to : Point = Point{.x=0; .y=0;};
+
+  private var lastX: Float32 = 0;
+  private var lastY: Float32 = 0;
+
+  override fun onUpdate(percent: Float32) {
+    var x = from.x + ((to.x - from.x) * percent);
+    var y = from.y + ((to.y - from.y) * percent);
+    var dx = x-lastX;
+    var dy = y-lastY;
+    
+    //echo("dx$dx,dy$dy,lx$lastX,ly$lastY, $widget?.transform")
+    lastX = x;
+    lastY = y;
+    
+    var widget = _widget.lock();
+    if (widget != null && widget.transformValid) {
+      widget.transform = widget.transform.translate(dx, dy);
+    }
+  }
+}
+
+struct RotateAnimChannel : TweenAnimChannel {
+  var from : Float32 = 0f;
+  var to : Float32 = 360f;
+
+  private var lastRotate : Float32 = 1f;
+
+  override fun onUpdate(percent: Float32 ) {
+    var widget = _widget.lock();
+    if (widget != null) {
+      var rotate = (from + (to - from) * percent);
+      var drotate = rotate - lastRotate;
+      var x = widget.width /2.0f;
+      var y = widget.height /2.0f;
+      lastRotate = rotate;
+
+      if (widget.transformValid) {
+        var trans = widget.transform.translate(-x, -y);
+        trans.rotate(drotate);
+        trans.translate(x, y);
+        widget.transform = trans;
+      }
+    }
+  }
+}
+
+struct AlphaAnimChannel : TweenAnimChannel {
+  var from : Float32 = 0f;
+  var to :Float32 = 1f;
+  override fun onUpdate(percent: Float32) {
+    //echo("update alpha $percent, this$this")
+    var alpha = (from + (to - from) * percent);
+
+    var widget = _widget.lock();
+    if (widget != null) {
+      widget.alpha = alpha;
+    }
+  }
+}
+
+struct ScaleAnimChannel : TweenAnimChannel {
+  var from : Float32 = 4f;
+  var to : Float32 = 1f;
+
+  private var lastScale : Float32 = 1f;
+
+  override fun onUpdate(percent: Float32) {
+    var widget = _widget.lock();
+    if (widget != null) {
+      var scale = (from + (to - from) * percent);
+      if (scale == 0.0) scale = 0.000000001;
+      var dscale = scale / lastScale;
+      var x = widget.width /2.0f;
+      var y = widget.height /2.0f;
+      var lastScale = scale;
+
+      if (widget.transformValid) {
+        widget.transform = Transform2D::makeTranslate(x, y) *
+                          Transform2D::makeScale(dscale, dscale) * 
+                          Transform2D::makeTranslate(-x, -y) *
+                          widget.transform;
+      }
+      //echo("x$x,y$y, scale:$scale, dscale:$dscale")
+      //widget.transform.matrix = Transform2D.makeScale(0f, 100f, scale, scale)
+    }
+  }
+}

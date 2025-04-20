@@ -1,0 +1,39 @@
+import sric::*;
+import waseGraphics::*;
+
+struct ImageStyle : WidgetStyle
+{
+  override fun doPaint(widget: *Widget , g:& Graphics)
+  {
+    var img = widget as * ImageView;
+    if (img.image == null) return;
+    if (!img.image.isReady()) {
+       return;
+    }
+
+    var w = widget.contentWidth();
+    var h = widget.contentHeight();
+    var top = widget.paddingTop();
+    var left = widget.paddingLeft();
+
+
+    var iw = img.image.width();
+    var ih = img.image.height();
+    var mp = Coord { .x = 0.0; .y = 0.0; };
+    var xp = Coord { .x = iw; .y = ih; };
+    img.imgToWidget(mp);
+    img.imgToWidget(xp);
+    var projSrc = Rect{ .x = mp.x; .y = mp.y; .w = (xp.x-mp.x); .h = (xp.y-mp.y); };
+    var dstRec = Rect{ .x = left; .y = top; .w = w; .h = h; };
+    var dst = projSrc.intersection(dstRec);
+    
+    mp.set(left, top);
+    xp.set((left+w), (top+h));
+    img.widgetToImg(mp);
+    img.widgetToImg(xp);
+    var projDst = Rect{ .x = mp.x; .y = mp.y; .w = (xp.x-mp.x); .h = (xp.y-mp.y); };
+    var srcRec = Rect{ .x = 0; .y = 0; .w = iw; .h = ih; };
+    var src = projDst.intersection(srcRec);
+    g.drawImageEx(img.image, src, dst);
+  }
+}

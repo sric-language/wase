@@ -1,0 +1,72 @@
+import sric::*;
+import waseGui::*;
+import waseGraphics::*;
+
+struct ListViewTest : BasePage
+{
+  protected override fun view(): own* Widget {
+    var model = new SimpleListAdapter;
+    for (var i=0; i<100; ++i) { model.list.add(String::format("item%d", i)); }
+    return new ListView {
+      .setModel(move model);
+      .refreshTip = new ProgressView {
+        .layout.hAlign = Align::Center;
+        .layout.height = 60;
+        .layout.width = 60;
+      };
+    };
+  }
+}
+
+struct BubbleViewTest : BasePage
+{
+  protected override fun view(): own* Widget {
+    var model = new BubbleListAdapter;
+    for (var i=0; i<100; ++i) { model.list.add(String::format("item%d", i)); }
+    return new ListView {
+      .setModel(move model);
+      .refreshTip = new ProgressView {
+        .layout.hAlign = Align::Center;
+        .layout.height = 60;
+        .layout.width = 60;
+      };
+    };
+  }
+}
+
+
+struct BubbleListAdapter : ListAdapter
+{
+  var list: DArray$<String>;
+
+  var onClick : fun(t: Int) = null;
+
+  override fun size(): Int { return list.size(); }
+
+  protected override fun bind(w: * Widget, data: Int) {
+    var p = w as * Pane;
+    var l = p.getChild(0) as *TextView;
+    if (l.text != list[data]) {
+      l.setText(list[data].copy());
+    }
+    //var self_ = this;
+    l.onClick = fun(t:* Widget){ if (this.onClick != null) this.onClick(data); };
+  }
+  
+  protected override fun getType(i: Int): Int { return i % 2; }
+
+  protected override fun newView(type: Int): own* Widget {
+    //echo("new view")
+    return new Pane {
+        .setStyle(type == 0 ? "bubbleTL" : "bubbleTR");
+        .padding = Insets{ .initAll(30); };
+        .margin = Insets{ .initAll(30); };
+        .layout.width = Layout::wrapContent;
+        .layout.hAlign = type == 0 ? Align::Begin : Align::End;
+        
+        new TextView {
+           .layout.width = Layout::wrapContent;
+        },;
+    };
+  }
+}

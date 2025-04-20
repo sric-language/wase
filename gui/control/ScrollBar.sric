@@ -1,0 +1,178 @@
+import sric::*;
+import waseGraphics::*;
+
+virtual struct ScrollBar : Widget
+{
+  var max : Float32 = 2000f;
+
+  var viewport : Float32 = 0f;
+
+  readonly var curPos : Float32 = 0f;
+
+  // store pos value as Int perecision
+  var intPrecision : Bool = true;
+
+  
+  var onPosChanged: fun(from: Float32, to: Float32);
+
+  readonly var vertical :Bool = true;
+  //@Transient
+  private var draging : Bool = false;
+
+  var barSize : Int = 60;
+
+  fun isActive(): Bool { return draging; }
+
+  fun setVertical(v: Bool) {
+    vertical = v;
+    setLayoutSize();
+  }
+
+  fun isOverScroll(): Bool {
+    if (curPos == 0.0) return false;
+    
+    if (curPos < 0f) {
+      return true;
+    }
+    
+    if (curPos + viewport > max) return true;
+    return false;
+  }
+  
+  fun overScrollVal(): Float32 {
+    if (curPos < 0f) {
+      return curPos;
+    }
+    if (curPos + viewport > max) return curPos + viewport - max;
+    return 0.0;
+  }
+
+  fun setCurPos(pos: Float32 ,  fireEvent: Bool = true,  allowOverScroll : Bool = false) {
+    var val = pos;
+    if (intPrecision) {
+      val = (val as Int) as Float32;
+    }
+
+    if (!allowOverScroll) {
+      if (pos + viewport > max) {
+        val = max - viewport;
+      }
+      else if (pos < 0f) {
+        val = 0f;
+      }
+    }
+
+    if (curPos == val) return;
+    var oldPos = curPos;
+    curPos = val;
+    if (fireEvent) {
+        //echo("curPos:$curPos")
+        // e := StateChangedEvent (oldPos, curPos, #curPos, this )
+        // onStateChanged.fire(e)
+        // posChangeFunc?.call(curPos)
+        if (onPosChanged != null)
+          onPosChanged(oldPos, curPos);
+    }
+
+      if (fireEvent) {
+        eventListeners.fire(EventType::ValueChanged, this);
+      }
+  }
+
+
+  fun new()
+  {
+    setLayoutSize();
+    focusable = true;
+    dragAware = true;
+    style = "ScrollBar";
+  }
+
+  protected fun setLayoutSize() {
+    if (vertical) {
+      //layout.widthType = SizeType.fixed
+      layout.width = barSize;
+      layout.height = Layout::matchParent;
+    }
+    else {
+      //layout.heightType = SizeType.fixed
+      layout.height = barSize;
+      layout.width = Layout::matchParent;
+    }
+  }
+
+  fun barLength(): Int {
+    if (vertical) {
+      return this.contentHeight();
+    } else {
+      return this.contentWidth();
+    }
+  }
+
+  fun thumbSize(): Int
+  {
+    return toScreenCoord(viewport) as Int;
+  }
+
+  fun screenPos(): Int {
+    return toScreenCoord(curPos) as Int;
+  }
+
+  protected fun toScreenCoord(val: Float32): Float32
+  {
+    return (val / (max as Float32) * barLength());
+  }
+
+  protected fun toWorldCoord(val: Float32): Float32
+  {
+    return ((val /(barLength() as Float32) )* max);
+  }
+  
+  protected override fun motionEvent(e: & MotionEvent)
+  {
+    super.motionEvent(e);
+    if (e.type == MotionEventType::Press) {
+        draging = true;
+    }
+  }
+
+  protected override fun onDrag(e: & GestureEvent) {
+    if (!draging) return;
+    
+    if (e.type == GestureEvent::drop)
+    {
+      draging = false;
+      repaint();
+    }
+    else if (e.type == GestureEvent::drag)
+    {
+      if (vertical)
+      {
+        var pos = toWorldCoord(e.deltaY) + curPos;
+        setCurPos(pos, true);
+      }
+      else
+      {
+        var pos = toWorldCoord(e.deltaX) + curPos;
+        setCurPos(pos, true);
+      }
+      //echo("=====>$curPos")
+      e.consumed = true;
+      repaint();
+    }
+  }
+
+}
+
+
+struct SliderBar : ScrollBar {
+    fun new()
+    {
+        setVertical(false);
+        this.intPrecision = false;
+        this.viewport = 0f;
+        this.max = 100f;
+        this.padding = Insets { .init(30, 50, 30, 50); };
+        style = "SliderBar";
+    }
+}

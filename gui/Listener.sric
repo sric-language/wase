@@ -1,0 +1,25 @@
+import sric::*;
+import waseGraphics::*;
+
+enum EventType {
+    Click,
+    ValueChanged,
+    SelectChanged,
+    TextChanged,
+    Other
+}
+
+trait Listener {
+    abstract fun onEvent(e: EventType, w: * Widget);
+}
+
+struct EventListeners {
+    var list: DArray$<own* Listener> = DArray$<own* Listener> {};
+    
+    fun fire(e: EventType, w: * Widget) {
+        for (var i=0; i<list.size(); ++i) {
+            var t: *Listener  = list[i];
+            t.onEvent(e, w);
+        }
+    }
+}

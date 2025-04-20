@@ -1,0 +1,80 @@
+import sric::*;
+import waseGraphics::*;
+
+struct AlertDialog : Dialog
+{
+  //readonly var label: own*? Label;
+  
+  var onAction: fun(v:Bool);
+
+  fun init(msg: String, okText: String= "OK", cancelText : String = "")
+  {
+    this.setStyle("dialog");
+    this.spacing = 0;
+    
+    var label = new Label {
+      .id = "alertDialog_msg";
+      .setText(move msg);
+      .margin = Insets { .initAll(20); };
+      .textAlign = Align::Center;
+      .layout.width = Layout::wrapContent;
+      .layout.hAlign = Align::Center;
+    };
+    this.add(move label);
+    
+    var hb = new HBox {
+        .spacing = 30;
+        .align = Align::Center;
+        .layout.width = Layout::wrapContent;
+        .layout.hAlign = Align::Center;
+    };
+
+    //var self_ = this;
+
+    if (okText.size() > 0) {
+        var bt = new Button {
+          .layout.width = 300;
+          .id = "alertDialog_ok";
+          .setStyle("flatButton");
+          .onClick = fun(w:*Widget) {
+            this.close();
+            if (this.onAction != null) this.onAction(true);
+          };
+          .setText(move okText);
+        };
+        hb.add(move bt);
+    }
+    else {
+      this.add(new ProgressView {
+        .layout.width = 300;
+      });
+    }
+
+    
+    if (cancelText.size() > 0) {
+        var bt = new Button {
+          .layout.width = 300;
+          .id = "alertDialog_cancel";
+          .setStyle("flatButton");
+          .onClick = fun(w:*Widget) {
+            this.close();
+            if (this.onAction != null) this.onAction(false);
+          };
+          .setText(move cancelText);
+        };
+        hb.add(move bt);
+    }
+
+    
+    //this.add(RectView { it.layout.height = 3.0; it.margin = Insets(30, 0) })
+    this.add(move hb);
+    this.layout.hAlign = Align::Center;
+    this.layout.vAlign = Align::Center;
+
+    this.layout.width = Layout::wrapContent;
+    padding = Insets { .initAll(30); };
+  }
+  
+  protected override fun animType(): Int { return 1; }
+
+}

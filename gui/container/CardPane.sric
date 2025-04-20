@@ -1,0 +1,210 @@
+import sric::*;
+import waseGraphics::*;
+import cstd::*;
+
+/**
+** lays out child elements as a stack of cards
+** where only one card may be visible at a time
+**/
+struct CardPane : Pane, PropertyAnimTarget
+{
+  readonly var selIndex :Int= 0;
+  var onSelect: fun(i: Int);
+
+  //@Transient
+  protected var offsetIndex :Float= 0f;
+
+  var pageWidthScale :Float = 0.4;
+
+  fun setSelIndex(t: Int, fire: Bool = true) {
+      if (t as Float != offsetIndex) select(t, false);
+
+      if (t == selIndex) return;
+      selIndex = t;
+
+      //var oldVal = selIndex;
+      if (fire && onSelect != null) {
+        onSelect(t);
+      }
+      
+      if (fire) {
+          eventListeners.fire(EventType::SelectChanged, this);
+      }
+  }
+  
+  fun setOffsetIndex(t: Float) {
+      if (offsetIndex != t) {
+        this.relayout();
+      }
+      offsetIndex = t;
+  }
+  
+  fun new() {
+    focusable = true;
+    isCliped = true;
+    dragAware = true;
+  }
+  
+  private fun select( i: Int,  updateWhenDone :Bool= true) {
+    var stdIndex = i;
+    if (stdIndex < 0) {
+        stdIndex = this.childrenNum()-1;
+    }
+    if (stdIndex >= this.childrenNum()) {
+        stdIndex = 0;
+    }
+    
+    var fromIndex = offsetIndex;
+    var endIndex = i as Float;
+    if (i >= this.childrenNum()) {
+        endIndex = 0f;
+    }
+    if (selIndex == this.childrenNum()-1 && i == 0) {
+       if (fromIndex > 0.0) {
+         fromIndex = -1.0;
+       }
+    }
+    if (selIndex == 0 && i == this.childrenNum()-1) {
+       if (endIndex > 0.0) {
+         endIndex = -1.0;
+       }
+    }
+    
+    //echo("from$fromIndex -> to:$endIndex, std:$stdIndex")
+    if (this.getRootView() != null) {
+        //var self_ = this;
+        var anim = new Animation {
+          .duration = 300;
+          .add(new PropertyAnimChannel {
+            .target = this;
+            .from = fromIndex; .to = endIndex;
+          });
+        };
+        anim.whenDone = fun() {
+            this.setOffsetIndex(stdIndex as Float);
+            if (updateWhenDone) this.setSelIndex(stdIndex);
+        };
+        var anim_ = anim as *Animation;
+        this.getRootView().animManager.add(move anim);
+        anim_.start();
+    }
+    else {
+        setOffsetIndex(stdIndex as Float);
+        if (updateWhenDone) this.setSelIndex(stdIndex);
+    }
+    this.relayout();
+  }
+
+   override fun onUpdateAnim(v: Float32, field: Int) {
+        this.setOffsetIndex(v);
+   }
+  
+  protected override fun onDrag( e: &GestureEvent) {
+    super.onDrag(e);
+    if (e.consumed) return;
+    
+    if (e.type == GestureEvent::drag) {
+        var r = (e.deltaX as Float)/(this.width * pageWidthScale);
+        var t = offsetIndex - r;
+        if (t > ((childrenNum()-1) as Float)) {
+            t = (t - (childrenNum()-1)) - 1;
+            //echo(t)
+        }
+        offsetIndex = t;
+        e.consumed = true;
+        this.relayout();
+    }
+    else if (e.type == GestureEvent::drop) {
+        //echo("offsetIndex:$offsetIndex, selIndex:$selIndex")
+        var offsetIndex = this.offsetIndex;
+        if (offsetIndex < 0f) {
+            offsetIndex = (1+this.offsetIndex) + (childrenNum()-1);
+        }
+
+        var baseOffset = 0;
+        if (e.deltaX < 0) {
+            baseOffset = (offsetIndex+0.99) as Int;
+        }
+        else {
+            baseOffset = (offsetIndex) as Int;
+        }
+        select(baseOffset);
+
+        e.consumed = true;
+        this.relayout();
+    }
+  }
+  
+  override fun layoutChildren(g: &Graphics,  force: Bool)
+  {
+    super.layoutChildren(g, force);
+    var pageWidth = this.width * pageWidthScale;
+    for (var i=0; i<children.size(); ++i) {
+        var c:* own* Widget = children.getPtr(i);
+        var dscale = 1.0;
+        if (i == childrenNum()-1 && offsetIndex < 0f) {
+            var pageOffset = -(1+offsetIndex) * pageWidth;
+            (*c).x += pageOffset as Int;
+            //echo("offsetIndex:$offsetIndex, $c.x");
+            dscale = 0.1/fabs((childrenNum()+offsetIndex)-i) + 0.3;
+        }
+        else {
+            var pageOffset = (i-offsetIndex) * pageWidth;
+            (*c).x += pageOffset as Int;
+            
+            if (fabs(offsetIndex-i) <= 0.1) {
+                (*c).transformValid = false;
+            }
+            else {
+                dscale = 0.1/fabs(offsetIndex-i) + 0.3;
+            }
+        }
+        
+        var x = (*c).width /2.0f;
+        var y = (*c).height /2.0f;
+        //dscale := 0.1/(offsetIndex-i).abs + 0.3
+
+        if (dscale > 0.99) {
+            (*c).transformValid = false;
+        }
+        else {
+            (*c).transform = Transform2D::makeTranslate(x, y) *
+                             Transform2D::makeScale(dscale, dscale) * 
+                             Transform2D::makeTranslate(-x, -y);
+            (*c).transformValid = true;
+        }
+    }
+  }
+
+  protected override fun paintChildren(clip: &Rect,  g: &Graphics)
+  {
+    for (var i=0; i<children.size(); ++i) {
+      var c:* own* Widget = children.getPtr(i);
+      if ((*c).visible && i != selIndex)
+      {
+        if (clip.intersects((*c).bounds())) {
+            g.save();
+            g.transform(Transform2D::makeTranslate((*c).x, (*c).y));
+            (*c).paint(clip, g);
+            g.restore();
+        }
+      }
+    }
+
+    var c:* own* Widget = children.getPtr(selIndex);
+    if ((*c).visible) {
+        g.save();
+        g.transform(Transform2D::makeTranslate((*c).x, (*c).y));
+        (*c).paint(clip, g);
+        g.restore();
+    }
+  }
+}
+
+struct CardIndicator : Widget {
+    var cardBox: *? CardPane;
+    fun new() {
+        layout.height = 30;
+        style = "CardIndicator";
+    }
+}

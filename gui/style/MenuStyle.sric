@@ -1,0 +1,49 @@
+import sric::*;
+import waseGraphics::*;
+
+struct MenuStyle : WidgetStyle {
+  fun new()
+  {
+    background = Color { .rgba = 0x434343ff; };
+    fontSize = 30;
+  }
+
+  override fun doPaint(widget: *Widget , g:& Graphics)
+  {
+    g.setColor(background);
+    g.fillRect(0, 0, widget.width, widget.height);
+  }
+}
+
+struct MenuItemStyle : WidgetStyle
+{
+  var mouseOverColor : Color = Color { .rgba = 0xb2b2b2ff; };
+
+  fun new()
+  {
+    background = Color { .rgba = 0x434343ff; };
+    fontColor = Color { .rgba = 0xffffffff; };
+    fontSize = 30;
+  }
+
+  override fun doPaint(widget: *Widget , g:& Graphics)
+  {
+    var btn = widget as * Button;
+    var item = btn as *? MenuItem;
+
+    //backgound
+    if (btn.state == Button::mouseOver || (item != null && item.isExpand()) ) {
+      g.setColor(this.mouseOverColor);
+    }
+    else if (btn.state == Button::mouseDown) {
+      g.setColor(this.color);
+    }
+    else {
+      g.setColor(background);
+    }
+
+    g.fillRect(0, 0, widget.width, widget.height);
+
+    drawText(widget, g, btn.text, Align::Begin);
+  }
+}

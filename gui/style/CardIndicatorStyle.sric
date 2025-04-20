@@ -1,0 +1,31 @@
+
+import sric::*;
+import waseGraphics::*;
+
+struct CardIndicatorStyle : WidgetStyle {
+  override fun doPaint(widget: *Widget , g:& Graphics) {
+    var p = widget as * CardIndicator;
+    if (p.cardBox == null) return;
+    var w = widget.contentWidth();
+    var h = widget.contentHeight();
+    var x = widget.paddingTop() as Float;
+    var y = widget.paddingLeft();
+
+    var size = p.cardBox.childrenNum();
+    var pw = ((w as Float) / p.cardBox.childrenNum());
+    
+    x += (pw/2);
+    y += (h/2);
+    var minW = (min(pw as Int, h) * 0.8) as Int;
+    var halfW = minW/2;
+    g.setColor(color);
+    //g.setColor(color);
+    
+    var curX = (pw/2)+(p.cardBox.offsetIndex * pw);
+    g.fillOval(curX, y, halfW, halfW);
+    for (var i=0; i<size; ++i) {
+        g.drawOval(x, y, halfW, halfW);
+        x += pw;
+    }
+  }
+}

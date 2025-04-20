@@ -1,0 +1,158 @@
+import sric::*;
+import waseGui::*;
+import waseGraphics::*;
+
+struct VBoxTest : BasePage
+{
+  protected override fun view(): own* Widget {
+    return new VBox
+    {
+      .margin = Insets { .initAll(50); };
+      .layout.height = Layout::matchParent;
+      
+      new Button
+      {
+        .setText("btn1");
+        .layout.offsetX = 80;
+        .layout.offsetY = 50;
+        .layout.width = Layout::wrapContent;
+      },
+      new Button
+      {
+        .setText("btn2");
+        .layout.width = 600;
+        .layout.height = Layout::matchParent;
+      },
+      new Button
+      {
+        .setText("btn3");
+        .layout.width = Layout::wrapContent;
+        .layout.hAlign = Align::Center;
+      };
+
+    };
+  }
+}
+
+struct FlowTest : BasePage
+{
+  protected override fun view(): own* Widget {
+    return new FlowBox
+    {
+      .margin = Insets { .initAll(50); };
+      .hAlign = Align::Center;
+      for (var i=0; i<20; ++i) {
+        new Button{
+          .setText(String::format("%d", i));
+          .layout.width = 100;
+        },;
+      }
+    };
+  }
+}
+
+struct HBoxTest : BasePage
+{
+  protected override fun view() : own* Widget {
+    return new VBox {
+      new HBox
+      {
+        new Button { .setText("btn1"); },
+        new Button { .setText("btn2"); .layout.weight = 3.0f; },
+        new Button { .setText("btn3"); };
+      },
+      new HBox
+      {
+        .align = Align::Center;
+        .spacing = 20;
+        new Button { .setText("btn1"); .layout.width = Layout::wrapContent; },
+        new Button { .setText("btn2"); .layout.width = Layout::wrapContent; },
+        new Button { .setText("btn3"); .layout.width = Layout::wrapContent; };
+      };
+    };
+  }
+}
+
+struct PaneTest : BasePage
+{
+  protected override fun view() : own* Widget {
+    return new Pane
+    {
+      .padding = Insets { .initAll(50); };
+      .margin = Insets { .initAll(50); };
+      .setStyle("shadow");
+      .layout.height = Layout::matchParent;
+      new Button
+      {
+        .setText("btn1");
+        .layout.offsetX = 20;
+        .layout.offsetY = 30;
+        .layout.width = Layout::wrapContent;
+      },
+      new Button
+      {
+        .setText("btn2");
+        .layout.vAlign = Align::Center;
+        .layout.hAlign = Align::Center;
+        .layout.width = Layout::wrapContent;
+      },
+      new Button
+      {
+        .setText("btn3");
+        .layout.width = Layout::wrapContent;
+        .layout.hAlign = Align::End;
+        .layout.vAlign = Align::End;
+        .layout.offsetX = -20;
+        .layout.offsetY = -30;
+      };
+    };
+  }
+}
+
+struct PercentTest : BasePage
+{
+  protected override fun view() : own* Widget {
+    return new Pane {
+      .layout.height = Layout::matchParent;
+      new VBox {
+        .layout = Layout {
+            .width = 30;
+            .wUnit = Unit::Percent;
+            .height = Layout::matchParent;
+
+            //vAlign = Align.center;
+            .hAlign = Align::Center;
+        };
+
+        .spacing = 20;
+        .align = Align::Center;
+        
+        new Button {
+          .layout = Layout {
+            .height = 100;
+            .width = 100;
+            .hUnit = Unit::PercentW;
+            .wUnit = Unit::Percent;
+          };
+        },
+        new Button {
+          .layout = Layout {
+            .height = 100;
+            .width = 100;
+            .hUnit = Unit::PercentW;
+            .wUnit = Unit::Percent;
+          };
+        },
+        new Button {
+          .layout = Layout {
+            .height = 100;
+            .width = 100;
+            .hUnit = Unit::PercentW;
+            .wUnit = Unit::Percent;
+          };
+        };
+
+      },;
+    };
+  }
+}

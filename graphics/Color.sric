@@ -1,0 +1,151 @@
+import sric::*;
+import cstd::*;
+
+externc fun sscanf(buf:raw*const Int8, format:raw*const Int8, args: ...): Int;
+
+//@SimpleSerial
+reflect struct Color {
+    var rgba : UInt32;
+
+    static var white: const Color = Color { .rgba = 0xffffffff; };
+    static var black: const Color = Color { .rgba = 0x000000ff; };
+    static var gray: const Color = Color { .rgba = 0x898989ff; };
+
+    fun init(r : Float32, g : Float32, b : Float32, a : Float32) {
+        var ir = (r * 255) as UInt32;
+        var ig = (g * 255) as UInt32;
+        var ib = (b * 255) as UInt32;
+        var ia = (a * 255) as UInt32;
+        rgba = (ir << 24) | (ig << 16) | (ib << 8) | ia;
+    }
+
+    fun r() : Float32 {
+        return ((rgba >> 24) & 0xff) / 255.0;
+    }
+
+    fun g() : Float32 {
+        return ((rgba >> 16) & 0xff) / 255.0;
+    }
+
+    fun b() : Float32 {
+        return ((rgba >> 8) & 0xff) / 255.0;
+    }
+
+    fun a() : Float32 {
+        return (rgba & 0xff) / 255.0;
+    }
+
+    fun ir() : UInt8 {
+        return ((rgba >> 24) & 0xff) as UInt8;
+    }
+
+    fun ig() : UInt8 {
+        return ((rgba >> 16) & 0xff) as UInt8;
+    }
+
+    fun ib() : UInt8 {
+        return ((rgba >> 8) & 0xff) as UInt8;
+    }
+
+    fun ia() : UInt8 {
+        return (rgba & 0xff) as UInt8;
+    }
+
+    static fun makeHsv(h: Float , s: Float , v: Float ): Color {
+        var r = v; var g = v; var b = v;
+        if (s != 0f)
+        {
+        if (h == 360f) h = 0f;
+        h /= 60f;
+        var i = floor(h);
+        var f = h - i;
+        var p = v * (1f - s);
+        var q = v * (1f - s * f);
+        var t = v * (1f - (s*(1f-f)));
+        switch (i as Int)
+        {
+            case 0: r=v; g=t; b=p;
+            case 1: r=q; g=v; b=p;
+            case 2: r=p; g=v; b=t;
+            case 3: r=p; g=q; b=v;
+            case 4: r=t; g=p; b=v;
+            case 5: r=v; g=p; b=q;
+        }
+        }
+        return Color { .init(r, g, b, 1.0); };
+    }
+
+    fun decHsv(_h: raw*Float32, _s: raw*Float32, _v: raw*Float32) {
+        var r = this.ir() as Float;
+        var b = this.ib() as Float;
+        var g = this.ig() as Float;
+        var min = sric::min(r, min(b, g));
+        var max = sric::max(r, max(b, g));
+        var delta = max - min;
+        var s = max == 0f ? 0f : delta / max;
+        var h = 0f;
+        if (s != 0f)
+        {
+        if (r == max) h = (g - b) / delta;
+        else if (g == max) h = 2f + (b - r) / delta;
+        else if (b == max) h = 4f + (r - g) / delta;
+        h *= 60f;
+        if (h < 0f) h += 360f;
+        }
+        var v = max / 255.0;
+        unsafe {
+            *_h = h;
+            *_v = v;
+            *_s = s;
+        }
+    }
+
+    /**
+    ** Get a color which is a lighter shade of this color.
+    ** This increases the brightness by the given percentage
+    ** which is a float between 0.0 and 1.0.
+    **/
+    fun lighter( percentage :Float= 0.2f): Color
+    {
+        // adjust value (brighness)
+        var h: Float32;
+        var s: Float32;
+        var v: Float32;
+        decHsv(&h, &s, &v);
+        v = min(max((v + percentage), 0f), 1f);
+        return makeHsv(h, s, v);
+    }
+
+    /**
+    ** Get a color which is a dark shade of this color.
+    ** This decreases the brightness by the given percentage
+    ** which is a float between 0.0 and 1.0.
+    **/
+    fun darker( percentage :Float= 0.2f): Color
+    {
+        return lighter(-percentage);
+    }
+
+    fun toString() : String {
+        if (ia() != 0xFF) {
+            return String::format("#%08X", rgba);
+        }
+        else {
+            var rgb = rgba >> 8;
+            return String::format("#%06X", rgb);
+        }
+    }
+
+    fun fromString(str: String): Bool {
+        if (str.size() == 8+1) {
+            var i = sscanf(str.c_str(), "#%08X", &rgba);
+            return i != 0;
+        }
+        else if (str.size() == 6+1) {
+            var i = sscanf(str.c_str(), "#%06X", &rgba);
+            rgba = (rgba << 8) | 0xFF;
+            return i != 0;
+        }
+        return false;
+    }
+}

@@ -1,0 +1,80 @@
+
+import sric::*;
+import waseGui::*;
+import waseGraphics::*;
+
+
+struct CardTest : BasePage
+{
+  protected override fun view(): own* Widget {
+    var r = new VBox {
+      .margin = Insets{ .initAll(50); };
+      .layout.height = Layout::matchParent;
+      var items : DArray$<String>;
+      items.add("Page1");
+      items.add("Page2");
+      items.add("Page3");
+      items.add("Page4");
+      items.add("Page5");
+
+      new TabsView { .id = "tabs"; .init(move items); },
+      new CardPane
+      {
+        .id = "card";
+        .padding = Insets{.initAll(50);};
+        .layout.height = Layout::matchParent;
+        .pageWidthScale = 0.3;
+        new Label
+        {
+          .setText("page1");
+          .setStyle("h1");
+          .layout.vAlign = Align::Center;
+          .layout.hAlign = Align::Center;
+          .layout.width = Layout::wrapContent;
+        },
+        new Label
+        {
+          .setText("page2");
+          .setStyle("h1");
+          .layout.vAlign = Align::Center;
+          .layout.hAlign = Align::Center;
+          .layout.width = Layout::wrapContent;
+        },
+        new Label
+        {
+          .setText("page3");
+          .setStyle("h1");
+          .layout.vAlign = Align::Center;
+          .layout.hAlign = Align::Center;
+          .layout.width = Layout::wrapContent;
+        },
+        new Label
+        {
+          .setText("page4");
+          .setStyle("h1");
+          .layout.vAlign = Align::Center;
+          .layout.hAlign = Align::Center;
+          .layout.width = Layout::wrapContent;
+        },
+        new Label
+        {
+          .setText("page5");
+          .setStyle("h1");
+          .layout.vAlign = Align::Center;
+          .layout.hAlign = Align::Center;
+          .layout.width = Layout::wrapContent;
+        };
+      },
+      new CardIndicator {
+        .id = "indicator";
+        .layout.hAlign = Align::Center;
+        .layout.width = 300;
+      }; 
+    };
+    var card = r.findById("card") as *CardPane;
+    (r.findById("tabs") as *TabsView).bind(card);
+    (r.findById("indicator") as *CardIndicator).cardBox = card;
+    return r;
+  }
+
+}

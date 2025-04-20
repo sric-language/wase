@@ -1,0 +1,35 @@
+import sric::*;
+import waseGraphics::*;
+
+struct Toast : Label {
+
+  fun new() {
+    style = "Toast";
+    layout.width = Layout::wrapContent;
+    this.layout.hAlign = Align::Center;
+    this.layout.vAlign = Align::End;
+    layout.offsetY = -50;
+//    layout.posX.with { it.parent = 0.5f; it.anchor = 0.5f; it.offset = 0f }
+//    layout.posY.with { it.parent = 0.8f; it.anchor = 0.5f; it.offset = 0f }
+    padding = Insets { .initAll(20); };
+    textAlign = Align::Center;
+  }
+
+  static fun showText(t: String) {
+    new Toast { .setText(move t); }.show();
+  }
+
+  fun show(parent: * Widget = Frame::cur())
+  {
+    var overlayer = parent.getRootView();
+    overlayer.add(rawToOwn(this));
+    overlayer.relayout();
+
+    //var self_ = this;
+    var a = AnimUtil::fadeInAnim(this);
+    a.whenDone = fun() {
+      AnimUtil::fadeOutAnim(this, 1000).start();
+    };
+    a.start();
+  }
+}

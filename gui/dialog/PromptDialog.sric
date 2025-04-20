@@ -1,0 +1,78 @@
+
+import sric::*;
+import waseGraphics::*;
+
+virtual struct PromptDialog : Dialog
+{
+  //Label label { private set }
+  
+  readonly var editText: *? EditText;
+  
+  var onAction: fun(s: & String);
+
+  fun init(msg: String, okText: String= "OK", cancelText : String = "")
+  {
+    this.setStyle("dialog");
+    this.spacing = 0;
+    
+    var label = new Label {
+      .id = "alertDialog_msg";
+      .setText(move msg);
+      .margin.initAll(20);
+      .textAlign = Align::Center;
+    };
+
+    //var self_ = this;
+    
+    var hb = new HBox {
+        .spacing = 30;
+        //it.align = Align.center
+        .add(new Button {
+          .id = "alertDialog_ok";
+          .setStyle("flatButton");
+          .onClick  = fun(w: *Widget){
+            this.close();
+            if (this.onAction != null) this.onAction(this.editText.text);
+          };
+          .setText(move okText);
+        });
+    };
+    
+    if (cancelText.size() > 0) {
+        var bt = new Button {
+          .id = "alertDialog_cancel";
+          .setStyle("flatButton");
+          .onClick = fun(w:*Widget) {
+            this.close();
+            if (this.onAction != null) {
+                var s: String = "";
+                this.onAction(s);
+            }
+          };
+          .setText(move cancelText);
+        };
+        hb.add(move bt);
+    }
+    
+    var _editText = new EditText;
+    editText = _editText;
+
+    this.add(move label);
+    this.add(move _editText);
+    //this.add(RectView { it.layout.height = 3.0; it.margin = Insets(30, 0) })
+    this.add(move hb);
+    this.layout.hAlign = Align::Center;
+    this.layout.vAlign = Align::Center;
+
+    this.layout.width = 600;
+    padding.initAll(30);
+  }
+  
+  protected override fun animType(): Int { return 1; }
+  
+  virtual fun show( parent : * Widget = Frame::cur()) {
+    super.show(parent);
+    editText.focus();
+  }
+
+}

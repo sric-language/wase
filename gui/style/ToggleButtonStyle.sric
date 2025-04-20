@@ -1,0 +1,151 @@
+import sric::*;
+import waseGraphics::*;
+
+struct CheckBoxStyle : WidgetStyle
+{
+  fun new() {
+    //foreground = Color(0x51d166)
+    background = Color { .rgba = 0xffffffff; };
+  }
+
+  override fun doPaint(widget: *Widget , g:& Graphics)
+  {
+    var btn = widget as * ToggleButton;
+    drawText(btn, g, btn.text, Align::Begin);
+    var top = widget.paddingTop();
+    var left = widget.paddingLeft();
+
+    var size = min(btn.contentWidth(), btn.contentHeight());
+    var r = size / 2;
+    var x = left + (widget.contentWidth()) - size;
+    var y = top + (widget.contentHeight()) - r;
+    r = (r*0.7f) as Int;
+    size = r + r;
+
+    //g.brush = this.background
+    //g.fillRect(x-r, y-r, size, size)
+    g.setColor(outlineColor);
+    g.strokeWidth(4);
+
+    g.drawRect(x-r, y-r, size, size);
+    if (btn.checked)
+    {
+      r = (r * btn.animPostion) as Int;
+      g.strokeWidth(6);
+      g.setColor(color);
+      //g.drawLine(x-(r*0.6f).toInt, y-(r*0.15f).toInt, x, y+(r/2f).toInt)
+      //g.drawLine(x+(r*1.1f).toInt, y-(r*1.1f).toInt, x, y+(r/2f).toInt)
+      var path = g.beginPath();
+      path.moveTo(x-(r*0.6f), y-(r*0.15f));
+      path.lineTo(x, y+(r/2f));
+      path.lineTo(x+(r*1.05f), y-(r*1.05f));
+      g.drawPath(path);
+    }
+  }
+}
+
+struct RadioButtonStyle : WidgetStyle
+{  
+  fun new() {
+    //foreground = Color(0x51d166)
+    background = Color { .rgba = 0xffffffff; };
+  }
+
+  override fun doPaint(widget: *Widget , g:& Graphics)
+  {
+    var btn = widget as * ToggleButton;
+    drawText(btn, g, btn.text, Align::Begin);
+    var top = widget.paddingTop();
+    var left = widget.paddingLeft();
+
+    var size = min(btn.contentWidth(), btn.contentHeight());
+    var r = size / 2;
+    var x = left + (widget.contentWidth()) - size;
+    var y = top + (widget.contentHeight()) - r;
+    r = (r*0.9f) as Int;
+    //size = r + r;
+
+    g.setColor(outlineColor);
+    g.fillOval(x, y, r, r);
+    if (btn.checked)
+    {
+      var cw = (r * 0.80 * btn.animPostion);
+      g.setColor(this.color);
+      g.fillOval(x, y, cw, cw);
+    }
+    else {
+      var cw = (r * 0.80);
+      g.setColor(this.background);
+      g.fillOval(x, y, cw, cw);
+    }
+  }
+}
+
+struct SwitchStyle : WidgetStyle {
+  var buttonColor : Color = Color { .rgba = 0xffffffff; };
+  
+  fun new() {
+    //foreground = Color(0x51d166)
+    background = outlineColor;
+  }
+
+  override fun doPaint(widget: *Widget , g:& Graphics)
+  {
+    var btn = widget as * ToggleButton;
+    drawText(btn, g, btn.text, Align::Begin);
+
+    var top = widget.paddingTop();
+    var left = widget.paddingLeft();
+
+    var h = btn.contentHeight();
+    var centerY = top + (widget.contentHeight()) - (h/2);
+    
+    h = (h-(5)) as Int;
+    var w = h*1.8;
+    var r = h/2;
+    var leftSize = left + (widget.contentWidth()) - w - r;
+
+    g.setColor(btn.checked ? this.color : background);
+    g.fillRoundRect(leftSize, centerY-r, w, h, r);
+    //fillRundRect(g, centerX-hw, centerY-r, w, h)
+
+    var radius = r - (4);
+    var xOffset = ((w-r-r) * btn.animPostion);
+    var cx = (leftSize+r)+xOffset;
+    var cy = centerY;
+    g.setColor(buttonColor);
+    g.fillOval(cx, cy, radius, radius);
+  }
+  
+  /*
+  private Void fillRundRect(Graphics g, Int x, Int y, Int w, Int h) {
+    r := h / 2
+    h = r + r
+    g.fillRect(x+r, y, w-h, h)
+    g.fillOval(x, y, h, h)
+    g.fillOval(x+w-h, y, h, h)
+  }
+ 
+  private Void drawRoundRect(Graphics g, Int x, Int y, Int w, Int h
+    , Color color, Brush outlineColor, Int outlineSize) {
+    g.brush = outlineColor
+    arc := h / 2
+    g.fillRoundRect(x, y, w, h, arc, arc)
+    
+    g.brush = color
+    arc = (h-outlineSize-outlineSize)/2
+    g.fillRoundRect(x+outlineSize, y+outlineSize
+        , w-outlineSize-outlineSize, h-outlineSize-outlineSize, arc, arc)
+  }
+  
+  private Void drawCircle(Graphics g, Int cx, Int cy, Int radius
+    , Color color, Color outlineColor, Int outlineSize) {
+    g.brush = outlineColor
+    g.fillOval(cx-radius, cy-radius, radius+radius, radius+radius)
+    
+    g.brush = color
+    r := radius - outlineSize
+    g.fillOval(cx-r, cy-r, r+r, r+r)
+  }
+  */
+}

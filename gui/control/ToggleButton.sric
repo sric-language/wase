@@ -1,0 +1,104 @@
+import sric::*;
+import waseGraphics::*;
+
+virtual struct ToggleButton : Button
+{
+  readonly var checked : Bool = false;
+
+  var onChecked: fun(s: Bool);
+
+  protected var animPostion : Float = 0.0;
+
+  fun setChecked(s: Bool, fire: Bool = true){
+      if (onChecked != null && fire) {
+        onChecked(s);
+      }
+      checked = s;
+      if (fire) {
+        eventListeners.fire(EventType::SelectChanged, this);
+      }
+  }
+
+  fun new() {
+    setText("ToggleButton");
+    layout.width = Layout::matchParent;
+    padding = Insets{};
+    textAlign = Align::Begin;
+    rippleEnable = false;
+    style = "ToggleButton";
+  }
+  
+  protected fun startAnim() {
+    var afrom = 0f;
+    var ato = 1f;
+    if (!this.checked) {
+      afrom = 1f;
+      ato = 0f;
+    }
+    //var self_ = this;
+    var anim = new Animation {
+      .add(new PropertyAnimChannel {
+        .target = this; .from = afrom; .to = ato; .field = 1;
+      });
+    };
+    anim.whenDone = fun() {
+      this.repaint();
+    };
+    anim.duration = 200;
+    var _anim = anim as *Animation;
+    this.getRootView().animManager.add(move anim);
+    _anim.start();
+    this.repaint();
+  }
+
+  protected override fun clicked() {
+    checked = !checked;
+    super.clicked();
+    startAnim();
+    //this.repaint
+  }
+
+  protected override fun prefContentSize(g: &Graphics, hintsWidth :Int= -1,  hintsHeight :Int= -1): Size {
+    var size = super.prefContentSize(g, hintsWidth, hintsHeight);
+    return Size { .w = size.w+(size.h*2); .h = (size.h*1.3f) as Int; } ;
+  }
+
+  override fun onUpdateAnim(v: Float32, field: Int) {
+    if (field == 1) {
+      this.animPostion = v;
+    }
+    else {
+      super.onUpdateAnim(v, field);
+    }
+  }
+}
+
+
+struct RadioButton : ToggleButton {
+  fun new() {
+    style = "RadioButton";
+  }
+  protected override fun clicked() {
+    if (this.parent == null) {
+      super.clicked();
+    }
+
+    if (checked == true) {
+      return;
+    }
+    for (var i=0; i<parent.children.size(); ++i) {
+      var w:* own* Widget = parent.children.getPtr(i);
+      if ((*w) is own* RadioButton) {
+        var r = w as * own* RadioButton;
+        if ((*r).checked) {
+          (*r).setChecked(false);
+          (*r).repaint();
+        }
+      }
+    }
+    //selected = true
+    super.clicked();
+    startAnim();
+    //this.repaint
+  }
+}

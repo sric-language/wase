@@ -1,0 +1,116 @@
+import sric::*;
+import waseGraphics::*;
+
+virtual struct ScrollAnimChannel : AnimChannel {
+  var acceleration :Float32= -0.0024f;
+  var startV :Float32= 1f;
+
+  protected var backwards :Bool= false;
+  protected var inited :Bool= false;
+  var target: WeakPtr$<ScrollBar>;
+  protected var allowOverScroll :Bool= false;
+
+  private var isFinished :Bool= false;
+  
+  override fun isFinish():Bool { return isFinished; }
+
+  protected virtual fun init() {
+    backwards = (startV < 0f);
+    if (backwards) {
+      acceleration = -acceleration;
+    }
+  }
+
+  protected virtual fun isEnd(): Bool {
+    var endV = 0f;
+    if (backwards) {
+      if (startV >= endV) {
+        return true;
+      }
+    } else {
+       if (startV <= endV) {
+        return true;
+      }
+    }
+    var targetP = target.lock();
+    if (targetP == null) return true;
+    if (targetP.isOverScroll()) {
+      return true;
+    }
+    return false;
+  }
+
+  override fun update( elapsedTime: Int,  frameTime: Int,  percent: Float32,  blendWeight: Float32) {
+
+    if (!inited) {
+      inited = true;
+      init();
+    }
+    
+    if (isFinished) {
+      return;
+    }
+
+    var t = frameTime;
+    var s = (startV * t) + (acceleration * t * t / 2);
+    var endV = startV + (acceleration * t);
+
+    //diretion change
+    if (endV * startV < 0f) {
+      isFinished = true;
+      return;
+    }
+
+    startV = endV;
+
+    var targetP = target.lock();
+    if (targetP != null) {
+      var pos = targetP.curPos - s;
+      //echo("t:$t, a:$acceleration, vt:$startV, s:$s, pos:$pos, $allowOverScroll")
+      targetP.setCurPos(pos, true, allowOverScroll);
+      isFinished = isEnd();
+      //echo("isFinished:$isFinished")
+      targetP.repaint();
+    }
+  }
+}
+
+struct OverScrollAnimChannel : ScrollAnimChannel {
+
+  private var startPos :Float32= 0f;
+
+  protected override fun init() {
+    //echo(acceleration)
+    var targetP = target.lock();
+    if (targetP == null) true;
+
+    startV = 0f;
+    if (targetP.curPos > 0f) {
+      //acceleration = -acceleration
+      backwards = true;
+      startPos = targetP.max - targetP.viewport;
+    }
+    
+    allowOverScroll = true;
+  }
+
+  protected override fun isEnd(): Bool {
+    var targetP = target.lock();
+    if (targetP == null) true;
+
+    //echo("backwards:$backwards, startPos:$startPos, target.curPos:$target.curPos, acc:$acceleration")
+    if (backwards) {
+      if (targetP.curPos <= startPos) {
+        targetP.setCurPos(startPos, true);
+        return true;
+      }
+    }
+    else {
+      if (targetP.curPos >= startPos) {
+        targetP.setCurPos(startPos, true);
+        return true;
+      }
+    }
+    return false;
+  }
+}

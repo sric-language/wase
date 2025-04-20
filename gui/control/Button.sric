@@ -1,0 +1,188 @@
+import sric::*;
+import waseGraphics::*;
+
+virtual struct Button : Label, PropertyAnimTarget {
+  static var mouseOver : const Int= 1;
+  static var mouseOut : const Int= 0;
+  static var mouseDown : const Int= 2;
+  
+  //@Transient
+  protected var ripplePoint: Point;
+  //@Transient
+  protected var rippleSize : Float32 = -1.0;
+  var rippleEnable : Bool = true;
+
+  // displays a small popup when the mouse hovers over
+  var tooltip: String;
+  //@Transient
+  var tooltipDelay : Int = 750;
+  //@Transient
+  private var tooltipValid: Bool = false;
+  //@Transient
+  private var tooltipLabel: own*? Label;
+
+  //@Transient
+  readonly var state : Int = mouseOut;
+  
+  //@Transient
+  var icon: own*? Image;
+  readonly var iconUri: String;
+  var iconPosition: Direction = Direction::Left;
+  var iconSize : Size;
+
+  fun setIconUri(s: String) {
+    if (iconUri != s) {
+      iconUri = move s;
+      icon = null;
+    }
+  }
+
+  fun setState(s: Int) {
+    if (state != s) {
+      state = s;
+      this.repaint();
+    }
+  }
+
+  fun new() {
+    padding = Insets { .initAll(25); };
+    textAlign = Align::Center;
+    focusable = true;
+    mouseAware = true;
+    style = "Button";
+  }
+
+  protected override fun onRemove(rootView: *? Frame) {
+    state = mouseOut;
+    super.onRemove(rootView);
+  }
+
+  protected override fun motionEvent(e: &MotionEvent)
+  {
+    //echo("e.type $e.type, $id")
+    super.motionEvent(e);
+
+    if (e.type == MotionEventType::Release || e.type == MotionEventType::Cancel)
+    {
+      setState(mouseOut);
+    }
+    else if (e.type == MotionEventType::Press)
+    {
+      setState(mouseDown);
+    }
+  }
+
+  protected override fun gestureEvent( e: & GestureEvent) {
+    //super.gestureEvent(e)
+    //if (e.consumed) return
+    //echo("e.type $e.type")
+
+    if (e.type == GestureEvent::click && e.button == ButtonType::Left) {    
+      getRootView().clearFocus();
+      clicked();
+      e.consumed = true;
+    }
+    else if (e.type == GestureEvent::shortPress) {
+      startRipple(e.relativeX-this.x, e.relativeY-this.y);
+      e.consumed = true;
+    }
+    else {
+      super.gestureEvent(e);
+    }
+  }
+
+  override protected fun clicked() {
+    if (onClick != null) {
+        onClick(this);
+    }
+  }
+
+  override fun mouseExit() {
+    setState(mouseOut);
+    tooltipValid = false;
+    if (tooltipLabel != null) {
+        if (tooltipLabel.parent != null) {
+            tooltipLabel.parent.detach();
+        }
+        tooltipLabel = null;
+    }
+  }
+
+  override fun mouseEnter() {
+    setState(mouseOver);
+    if (tooltip.size() > 0 && tooltipLabel == null) {
+      tooltipValid = true;
+      var self_ : WeakPtr$<Button> = toWeak(rawToOwn(this));
+      setTimeout(tooltipDelay, fun() {
+          var _self = self_.lock();
+          if (_self != null && tooltipValid && _self.tooltipLabel == null) {
+              var pos = _self.posOnWindow();
+              _self.tooltipLabel = new Label {
+                .layout.offsetX = pos.x as Int;
+                .layout.offsetY = (pos.y as Int) + _self.height;
+                .layout.width = Layout::wrapContent;
+                .padding = Insets{ .init(10, 30, 10, 30); };
+                .setText(_self.tooltip.copy());
+                .setStyle("tooltip");
+              };
+              _self.getRootView().topOverlayer(0).add(share$<Widget>(_self.tooltipLabel));
+              _self.tooltipLabel.relayout();
+          }
+      });
+    }
+  }
+
+  override fun keyEvent(e: &KeyEvent)
+  {
+    if (e.type == KeyEventType::Release && e.key == Key::Enter)
+    {
+      clicked();
+    }
+  }
+
+  protected fun startRipple(x: Int, y: Int) {
+    if (!rippleEnable) return;
+    
+    //var self_ = this;
+    ripplePoint = Point { .x = x; .y = y; };
+    var anim = new Animation {
+        .duration = 300;
+        .add(new PropertyAnimChannel {
+          .target = this;
+          .from = 0.0; .to = 1.0;
+        });
+    };
+    anim.whenDone = fun() {
+        rippleSize = -1.0;
+        ripplePoint.x = 0;
+        ripplePoint.y = 0;
+    };
+    var _anim = anim as * Animation;
+    this.getRootView().animManager.add(move anim);
+    _anim.start();
+    this.repaint();
+  }
+
+  override fun onUpdateAnim(v: Float32, field: Int) {
+    this.rippleSize = v;
+  }
+
+  protected override fun prefContentSize(g: &Graphics, hintsWidth : Int = -1, hintsHeight : Int = -1): Size {
+    var size = super.prefContentSize(g, hintsWidth, hintsHeight);
+    if (iconSize.w != 0 || iconSize.h != 0) {
+      switch (iconPosition) {
+        case Direction::Left:
+          fallthrough;
+        case Direction::Right:
+          size.w += iconSize.w + 4;
+          size.h = max(size.h, iconSize.h);
+        case Direction::Top:
+          fallthrough;
+        case Direction::Bottom:
+          size.h += iconSize.h + 4;
+          size.w = max(size.w, iconSize.w);
+      }
+    }
+    return size;
+  }
+}

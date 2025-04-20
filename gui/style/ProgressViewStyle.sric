@@ -1,0 +1,63 @@
+import sric::*;
+import waseGraphics::*;
+
+struct ProgressViewStyle : WidgetStyle {
+  override fun doPaint(widget: * Widget , g:& Graphics) {
+    var p = widget as * ProgressView;
+    var w = widget.contentWidth();
+    var h = widget.contentHeight();
+    var top = widget.paddingTop();
+    var left = widget.paddingLeft();
+
+    var width = (8);
+    g.setColor(color);
+    g.strokeWidth(width);
+    
+    var elapsed = 0;
+    if (p.time == 0) {
+        p.time = currentTimeMillis();
+    }
+    else {
+        elapsed = currentTimeMillis() - p.time;
+        if (elapsed < 0) elapsed = 0;
+    }
+
+    var t = (elapsed / 3);
+
+    var start = t * 1;
+    var end = t * 2;
+
+    var sweep = end - start;
+    if (sweep < 0) {
+        start = end;
+        sweep = -sweep;
+    }
+    if (sweep > 360) {
+        sweep = sweep % 360;
+    }
+
+    var s = ((min(w, h) - width - width) / 2) as Int;
+    var cx = w/2;
+    var cy = h/2;
+    g.drawArc(cx, cy, s, toRadians(start), toRadians(sweep));
+
+    p.repaint();
+  }
+}
+
+struct ProgressBarStyle : WidgetStyle {
+  override fun doPaint(widget: * Widget , g:& Graphics) {
+    var p = widget as * ProgressView;
+    var w = widget.contentWidth();
+    var h = widget.contentHeight();
+    var x = widget.paddingTop();
+    var y = widget.paddingLeft();
+
+    g.setColor(background);
+    g.fillRect(x, y, w, h);
+    
+    var w2 = (w * p.value);
+    g.setColor(color);
+    g.fillRect(x, y, w2, h);
+  }
+}

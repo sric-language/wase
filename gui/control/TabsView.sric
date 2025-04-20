@@ -1,0 +1,88 @@
+import sric::*;
+import waseGraphics::*;
+
+struct TabsView : HBox
+{
+    var selIndex :Int= 0;
+    var onSelect: fun(i: Int);
+
+    //@Transient
+    private var offsetX: Int = 0;
+    private var items : DArray$<String>;
+
+    fun setSelIndex(v: Int, fire : Bool = true) {
+        if (v == selIndex) return;
+
+        var w = this.getChild(selIndex);
+        if (w != null) w.setStyle("tabItem");
+        
+        var w2 = this.getChild(v);
+        if (w2 != null) w2.setStyle("tabItemHighlight");
+        
+        selIndex = v;
+        //var oldVal = selIndex;
+        if (fire && onSelect != null) {
+            onSelect(v);
+        }
+        
+        this.resetStyle();
+        this.repaint();
+
+        if (fire) {
+            eventListeners.fire(EventType::SelectChanged, this);
+        }
+    }
+    
+    fun bind(card: * CardPane) {
+        //var self_ = this;
+        card.onSelect = fun(i: Int) {
+            this.setSelIndex(i);
+        };
+        this.onSelect = fun(i: Int) {
+            card.setSelIndex(i);
+        };
+    }
+
+    fun init(items: DArray$<String>) {
+        this.items = move items;
+        //var self_ = this;
+        for (var i = 0; i<this.items.size(); ++i) {
+            var bt = new Button {
+                .setStyle(i == selIndex ? "tabItemHighlight" : "tabItem");
+                .setText(this.items[i].copy());
+                .layout.width = Layout::wrapContent;
+                .onClick = fun(w: * Widget) {
+                    this.setSelIndex(i);
+                };
+            };
+            this.add(move bt);
+        }
+        focusable = true;
+        isCliped = true;
+        dragAware = true;
+    }
+    
+  override fun layoutChildren(g: &Graphics,  force: Bool)
+  {
+    super.layoutChildren(g, force);
+    for (var i=0; i<children.size(); ++i) {
+        var c:* own* Widget = children.getPtr(i);
+        (*c).x += offsetX;
+    }
+  }
+  
+  protected override fun onDrag( e: &GestureEvent) {
+    super.onDrag(e);
+    if (e.consumed) return;
+    if (e.type == GestureEvent::drag) {
+        var last = this.getChild(items.size()-1);
+        if (e.deltaX + last.x + last.width < this.contentWidth()) {
+            return;
+        }
+        offsetX += e.deltaX;
+        if (offsetX > 0) offsetX = 0;
+        e.consumed = true;
+        this.relayout();
+    }
+  }
+}

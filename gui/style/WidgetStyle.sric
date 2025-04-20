@@ -1,0 +1,81 @@
+import sric::*;
+import waseGraphics::*;
+
+// struct FontInfo {
+//     var size : Int = 33;
+//     var name : String;
+//     var bold: Bool = false;
+//     var italic: Bool = false;
+// }
+
+reflect virtual struct WidgetStyle {
+    var background: Color = Color { .rgba = 0xf9f9f9ff; };
+    var color: Color = Color { .rgba = 0x33b5e5ff; };
+    var outlineColor: Color = Color { .rgba = 0xe9e9e9ff; };
+    var fontColor: Color = Color { .rgba = 0x222222ff; };
+    var disableColor : Color = Color { .rgba = 0xb0b0b0ff; };
+    var rippleColor : Color = Color { .rgba = 0x999999ff; };
+    //@Transient
+    var backgroundImage: own*? Image;
+    var backgroundImageUri: String;
+
+    var lineWidth : Int = 2;
+    var font : Font;
+    var fontSize : Int = 33;
+    var roundRadius : Int = 0;
+
+    //private var fontSizeCache: Int = 0;
+
+    fun paint(widget: *Widget, g: &Graphics) {
+        if (!backgroundImageUri.isEmpty() && backgroundImage == null) {
+            backgroundImage = g.createImage();
+            backgroundImage.load(backgroundImageUri.c_str());
+        }
+        doPaint(widget, g);
+    }
+    
+    protected virtual fun doPaint(widget: *Widget, g: &Graphics) {}
+
+    protected fun drawText(widget: *Widget, g: &Graphics, text: &String, align: Align, vAlign: Align = Align::Center) {
+        if (text.size() == 0) return;
+        
+        var top = widget.paddingTop();
+        var left = widget.paddingLeft();
+        //draw text
+        g.setColor(fontColor);
+        g.setFont(font);
+        g.setFontSize(fontSize);
+
+        var metric: FontMetrics;
+        g.fontMetrics(metric);
+        var lineh = metric.height;
+
+        var offset = metric.ascent;
+        var y: Float32 = top;
+        if (vAlign == Align::Begin) {
+            y = top + offset;
+        }
+        else if (vAlign == Align::Center) {
+            y = top + (widget.contentHeight() / 2) - (lineh/2f) + offset;
+        }
+        else if (vAlign == Align::End) {
+            y = top + (widget.contentHeight()) - (lineh) + offset;
+        }
+
+        var x: Float32 = left;
+        if (align == Align::Begin) {
+            x = left + 2;
+        }
+        else if (align == Align::Center) {
+            var w = g.textWidth(text.c_str(), text.size());
+            x = left + (widget.contentWidth() / 2) - (w/2f);
+        }
+        else if (align == Align::End) {
+            var w = g.textWidth(text.c_str(), text.size());
+            x = left + (widget.contentWidth()) - w;
+        }
+
+        g.drawText(x, y, text.c_str(), text.size());
+  }
+}
+

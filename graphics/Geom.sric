@@ -1,0 +1,68 @@
+
+import sric::*;
+import cstd::*;
+
+fun toRadians(degree : Float) : Float {
+    return degree * (M_PI / 180.0);
+}
+
+fun toDegress(radians : Float) : Float {
+    return radians * (180.0 / M_PI);
+}
+
+reflect struct Size {
+    var w : Int;
+    var h : Int;
+}
+
+reflect struct Point {
+    var x : Int;
+    var y : Int;
+}
+
+reflect struct Rect {
+    var x : Float32;
+
+    var y : Float32;
+
+    var w : Float32;
+
+    var h : Float32;
+
+    fun contains(x: Float32, y: Float32) const: Bool 
+    {
+        return x >= this.x && x <= this.x + w &&
+            y >= this.y && y <= this.y + h;
+    }
+
+    fun intersects(that: const &Rect) const : Bool {
+        var ax1 = x; var ay1 = y; var ax2 = ax1 + w; var ay2 = ay1 + h;
+        var bx1 = that.x; var by1 = that.y; var bx2 = bx1 + that.w; var by2 = by1 + that.h;
+        return !(ax2 <= bx1 || bx2 <= ax1 || ay2 <= by1 || by2 <= ay1);
+    }
+
+    fun intersection(that: const &Rect) const : Rect {
+        var ax1 = x; var ay1 = y; var ax2 = ax1 + w; var ay2 = ay1 + h;
+        var bx1 = that.x; var by1 = that.y; var bx2 = bx1 + that.w; var by2 = by1 + that.h;
+
+        var rx1 = max(ax1,bx1); var rx2 = min(ax2, bx2);
+        var ry1 = max(ay1,by1); var ry2 = min(ay2, by2);
+        var rw = rx2 - rx1;
+        var rh = ry2 - ry1;
+        if (rw <= 0 || rh <= 0) return Rect{ .x = 0; .y = 0; .w = 0; .h = 0; };
+        return Rect{ .x = rx1; .y = ry1; .w = rw; .h = rh; };
+    }
+
+    fun unions(that: const &Rect) const : Rect {
+        var ax1 = x; var ay1 = y; var ax2 = ax1 + w; var ay2 = ay1 + h;
+        var bx1 = that.x; var by1 = that.y; var bx2 = bx1 + that.w; var by2 = by1 + that.h;
+
+        var rx1 = min(ax1,bx1); var rx2 = max(ax2, bx2);
+        var ry1 = min(ay1,by1); var ry2 = max(ay2, by2);
+        var rw = rx2 - rx1;
+        var rh = ry2 - ry1;
+        if (rw <= 0 || rh <= 0) return Rect{ .x = 0; .y = 0; .w = 0; .h = 0; };
+        return Rect{ .x = rx1; .y = ry1; .w = rw; .h = rh; };
+    }
+}
+

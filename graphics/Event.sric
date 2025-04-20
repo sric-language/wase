@@ -1,0 +1,212 @@
+
+import sric::*;
+import cstd::*;
+
+enum MotionEventType {
+    Press,
+    Release,
+    TouchMove,
+    MouseMove,
+    LongPress,
+    Click,
+    Cancel,
+    Wheel,
+    Other
+}
+
+enum ButtonType {
+    Left, Middle, Right
+}
+
+struct MotionEvent
+{
+    var type: MotionEventType;
+
+    var consumed: Bool = false;
+
+    /**
+    * event occurs time
+    */
+    var time: Int64 = 0;
+
+    /**
+    ** X coordinates
+    **/
+    var x : Int = 0;
+
+    /**
+    ** Y coordinates
+    **/
+    var y : Int = 0;
+
+    /**
+    ** delta x
+    **/
+    //var deltaX: Int = 0;
+
+    /**
+    ** delta y
+    **/
+    //var deltaY: Int = 0;
+
+    /**
+    ** Delta value of event.  For mouse wheel events this is the
+    ** amount the mouse wheel has traveled.
+    **/
+    var delta: Int = 0;
+
+    /**
+    ** Number of mouse clicks.
+    **/
+    var count: Int = 0;
+
+    /**
+    ** Mouse button number pressed
+    **/
+    var button: ButtonType = ButtonType::Left;
+
+    /**
+    ** Key code and modifiers.
+    **/
+    //Key? key
+
+    /**
+    ** Current pressure of pointer
+    **/
+    var pressure : Float32 = 0.0;
+
+    /**
+    ** Current size of pointer
+    **/
+    var size : Float32 = 0.0;
+
+    /**
+    ** For muilt touch event
+    **/
+    var pointers: SharedPtr$<DArray$<MotionEvent>>;
+
+    /**
+    ** pixel move per millisecond
+    **/
+    var speed: Float32 = 0.0;
+
+    var relativeX : Int = 0;
+    var relativeY : Int = 0;
+
+    var pointerId : Int = 0;
+}
+
+enum Key {
+    A = 'A',
+    B = 'B',
+    C = 'C',
+    D = 'D',
+    E = 'E',
+    F = 'F',
+    G = 'G',
+    H = 'H',
+    I = 'I',
+    J = 'J',
+    K = 'K',
+    L = 'L',
+    M = 'M',
+    N = 'N',
+    O = 'O',
+    P = 'P',
+    Q = 'Q',
+    R = 'R',
+    S = 'S',
+    T = 'T',
+    U = 'U',
+    V = 'V',
+    W = 'W',
+    X = 'X',
+    Y = 'Y',
+    Z = 'Z',
+
+    Num0  = '0',
+    Num1  = '1',
+    Num2  = '2',
+    Num3  = '3',
+    Num4  = '4',
+    Num5  = '5',
+    Num6  = '6',
+    Num7  = '7',
+    Num8  = '8',
+    Num9  = '9',
+
+    Space = ' ',
+    Backspace = '\b',
+    Enter = '\r',
+    Delete= 0x7F,
+    Esc   = 0x1B,
+    Tab   = '\t',
+
+    Comma = ',',
+    Period= '.',
+    Slash = '/',
+    Semicolon = ';',
+    Quote = '\'',
+    OpenBracket = '[',
+    CloseBracket= ']',
+    BackSlash = '\\',
+    Backtick  = '`',
+
+    Up= 0x0100_0001,
+    Down  = 0x0100_0002,
+    Left  = 0x0100_0003,
+    Right = 0x0100_0004,
+    PageUp= 0x0100_0005,
+    PageDown  = 0x0100_0006,
+    Home  = 0x0100_0007,
+    End   = 0x0100_0008,
+    Insert= 0x0100_0009,
+
+    F1= 0x0100_000A,
+    F2= 0x0100_000B,
+    F3= 0x0100_000C,
+    F4= 0x0100_000D,
+    F5= 0x0100_000E,
+    F6= 0x0100_000F,
+    F7= 0x0100_0010,
+    F8= 0x0100_0011,
+    F9= 0x0100_0012,
+    F10   = 0x0100_0013,
+    F11   = 0x0100_0014,
+    F12   = 0x0100_0015,
+
+    CapsLock  = 0x0100_0082,
+    NumLock   = 0x0100_0083,
+    ScrollLock= 0x0100_0084,
+    Pause = 0x0100_0085,
+    PrintScreen = 0x0100_0087,
+
+    Alt   = 0x0001_0000,
+    Shift = 0x0002_0000,
+    Ctrl  = 0x0004_0000,
+    Command   = 0x0040_0000
+}
+
+enum KeyEventType {
+    Press = 9,
+    Release = 10,
+    Typed = 11
+}
+
+struct KeyEvent {
+    var keyChar: Int = 0;
+    var key: Key;
+    var type: KeyEventType;
+}
+
+enum WindowEventType {
+    Opened = 0,
+    Closing = 1,
+    Closed = 2,
+
+    Deactivated = 3,
+    Activated = 4,
+
+    LostFocus = 7,
+    GainedFocus = 8
+}

@@ -1,0 +1,30 @@
+import sric::*;
+import waseGraphics::*;
+
+/**
+A display area for a short text string.
+*/
+virtual struct Label : Widget {
+    var textAlign : Align = Align::Begin;
+
+    readonly var text: String = "Label";
+
+    fun new() {
+        style = "Label";
+    }
+
+    fun setText(t: String) {
+        text = move t;
+    }
+
+    protected override fun prefContentSize(g: &Graphics, hintsWidth : Int = -1, hintsHeight : Int = -1): Size {
+        g.setFont(getStyle().font);
+        g.setFontSize(getStyle().fontSize);
+        var metric: FontMetrics;
+        g.fontMetrics(metric);
+        var w = g.textWidth(text.c_str(), text.size())+3;
+        var h = metric.height;
+        var sizeCache = Size{.w=w as Int; .h = h as Int;};
+        return sizeCache;
+    }
+}

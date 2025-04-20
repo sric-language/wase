@@ -1,0 +1,151 @@
+import sric::*;
+import sric;
+import waseGraphics::*;
+
+
+
+
+protected struct ColorLine : Widget {
+    var value: Float = 180.0;
+    var step: Int = (5);
+
+    protected override fun doPaint( clip: &Rect,  g: &Graphics) {
+        var w = this.contentWidth();
+        var h = this.contentHeight();
+        var ox = this.paddingLeft();
+        var oy = this.paddingTop();
+        g.strokeWidth(step+1.0);
+        for (var i = 0; i<w; i+=step) {
+            var v = i  * 360.0 / w;
+            g.setColor(Color::makeHsv(v, 1.0, 1.0));
+            g.drawLine(ox+i, oy, ox+i, h);
+        }
+
+        g.strokeWidth(2);
+        g.setColor(Color::black);
+        var x = (value / 360.0 * w) as Int;
+        g.drawLine(ox+x, oy, ox+x, h);
+    }
+
+    protected override fun motionEvent(e: &MotionEvent) {
+        if (e.consumed) return;
+        if (e.type == MotionEventType::Release || e.type == MotionEventType::TouchMove) {
+            var w = this.contentWidth();
+            var h = this.contentHeight();
+            var ox = this.paddingLeft();
+
+            value = (e.relativeX-x-ox) * 360.0 / w;
+            value = clamp(value, 0.0, 360.0);
+            (parent as * ColorPicker).update();
+            e.consumed = true;
+        }
+    }
+}
+
+protected struct ColorRect : Widget {
+    var valueX: Float = 1.0;
+    var valueY: Float = 1.0;
+    var colorLine: *? ColorLine;
+    var step : Int = (5);
+
+    protected override fun doPaint(clip: &Rect,  g: &Graphics) {
+        var w = this.contentWidth();
+        var h = this.contentHeight();
+        var ox = this.paddingLeft();
+        var oy = this.paddingTop();
+
+        var hstep = step / 2;
+
+        g.strokeWidth(1.0);
+        for (var i = 0; i<w; i+=step) {
+            var vx = i / (w as Float);
+            for (var j = 0; j<h; j+=step) {
+                var vy = j / (h as Float);
+                g.setColor(Color::makeHsv(colorLine.value, vx, vy));
+                g.fillRect(ox+i-hstep, oy+j-hstep, step+1, step+1);
+            }
+        }
+
+        g.strokeWidth(1.0);
+        g.setColor(Color::black);
+        var x = (valueX * w) as Int;
+        var y = (valueY * h) as Int;
+        var offsize = (7);
+        g.drawRect(ox+x-offsize, oy+y-offsize, offsize+offsize, offsize+offsize);
+    }
+
+    protected override fun motionEvent(e: &MotionEvent) {
+        if (e.consumed) return;
+        if (e.type == MotionEventType::Release || e.type == MotionEventType::TouchMove) {
+            var w = this.contentWidth();
+            var h = this.contentHeight();
+            var ox = this.paddingLeft();
+            var oy = this.paddingTop();
+            valueX = (e.relativeX - x - ox) / (w as Float);
+            valueY = (e.relativeY - y - oy) / (h as Float);
+            valueX = clamp(valueX, 0.0, 1.0);
+            valueY = clamp(valueY, 0.0, 1.0);
+            (parent as * ColorPicker).update();
+            e.consumed = true;
+        }
+    }
+}
+
+struct ColorPicker : VBox {
+    readonly var color: Color;
+
+    private var colorLine: * ColorLine = ...;
+    private var colorRect: * ColorRect = ...;
+    private var rectView: * RectView = ...;
+    private var label: * Label = ...;
+
+    var onColorChanged: fun(c: Color);
+
+    fun setColor(t: Color) {
+        color = t;
+        var h: Float32;
+        var v: Float32;
+        var s: Float32;
+        t.decHsv(&h, &s, &v);
+        colorLine.value = h;
+        colorRect.valueX = s;
+        colorRect.valueY = v;
+        (rectView.inlineStyle as * RectViewStyle).background = t;
+    }
+
+    fun new() {
+        layout.width = Layout::wrapContent;
+        layout.height = Layout::wrapContent;
+
+        inlineStyle = new PaneStyle;
+
+        var width = 500;
+        
+        var colorLine = new ColorLine { .layout.width = width; .layout.height = 100; .padding.initAll(14); };
+        var colorRect = new ColorRect { .layout.width = width; .layout.height = width; .padding.initAll(14); };
+        colorRect.colorLine = colorLine;
+        this.colorLine = colorLine;
+        this.colorRect = colorRect;
+        add(move colorLine);
+        add(move colorRect);
+
+        var label = new Label { .layout.width = width; .padding = Insets { .init(0, 14, 0, 14); }; };
+        this.label = label;
+        add(move label);
+        var rectView = new RectView { .layout.width = width; .layout.height = 100; .inlineStyle = new RectViewStyle; .padding.initAll(14); };
+        this.rectView = rectView;
+        add(move rectView);
+
+        color = Color { .rgba = 0x33b5e5ff; };
+    }
+
+    protected fun update() {
+        color = Color::makeHsv(colorLine.value, colorRect.valueX, colorRect.valueY);
+        label.setText(String::format("%08X", color.rgba));
+        (rectView.inlineStyle as *RectViewStyle).background = color;
+
+        if (onColorChanged != null)
+            onColorChanged(color);
+        this.repaint();
+    }
+}

@@ -1,0 +1,259 @@
+import sric::*;
+import waseGraphics::*;
+
+struct TreeView : ScrollPane
+{
+  /**
+  ** Backing data model of tree.
+  **/
+  //@Transient
+  var model : own*? TreeModel;
+
+  //@Transient
+  protected var items : DArray$<TreeItem>;
+  
+  //@Transient
+  readonly var selectedItem: Int = -1;
+  //@Transient
+  protected var dragDropItem: Int = -1;
+  //@Transient
+  private var draging :Bool= false;
+
+  var onSelect: fun(t:Int, event:Int);
+  var onDragDrop: fun(f:Int, t:Int);
+
+  var rowHeight: Int = 32;
+
+  var minWidth :Int= 600;
+  var indent :Int= 60;
+
+  fun setModel(t: own*TreeModel) {
+    model = move t;
+    init();
+  }
+
+  fun select(id: Int) {
+    selectedItem = id;
+    this.repaint();
+  }
+
+  fun new()
+  {
+    super.autoScrollContent = false;
+    autoResetOffset = true;
+    style = "TreeView";
+  }
+
+  protected override fun contentMaxWidth(g: &Graphics): Float32 {
+    var  w :Int= (minWidth);
+    var  indent :Int= (this.indent);
+ 
+    g.setFont(getStyle().font);
+    g.setFontSize(getStyle().fontSize);
+
+    for (var i=0; i<items.size(); ++i) {
+        var text = items[i].text();
+        var fw = g.textWidth(text.c_str(), text.size());
+        var x = items[i].level * indent + fw + indent;
+        if (w < x) {
+            w = x as Int;
+        }
+    }
+    return w as Float;
+  }
+
+  protected override fun prefContentSize(g: &Graphics, hintsWidth :Int= -1,  hintsHeight :Int= -1): Size {
+    var w :Int= (minWidth);
+    var h :Int= items.size() * rowHeight;
+    return Size { .w = w; .h = h; };
+  }
+
+  // private fun indexSame(item: * TreeItem): Int {
+  //   for (var i=0; i<items.size(); ++i) {
+  //       if (&items[i] == item) {
+  //           return i;
+  //       }
+  //   }
+  //   return -1;
+  // }
+
+  private fun removeRange(begin: Int, end: Int) {
+    for (var i = end-1; i>=begin; --i) {
+        items.removeAt(i);
+    }
+  }
+
+  fun expanded(i: Int)
+  {
+    var item: * TreeItem = items.getPtr(i);
+    if (!item.hasChildren()) return;
+
+    if (item.expanded)
+    {
+      //close
+      //var i = indexSame(item) + 1;
+      var start = i + 1;
+      var p = i + 1;
+      for (var n = items.size(); p<n; ++p)
+      {
+        if (items[p].level <= item.level) break;
+      }
+      item.expanded = !item.expanded;
+      removeRange(start, p);
+      return;
+    }
+    else
+    {
+      //expand
+      //var i = indexSame(item);
+      item.expanded = !item.expanded;
+      items.insertAll(i+1, item.children());
+      return;
+    }
+  }
+
+  /**
+  ** Update the entire tree's contents from the model.
+  **/
+  private fun init()
+  {
+    items.clear();
+    var roots = model.roots();
+    for (var i=0; i<roots.size(); ++i) {
+        var subNode:Int = roots[i];
+        var item = TreeItem { .init(this, subNode, 0); };
+        items.add(move item);
+    }
+  }
+  
+  protected override fun motionEvent( e: & MotionEvent) {
+    super.motionEvent(e);
+    
+    if (e.type == MotionEventType::Press) {
+        var i = findItemAt(e.relativeY);
+        if (i != -1 && selectedItem == items[i].node) {
+            draging = true;
+            dragDropItem = -1;
+        }
+    }
+  }
+  
+  private fun findItemAt(eventY:Int ): Int {
+    var sy = eventY - y;
+    var i = (offsetY + sy) / rowHeight;
+    if (i < items.size()) {
+        return i;
+    }
+    else {
+        return -1;
+    }
+  }
+  
+  protected override fun onDrag( e:&GestureEvent) {
+    if (e.type == GestureEvent::drag) {
+      if (draging) {
+        var i = findItemAt(e.relativeY);
+        dragDropItem = i == -1 ? -1 : items[i].node;
+        e.consumed = true;
+        this.repaint();
+      }
+    }
+    else if (e.type == GestureEvent::drop) {
+      draging = false;
+      var i = findItemAt(e.relativeY);
+      dragDropItem = i == -1 ? -1 : items[i].node;
+      if (selectedItem != -1 && dragDropItem != -1 && selectedItem != dragDropItem) {
+        if (onDragDrop != null)
+            onDragDrop(selectedItem, dragDropItem);
+      }
+      dragDropItem = -1;
+      this.relayout();
+      e.consumed = true;
+    }
+  }
+
+  protected override fun gestureEvent(e: &GestureEvent )
+  {
+    if ((e.type == GestureEvent::click || e.type == GestureEvent::doubleClick) && e.button == ButtonType::Left)
+    {
+      var i = findItemAt(e.relativeY);
+      selectedItem = i == -1 ? -1 : items[i].node;
+      if (i != -1)
+      {
+        expanded(i);
+        this.relayout();
+        e.consumed = true;
+      }
+      if (onSelect != null)
+        onSelect(selectedItem, e.type);
+      
+      dragDropItem = -1;
+    }
+    
+    if (e.consumed) return;
+    if (!draging) {
+      super.gestureEvent(e);
+      return;
+    }
+  }
+}
+
+
+struct TreeItem
+{
+  //@Transient
+  private var tree: *? TreeView;
+
+  var node: Int64;
+  var parentItem: *? TreeItem;
+
+  var level :Int= 0;
+  var expanded :Bool= false;
+
+  fun text(): String { return tree.model.text(node); }
+
+  fun init( tree: * TreeView, node: Int64,  level: Int)
+  {
+    this.tree = tree;
+    this.node = node;
+    this.level = level;
+  }
+
+  fun hasChildren(): Bool { return tree.model.hasChildren(node); }
+
+  fun children(): DArray$<TreeItem>
+  {
+    var list : DArray$<TreeItem>;
+    var children = tree.model.children(node);
+    for (var i=0; i<children.size(); ++i)
+    {
+      var subNode: Int64 = children[i];
+      var item = TreeItem { .init(tree, subNode, level+1); };
+      item.parentItem = this;
+      list.add(move item);
+    }
+    return list;
+  }
+}
+
+
+virtual struct TreeModel
+{
+  virtual fun roots(): DArray$<Int64> {
+    var p : DArray$<Int64>;
+    return p;
+  }
+
+  virtual fun text(p: Int64): String {
+    return String::format("%d", p);
+  }
+
+  virtual fun image(node: Int64): own*? Image { return null; }
+
+  virtual fun hasChildren(node: Int64): Bool { return !children(node).isEmpty(); }
+
+  virtual fun children(node: Int64): DArray$<Int64> {
+    var p : DArray$<Int64>;
+    return p;
+  }
+}

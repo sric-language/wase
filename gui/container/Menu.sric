@@ -1,0 +1,159 @@
+import sric::*;
+import waseGraphics::*;
+
+struct Menu : HBox
+{
+  var layer: own*? WidgetGroup;
+  
+  fun new()
+  {
+    style = "Menu";
+    //vertical = false
+    layout.height = Layout::wrapContent;
+    layout.width = Layout::matchParent;
+  }
+
+  fun close()
+  {
+    if (layer != null) {
+        layer.detach();
+        layer = null;
+    }
+  }
+}
+
+protected struct MenuList : VBox
+{
+  //@Transient
+  var owner: *? MenuItem;
+
+  fun new()
+  {
+    spacing = 2;
+    margin = Insets { .initAll(3); };
+    setStyle("menuPane");
+    layout.width = Layout::wrapContent;
+  }
+}
+
+struct MenuItem : Button
+{
+  protected var subMenuList: own* MenuList = ...;
+  private var topLevel :Bool = true;
+  
+  fun new()
+  {
+    rippleEnable = false;
+    subMenuList = new MenuList;
+    subMenuList.owner = this;
+    padding = Insets { .initAll(15); };
+    textAlign = Align::Begin;
+    setStyle("menuItem");
+    this.layout.width = Layout::wrapContent;
+  }
+
+  protected override fun clicked() {
+      var rootM = this.rootMenu();
+      if (this.subMenuList.childrenNum() > 0) {
+        if (rootM.layer == null || rootM.layer.parent == null) {
+          var layer = this.getRootView().topOverlayer(0);
+          rootM.layer = refToOwn(layer);
+        }
+        this.expand(rootM.layer);
+        //getRootView.modal = true
+      }
+      else {
+        //getRootView.modal = false
+        rootM.close();
+      }
+      super.clicked();
+  }
+
+  private fun mouseEnter() {
+      super.mouseEnter();
+
+      var root = rootMenu();
+      if (root == null) return;
+      var layer: *? WidgetGroup = root.layer;
+      if (layer != null) {
+        if (state == Button::mouseOver) {
+          if (subMenuList.childrenNum() > 0) {
+            expand(layer);
+            //getRootView.modal = true
+          }
+        }
+      }
+  }
+
+  private fun rootMenu(): *? Menu
+  {
+    if (this.parent is * Menu)
+        return this.parent as * Menu;
+     
+    var list = this.parent as *?MenuList;
+    while (list != null)
+    {
+      if (list.owner.parent is *Menu)
+      {
+        return list.owner.parent as *Menu;
+      }
+      list = list.owner.parent as *?MenuList;
+    }
+    return null;
+  }
+
+  private fun addParentTo(layer: * WidgetGroup)
+  {
+    var list = this.parent as *?MenuList;
+    while (list != null)
+    {
+      if (list.parent != null) {
+        list.parent.remove(list);
+      }
+      layer.add(refToOwn(list));
+      var owner : * MenuItem= list.owner;
+      list = owner.parent as *? MenuList;
+    }
+  }
+
+  fun isExpand(): Bool {
+    return subMenuList.getRootView() != null;
+  }
+
+  fun expand(layer: * WidgetGroup)
+  {
+    if (subMenuList.parent != null) {
+      subMenuList.parent.remove(subMenuList);
+    }
+
+    //reset
+    layer.removeAll();
+    addParentTo(layer);
+
+    layer.add(share(subMenuList));
+    var pos = this.posOnWindow();
+    if (parent is * Menu)
+    {
+      subMenuList.layout.offsetX = (pos.x as Int);
+      subMenuList.layout.offsetY = (pos.y as Int) + this.height;
+    }
+    else
+    {
+      subMenuList.layout.offsetX = (pos.x as Int) + this.width;
+      subMenuList.layout.offsetY = (pos.y as Int);
+    }
+
+    layer.relayout();
+  }
+
+  fun add(item: own* MenuItem ): *MenuItem
+  {
+    //item.layout.widthType = SizeType.fixed
+    item.layout.width = 500;
+    item.padding.initAll(15);
+    //item.margin = Insets(2, 0, 0)
+    item.topLevel = false;
+    subMenuList.add(move item);
+    return this;
+  }
+}

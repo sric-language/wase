@@ -1,0 +1,409 @@
+import sric::*;
+import waseGraphics::*;
+
+reflect abstract struct Widget {
+    var id: String;
+    
+    readonly var style: String;
+
+    //@Transient
+    var transform: Transform2D;
+    //@Transient
+    var transformValid : Bool = false;
+    //@Transient
+    var alpha: Float32 = -1f;
+
+    var isCliped: Bool = true;
+    
+    //@Transient
+    private var layoutDirty: Int = 1;
+
+    var padding: Insets = Insets{};
+
+    var margin: Insets = Insets{};
+
+    var layout: Layout = Layout {};
+
+    //@Transient
+    private var styleCache: *? WidgetStyle = null;
+    var inlineStyle: own*? WidgetStyle;
+
+    //@Transient
+    var onClick: fun(w: * Widget) = null;
+    //@Transient
+    var eventListeners: EventListeners = EventListeners{};
+    //@Transient
+    var onGestureEvent: fun(w: * Widget, e: &GestureEvent);
+
+    var clickAnimation: Bool = true;
+    var dragAware: Bool = false;
+    var mouseAware: Bool = false;
+    var consumeEvent: Bool = true;
+
+    readonly var visible : Bool = true;
+    var enabled: Bool = true;
+
+    //@Transient
+    protected var x: Int = 0;
+    //@Transient
+    protected var y: Int = 0;
+    //@Transient
+    protected var width: Int = 0;
+    //@Transient
+    protected var height: Int = 0;
+
+    //@Transient
+    readonly var parent: *? WidgetGroup;
+    var willRemoved : Bool = false;
+
+    var focusable: Bool = false;
+    var onFocusChanged: fun(f: Bool) = null;
+
+    fun setVisible(v: Bool) {
+        visible = v;
+    }
+
+    fun bounds(): Rect {
+        return Rect { .x = x; .y = y; .w = width; .h = height; };
+    }
+
+    protected fun setParent(p: *? WidgetGroup) {
+        parent = p;
+    }
+
+    virtual fun findById(id: &const String) : *? Widget {
+        if (id == this.id) {
+             return this;
+        }
+        else return null;
+    }
+
+    protected virtual fun motionEvent(e: &MotionEvent) {
+        if (e.consumed)
+            return;
+        if (e.type == MotionEventType::Press) {
+            if (dragAware) {
+                //var self_ : * Widget = this;
+                getRootView().dragFocus(this);
+                e.consumed = true;
+            }
+        }
+        else if (e.type == MotionEventType::MouseMove) {
+            if (mouseAware) {
+                //var self_ : *? Widget = this;
+                getRootView().mouseHover(this);
+                e.consumed = true;
+            }
+        }
+    }
+
+    protected virtual fun gestureEvent(e: &GestureEvent) {
+        if (e.type == GestureEvent::click) {
+            if (e.button != ButtonType::Right) {
+                if (onClick != null) {
+                    clicked();
+                    e.consumed = true;
+                }
+                eventListeners.fire(EventType::Click, this);
+            }
+        }
+        if (onGestureEvent != null) {
+            onGestureEvent(this, e);
+        }
+    }
+
+    protected virtual fun postGestureEvent(e: &GestureEvent) {
+        if (!this.enabled)
+            return;
+        if (!contains(e.relativeX, e.relativeY))
+            return;
+        gestureEvent(e);
+    }
+
+    protected virtual fun postMotionEvent(e: &MotionEvent) {
+        if (!this.enabled)
+            return;
+        if (!contains(e.relativeX, e.relativeY))
+            return;
+        motionEvent(e);
+    }
+
+    protected virtual fun clicked() {
+        if (clickAnimation) {
+            AnimUtil::scaleAnim(this, 0.95).start();
+        }
+        if (onClick != null) {
+            onClick(this);
+        }
+    }
+
+    protected virtual fun onDrag(e: &GestureEvent ) {}
+
+    protected virtual fun keyEvent(e: &KeyEvent) {}
+
+    virtual fun detach( doRelayout :Bool= true)
+    {
+        var p = this.parent;
+        if (p == null) return;
+        //var rootView = getRootView();
+        //this.onDetach(rootView);
+        willRemoved = true;
+        //var self_ : *? Widget = this;
+        if (doRelayout) {
+            this.relayout();
+        }
+        //p.remove(this, doRelayout);
+    }
+
+//////////////////////////////////////////////////////////////////////////
+// layout
+//////////////////////////////////////////////////////////////////////////
+
+    protected fun bufferedPrefSize(g: &Graphics, parentContentWidth: Int = -1, parentContentHeight: Int = -1): Size {
+        var size = prefSize(g, parentContentWidth, parentContentHeight);
+        return Size{
+                    .w=size.w+ (margin.left + margin.right);
+                    .h=size.h+(margin.top+margin.bottom);
+                };
+    }
+
+    virtual fun prefSize(g: &Graphics, parentContentWidth: Int = -1, parentContentHeight: Int = -1): Size {
+        var hintsWidth = parentContentWidth - (margin.left + margin.right);
+        var hintsHeight = parentContentHeight - (margin.top + margin.bottom);
+        var w = -1;
+        var h = -1;
+        w = layout.prefWidth(hintsWidth, hintsHeight, -1);
+        h = layout.prefHeight(hintsWidth, hintsHeight, -1);
+
+        if (w < 0 || h < 0) {
+            var s = prefContentSize(g, w<0?hintsWidth:w, h<0?hintsHeight:h);
+            if (w<0) {
+                w = s.w + (padding.left+padding.right);
+            }
+            if (h<0) {
+                h = s.h + (padding.top+padding.bottom);
+            }
+        }
+        return Size{ .w = w; .h = h; };
+    }
+
+    protected virtual fun prefContentSize(g: &Graphics, parentContentWidth: Int = -1, parentContentHeight: Int = -1): Size {
+        return Size{.w = (50); .h=(50);};
+    }
+
+    fun contentWidth(): Int {
+        return width - (padding.left+padding.right);
+    }
+    fun contentHeight(): Int {
+        return height - (padding.top+padding.bottom);
+    }
+    fun bufferedWidth(): Int {
+        return width + (margin.left + margin.right);
+    }
+    fun bufferedHeight(): Int {
+        return height + (margin.top + margin.bottom);
+    }
+    fun paddingLeft(): Int {
+        return (padding.left);
+    }
+    fun paddingTop(): Int {
+        return (padding.top);
+    }
+    fun setLayout(g: &Graphics, x: Int, y: Int, w:Int, h:Int, force: Bool) {
+        this.x = x + (margin.left);
+        this.y = y + (margin.top);
+        this.width = w - (margin.left+margin.right);
+        this.height = h - (margin.top+margin.bottom);
+
+        onLayout(force);
+
+        if (layoutDirty > 0 || force) {
+            layoutChildren(g, force || layoutDirty>1);
+        }
+        layoutDirty = 0;
+    }
+
+    protected virtual fun onLayout(force: Bool) {}
+
+    protected virtual fun layoutChildren(g: &Graphics, force: Bool) {}
+
+    virtual fun relayout(dirty: Int = 1) {
+        this.layoutDirty = dirty;
+        //this.renderCacheDirty = true;
+        if (this.parent != null) {
+            this.parent.relayout();
+        }
+    }
+
+//////////////////////////////////////////////////////////////////////////
+// rootView
+//////////////////////////////////////////////////////////////////////////
+
+    virtual fun findAt(x: Int, y: Int): *? Widget {
+        if (!contains(x, y))
+            return null;
+        return this;
+    }
+
+    virtual fun contains(rx: Int, ry: Int) : Bool {
+        if (rx < x || rx > x+width) {
+            return false;
+        }
+        if (ry < y || ry > y+ height) {
+            return false;
+        }
+        return true;
+    }
+
+    fun posOnWindow(): Coord {
+        if (this is Frame) {
+            return Coord { .x=0; .y=0; };
+        }
+        if (parent == null) return Coord { .x=0; .y=0; };
+
+        var result = parent.posOnWindow();
+
+        result.x += x;
+        result.y += y;
+        return result;
+    }
+
+    fun mapToRelative(p: Coord): Coord {
+        var posOW = parent.posOnWindow();
+        return Coord { .x = p.x - posOW.x; .y = p.y - posOW.y; };
+    }
+
+    fun mapToWidget(p: Coord): Coord {
+        var posOW = this.posOnWindow();
+        return Coord { .x = p.x - posOW.x; .y = p.y - posOW.y; };
+    }
+
+    fun getRootView(): *? Frame {
+        var x: *? Widget = this;
+        while (x != null) {
+            if (x is * Frame) {
+                return x as * Frame;
+            }
+            x = x.parent;
+        }
+        return null;
+    }
+
+    fun getAncestor(): *? Frame {
+        var x: *? Widget = this;
+        while (x != null) {
+            if (x.parent == null) {
+                return x as *? Frame;
+            }
+            x = x.parent;
+        }
+        return null;
+    }
+
+//////////////////////////////////////////////////////////////////////////
+// paint
+//////////////////////////////////////////////////////////////////////////
+
+    virtual fun resetStyle() {
+        styleCache  = null;
+    }
+
+    fun setStyle(s: String) {
+        style = move s;
+        styleCache  = null;
+    }
+
+    protected fun getStyle(): * WidgetStyle {
+        if (inlineStyle != null) {
+            return inlineStyle;
+        }
+        if (styleCache == null) {
+            styleCache = getRootView().findStyle(*this);
+        }
+        return styleCache;
+    }
+
+    fun paint(clip: Rect, g: & Graphics) {
+        if (!visible) return;
+        if (width < 0 || height < 0) {
+            return;
+        }
+
+        if (isCliped) {
+            g.clip(0, 0, width, height);
+            clip = clip.intersection(this.bounds());
+        }
+
+        if (transformValid) {
+            g.transform(transform);
+        }
+
+        if (alpha != -1f) {
+            g.globalAlpha(alpha);
+        }
+
+        doPaint(clip, g);
+    }
+
+    protected virtual fun doPaint(clip: &Rect, g: &Graphics) {
+        //var self_ : *? Widget = this;
+        getStyle().paint(this, g);
+        //debug
+        // if (debug) {
+            // g.brush = Color.black
+            // g.drawLine(0, 0, width, height)
+            // g.drawLine(width, 0, 0, height)
+            // g.brush = Color.red
+            // g.pen = Pen { it.width = 1 }
+            // g.drawRect(1, 1, width-2, height-2)
+        // }
+    }
+//////////////////////////////////////////////////////////////////////////
+// Focus
+//////////////////////////////////////////////////////////////////////////
+
+    virtual fun repaint()
+    {
+        //renderCacheDirty = true;
+        //convert dirty coordinate system to realative to parent
+        //if (dirty != null) dirty = Rect(dirty.x + x, dirty.y + y, dirty.w, dirty.h)
+        if (this.parent != null) {
+            this.parent.repaint();
+        }
+    }
+
+    virtual fun focused(): Bool
+    {
+        var root = getRootView();
+        //var self_ : *? Widget = this;
+        return root.isFocusedWidiget(this);
+    }
+
+    virtual fun focus(check: Bool = true): Bool {
+        if (focusable) {
+            //var self_ : *? Widget = this;
+            getRootView().focusIt(this);
+            return true;
+        }
+        else {
+            if (check) scError("ui", "try focus a unfocusable widget");
+            return false;
+        }
+    }
+
+    protected virtual fun setFocusState(focus: Bool) {
+        if (onFocusChanged != null) {
+            onFocusChanged(focus);
+        }
+    }
+
+    protected virtual fun mouseExit() {}
+    protected virtual fun mouseEnter() {}
+
+    protected virtual fun onOpen() {}
+    protected virtual fun onRemove(rootView: *?Frame) {
+        if (rootView != null) {
+            rootView.onRemoveWidget(this);
+        }
+    }
+}

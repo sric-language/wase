@@ -1,0 +1,268 @@
+import sric::*;
+import waseGraphics::*;
+
+
+struct ModalLayer : Pane {
+    var level: Int;
+    var backgroundAlpha: Float32 = 0;
+
+    fun init(level: Int) {
+        layout.width = Layout::matchParent;
+        layout.height = Layout::matchParent;
+        this.level = level;
+        if (level > 1) backgroundAlpha = 0.5;
+        if (level == 0) consumeEvent = false;
+    }
+    
+    protected override fun gestureEvent( e: &GestureEvent) {
+        super.gestureEvent(e);
+        if (e.consumed) return;
+        if (e.type == GestureEvent::click) {
+            if (level > 1) return;
+            else {
+                if (level > 0) e.consumed = true;
+                this.detach();
+            }
+        }
+    }
+    
+    protected override fun doPaint(clip: &Rect, g: &Graphics) {
+      if (backgroundAlpha > 0) {
+        g.setColor(Color { .rgba = 0x000000ff; });
+        g.globalAlpha(backgroundAlpha);
+        g.fillRect(0, 0, width, height);
+        //TODO restore this
+        g.globalAlpha(1);
+      }
+      super.doPaint(clip, g);
+    }
+}
+
+struct Frame : Pane {
+    var name : String = "Frame";
+
+    //@Transient
+    private var view: *? WinView;
+
+    //@Transient
+    private var focusWidget: *? Widget;
+
+    //@Transient
+    private var dragFocusWidget: *? Widget;
+
+    //@Transient
+    private var mouseHoverWidget: *? Widget;
+
+    var background : Color = Color { .rgba = 0xffffffff; };
+
+    //@Transient
+    var styleManager : StyleManager;
+
+    //@Transient
+    private var initState: Int = 0;
+
+    //@Transient
+    var animManager: AnimManager;
+
+    fun findStyle(widget: & Widget): *WidgetStyle {
+        return styleManager.find(widget);
+    }
+
+    fun host(): * Window {
+        return view.host();
+    }
+
+    static fun cur(): *? Frame {
+        var win: *? Window = Window::getCur();
+        if (win == null) return null;
+        var view = win.view() as * WinView;
+        return view.curFrame;
+    }
+
+    fun show(push :Bool = true)
+    {
+        var win: *? Window = Window::getCur();
+        if (win == null) {
+            var view = new WinView { .init(rawToOwn(this)); };
+            this.view = view;
+            Window::open(move view, name.c_str());
+        }
+        else {
+            view = win.view() as * WinView;
+            view.showFrame(rawToOwn(this), push, push);
+        }
+    }
+
+    fun pop() {
+        view.popFrame();
+    }
+
+    protected fun onUpdate() {
+        if (animManager.updateFrame()) {
+    //      echo("anim continue")
+            view.repaint();
+        }
+    }
+
+    override fun detach(doRelayout: Bool = true)
+    {
+        initState = -1;
+        //view = null
+        super.detach(doRelayout);
+    }
+
+    fun isOpened(): Bool {
+        return initState == 1;
+    }
+
+    override fun repaint()
+    {
+        //renderCacheDirty = true;
+        //convert dirty coordinate system to realative to parent
+        //if (dirty != null) dirty = Rect(dirty.x + x, dirty.y + y, dirty.w, dirty.h)
+        view.repaint();
+    }
+
+    override fun relayout(dirty: Int = 1) {
+        super.relayout(dirty);
+        if (view != null) {
+            view.layoutDirty = dirty;
+            view.repaint();
+        }
+    }
+
+    protected override fun doPaint(clip: &Rect , g:&Graphics ) {
+        //beginTime := Duration.nowTicks
+        //g.antialias = antialias
+        g.setColor(background);
+        g.fillRect(0, 0, width, height);
+        super.doPaint(clip, g);
+    }
+
+    
+    protected fun onRemoveWidget(w: *Widget) {
+        if (focusWidget == w) {
+            clearFocus();
+        }
+
+        if (mouseHoverWidget == w) {
+            mouseHoverWidget = null;
+        }
+        
+        if (dragFocusWidget == w) {
+            dragFocusWidget = null;
+        }
+    }
+
+    fun clearFocus() {
+        focusIt(null);
+    }
+
+    fun focusIt(w: *? Widget)
+    {
+        if (focusWidget == w) return;
+        //echo("focus:$focusWidget => $w")
+        var oldFocus = focusWidget;
+        this.focusWidget = w;
+        
+        // Event e := Event();
+        if (oldFocus != null) { 
+            oldFocus.setFocusState(false);
+        }
+        
+        if (w != null) {
+            view.host().focus();
+            focusWidget.setFocusState(true);
+        }
+    }
+
+    fun dragFocus(w: *? Widget) {
+        if (dragFocusWidget == w) return;
+        dragFocusWidget = w;
+        clearFocus();
+    }
+
+    fun mouseHover(w: *? Widget)
+    {
+        if (mouseHoverWidget == w) return;
+        if (mouseHoverWidget != null) {
+            mouseHoverWidget.mouseExit();
+        }
+        this.mouseHoverWidget = w;
+        w.mouseEnter();
+    }
+
+    override fun focused(): Bool { return view.host().hasFocus(); }
+
+    fun isFocusedWidiget(w: *? Widget): Bool {
+        if (!focused()) return false;
+        return w == focusWidget;
+    }
+
+    protected override fun onDrag(e:&GestureEvent ){
+        if (dragFocusWidget == null) return;
+        var px = e.relativeX;
+        var py = e.relativeY;
+        var pos = dragFocusWidget.parent.posOnWindow();
+        //if (pos != null) {
+            e.relativeX = (e.x - pos.x) as Int;
+            e.relativeY = (e.y - pos.y) as Int;
+        //}
+        if (dragFocusWidget.enabled) dragFocusWidget.onDrag(e);
+        e.relativeX = px;
+        e.relativeY = py;
+    }
+
+    protected override fun postMotionEvent(e:&MotionEvent ) {
+        //fire mouse out event
+        if (mouseHoverWidget != null) {
+            var ap = Coord{.x=e.x;.y= e.y;};
+            var p = mouseHoverWidget.mapToRelative(ap);
+            if (!mouseHoverWidget.contains(p.x as Int, p.y as Int)) {
+                mouseHoverWidget.mouseExit();
+                mouseHoverWidget = null;
+            }
+        }
+        
+        super.postMotionEvent(e);
+    }
+
+    protected override fun postGestureEvent( e:&GestureEvent) {
+        if (e.type == GestureEvent::drop) {
+            //e.data = dragFocusWidget;
+        }
+        super.postGestureEvent(e);
+    }
+
+    override fun keyEvent(e:&KeyEvent ) {
+        if (focusWidget == null) return;
+        if (focusWidget.enabled) focusWidget.keyEvent(e);
+    }
+
+    protected fun windowEvent(e: WindowEventType )
+    {
+        // onWindowStateChange.fire(e);
+    }
+
+    protected override fun onOpen() {
+        // isFirst := initState == 0
+        initState = 1;
+        // onOpened.fire(Event { data = isFirst })
+        // super.onOpen
+    }
+    //protected override fun onDetach() {
+        // onClosing.fire(null)
+        // super.onDetach
+    //}
+
+    /**
+    * make a widget that layout top of root view
+    */
+    fun topOverlayer(modal :Int = 1) : * WidgetGroup
+    {
+        var topLayer = new ModalLayer { .init(modal); };
+        var t: * WidgetGroup = topLayer;
+        this.add(move topLayer);
+        return t;
+    }
+}

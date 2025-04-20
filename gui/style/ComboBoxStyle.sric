@@ -1,0 +1,38 @@
+import sric::*;
+import waseGraphics::*;
+
+struct ComboBoxStyle : WidgetStyle {
+
+  fun new()
+  {
+    outlineColor = Color { .rgba = 0x7f7f7fff; };
+    color = Color { .rgba = 0x232323ff; };
+  }
+
+  override fun doPaint(widget: *Widget , g:& Graphics)
+  {
+    var btn = widget as * Button;
+
+    g.setColor(color);
+    //var lWidth = (lineWidth);
+    //g.strokeWidth(lWidth);
+
+    var top = widget.paddingTop();
+    var left = widget.paddingLeft();
+    var bottom = top + widget.contentHeight();
+    var right =  left + widget.contentWidth();
+
+    //g.drawLine(left, bottom, right-1, bottom);
+
+    var cornerSize = (widget.contentHeight() * 0.6f) as Int;
+    var pa = g.beginPath();
+    pa.moveTo(right-cornerSize, bottom);
+    pa.lineTo(right, bottom);
+    pa.lineTo(right, bottom-cornerSize);
+    pa.close();
+    g.fillPath(pa);
+
+    //draw text
+    drawText(widget, g, btn.text, btn.textAlign);
+  }
+}

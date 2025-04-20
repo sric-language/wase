@@ -1,0 +1,101 @@
+import sric::*;
+import waseGraphics::*;
+
+virtual struct VBox : WidgetGroup
+{
+  var spacing : Int = 4;
+
+  var align : Align = Align::Begin;
+
+  //@Transient
+  private var weightSpace : Float;
+  //@Transient
+  private var alignOffset : Int;
+
+  private fun calSpace(g: &Graphics) {
+    var hintsW = contentWidth();
+    var hintsH = contentHeight();
+    var spacing = (this.spacing);
+
+    var spaceUsage : Int = 0;
+    var allWeight : Float = 0f;
+
+    for (var i=0; i<children.size(); ++i) {
+      var c:* own* Widget = children.getPtr(i);
+      if ((*c).layout.height == Layout::matchParent) {
+        allWeight += (*c).layout.weight;
+        if (this.layout.height == Layout::wrapContent) {
+          scError("ui","parent size depends on chilren");
+        }
+      }
+      else if ((*c).layout.height == Layout::wrapContent) {
+        var size = (*c).bufferedPrefSize(g, -1, -1);
+        spaceUsage += size.h;
+      }
+       else {
+        var size = (*c).bufferedPrefSize(g, hintsW, hintsH);
+        spaceUsage += size.h;
+      }
+      if (i > 0) spaceUsage += spacing;
+    }
+
+    weightSpace = 1f;
+  
+    if (hintsH > spaceUsage && allWeight>0f) {
+      weightSpace = (hintsH - spaceUsage)/allWeight;
+    }
+
+    if (align == Align::Center) {
+        alignOffset = ((hintsH - spaceUsage)/2) as Int;
+    }
+    else if (align == Align::End) {
+        alignOffset = (hintsH - spaceUsage);
+    }
+
+  }
+
+  override fun layoutChildren(g: &Graphics, force: Bool )
+  {
+    var x = paddingLeft();
+    var y = paddingTop();
+    var hintsW = contentWidth();
+    var hintsH = contentHeight();
+    var spacing = this.spacing;
+    calSpace(g);
+    y += alignOffset;
+
+    for (var i=0; i<children.size(); ++i) {
+      var c:* own* Widget = children.getPtr(i);
+      var size = (*c).bufferedPrefSize(g, hintsW, hintsH);
+      var cx = x;
+      var cy = y;
+
+      var cw = size.w;
+      var ch = size.h;
+      
+      if ((*c).layout.height == Layout::matchParent) {
+        ch = ((*c).layout.weight*weightSpace) as Int;
+      }
+      y += ch + spacing;
+      cx += (*c).layout.prefX(hintsW, hintsH, size.w);
+    
+      (*c).setLayout(g, cx, cy, cw, ch, force);
+    }
+  }
+
+  protected override fun prefContentSize(g: &Graphics, hintsWidth: Int = -1, hintsHeight: Int = -1): Size {
+    var w = 0;
+    var h = 0;
+    var spacing = (this.spacing);
+    for (var i=0; i<children.size(); ++i) {
+      var c:* own* Widget = children.getPtr(i);
+      var size = (*c).bufferedPrefSize(g, hintsWidth, hintsHeight);
+      //echo("size$size")
+      w = max(w, size.w);
+      h += size.h;
+      if (i > 0) h += spacing;
+    }
+
+    return Size { .w = w; .h = h; };
+  }
+}

@@ -1,0 +1,94 @@
+import sric::*;
+import cstd::*;
+
+/**
+** Transform models an affine transformation matrix:
+**
+**   |a  c  e|
+**   |b  d  f|
+**   |0  0  1|
+**/
+struct Transform2D {
+    var a : Float;
+
+    var b : Float;
+
+    var c : Float;
+
+    var d : Float;
+
+    var e : Float;
+
+    var f : Float;
+
+    fun translate(tx : Float, ty : Float) : Transform2D {
+        return makeTranslate(tx, ty) * (*this);
+    }
+
+    fun scale(sx : Float, sy : Float) : Transform2D {
+        return makeScale(sx, sy) * (*this);
+    }
+
+    fun rotate(angle : Float) : Transform2D {
+        return makeRotate(angle) * (*this);
+    }
+
+    static fun makeTranslate(tx : Float, ty : Float) : Transform2D {
+        return make(1, 0, 0, 1, tx, ty);
+    }
+
+    static fun makeScale(sx : Float, sy : Float) : Transform2D {
+        return make(sx, 0, 0, sy, 0, 0);
+    }
+
+    static fun makeRotate(angle : Float) : Transform2D {
+        var a = toRadians(angle);
+        var acos = cos(a);
+        var asin = sin(a);
+        var rot = make(acos, asin, -asin, acos, 0, 0);
+        return rot;
+    }
+
+    static fun makeSkewX(angle : Float) : Transform2D {
+        var a = toRadians(angle);
+        return make(1, 0, tan(a), 1, 0, 0);
+    }
+
+    static fun makeSkewY(angle : Float) : Transform2D {
+        var a = toRadians(angle);
+        return make(1, tan(a), 0, 1, 0, 0);
+    }
+
+    static fun makeIndentity() : Transform2D {
+        return make(1, 0, 0, 1, 0, 0);
+    }
+
+    static fun make(a : Float, b : Float, c : Float, d : Float, e : Float, f : Float) : Transform2D {
+        var t: Transform2D = uninit;
+        t.a = a; t.c = c; t.e = e;
+        t.b = b; t.d = d; t.f = f;
+        return t;
+    }
+
+    operator fun mult(that : const Transform2D) : Transform2D {
+        return make(a * that.a + c * that.b + e * 0,  // a
+            b * that.a + d * that.b + f * 0,  // b
+            a * that.c + c * that.d + e * 0,  // c
+            b * that.c + d * that.d + f * 0,  // d
+            a * that.e + c * that.f + e * 1,  // e
+            b * that.e + d * that.f + f * 1);  // f
+    }
+
+    /**
+    /**
+    ** transform the coordinate using current matrix.
+    ** x: xy[0], y: xy[1]. The result will rewrite the list
+    **/
+    */
+    fun transformPoint(x : Float, y : Float, x2 : raw* Float, y2 : raw* Float) {
+        unsafe {
+            *x2 = a*x + c*y + e;
+            *y2 = b*x + d*y + f;
+        }
+    }
+}

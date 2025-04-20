@@ -1,0 +1,54 @@
+import sric::*;
+import waseGraphics::*;
+
+struct ComboBox : Button
+{
+  var items : DArray$<String>;
+  readonly var selIndex : Int = -1;
+  var onSelect: fun(i: Int);
+  
+  fun setSelIndex(val: Int, fire: Bool = true) {
+      if (selIndex == val) return;
+
+      if (onSelect != null && fire) {
+        onSelect(val);
+      }
+      selIndex = val;
+      this.setText(items[val].copy());
+      if (fire) {
+        eventListeners.fire(EventType::SelectChanged, this);
+      }
+  }
+
+  fun new()
+  {
+    setText("");
+    this.onClick = fun(w: * Widget) { this.show(); };
+    padding = Insets { .initAll(15); };
+    style = "ComboBox";
+  }
+
+  fun show()
+  {
+    //var self_ = this;
+    var list = new CtxMenu {
+      .layout.vAlign = Align::Begin;
+      .layout.hAlign = Align::Begin;
+      .layout.width = (this.width);
+      .layout.height = 600;
+      // .items = this.items;
+      for (var i = 0; i<this.items.size(); ++i) {
+        .items.add(this.items[i].copy());
+      }
+      .onSelect = fun (i:Int) {
+        this.setSelIndex(i);
+      };
+    };
+
+    var pos = posOnWindow();
+    list.layout.offsetX = (pos.x) as Int;
+    list.layout.offsetY = (pos.y + height) as Int;
+    //echo("${list.layout.offsetY},${pos.y.toInt},${height}")
+    list.show(this);
+  }
+}

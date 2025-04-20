@@ -1,0 +1,156 @@
+
+import sric::*;
+import waseGui::*;
+import waseGraphics::*;
+
+struct MenuTest : BasePage
+{
+  protected override fun view(): own* Widget {
+    return new Menu
+    {
+      new MenuItem
+      {
+        .setText("File");
+        new MenuItem
+        {
+          .setText("Open");
+          new MenuItem{.setText("From 1");},
+          new MenuItem{.setText("From 2");};
+        },
+        new MenuItem
+        {
+          .setText("Save");
+          new MenuItem{.setText("as 1");},
+          new MenuItem{.setText("as 2");};
+        };
+      },
+      new MenuItem
+      {
+        .setText("Edit");
+        new MenuItem{.setText("Copy");},
+        new MenuItem{.setText("Paste");};
+      },
+      new MenuItem
+      {
+        .setText("Help");
+        new MenuItem
+        {
+          .setText("About");
+          .onClick = fun(w:*Widget)
+          {
+            Toast::showText("hello world");
+          };
+        },;
+      };
+    };
+  }
+}
+
+struct TooltipTest : BasePage
+{
+  protected override fun view(): own*Widget {
+    return new VBox
+    {
+      .padding = Insets { .initAll(50); };
+      .layout.height = Layout::matchParent;
+
+      new Button {
+        .setText("Button");
+        .tooltip = "hello world";
+      },;
+    };
+  }
+}
+
+struct TableTest : BasePage
+{
+  protected override fun view(): own*Widget {
+    return new Table { .setModel(new MyTableModel); };
+  }
+}
+
+struct MyTableModel : TableModel
+{
+  var vals : DArray$<String>;
+
+  var headerPrefix : String = "Col-";
+
+  fun new() {
+    for (var i=0; i<100; ++i) {
+      vals.add(String::format("row %d", i));
+    }
+  }
+
+  override fun header(col: Int): String { return headerPrefix + String::fromInt32(col); }
+  override fun text(col: Int , row: Int ): String
+  {
+    if (col == 0) return vals[row].copy();
+    return String::format("%d %d", row, col);
+  }
+  override fun numRows(): Int { return vals.size(); }
+  override fun numCols(): Int { return 5; }
+}
+
+
+
+
+struct TreeTest : BasePage
+{
+  protected override fun view(): own*Widget {
+    return new TreeView { .setModel(new MyTreeModel); };
+  }
+}
+
+struct MyTreeModel : TreeModel
+{
+  override fun roots(): DArray$<Int64>
+  {
+    var p : DArray$<Int64>;
+    p.add(1);
+    p.add(2);
+    p.add(3);
+    p.add(4);
+    p.add(5);
+    p.add(6);
+    p.add(7);
+    p.add(8);
+    p.add(9);
+    return p;
+    //["1", "2", "3", "4", "5", "6", "7", "8", "9"]
+  }
+  override fun text(node: Int64): String { return String::fromInt64(node); }
+  override fun hasChildren(node: Int64): Bool { return true; }
+  override fun children(node: Int64): DArray$<Int64> {
+    var p : DArray$<Int64>;
+    p.add(node*10+1);
+    p.add(node*10+2);
+    p.add(node*10+3);
+    p.add(node*10+4);
+    p.add(node*10+5);
+    p.add(node*10+6);
+    p.add(node*10+7);
+    p.add(node*10+8);
+    p.add(node*10+9);
+    return p;
+    //["aaa", "bbb", "ccc", "ddd", "eee", "fff"]
+  }
+}
+
+struct ResizePaneTest : BasePage
+{
+  protected override fun view(): own* Widget {
+    return new Pane
+    {
+      .padding = Insets{.initAll(50);};
+      .layout.height = Layout::matchParent;
+
+      new ResizePane {
+          .layout = Layout { .width = 300; .height = 300; };
+          new Button {
+            .layout.height = Layout::matchParent;
+            .setText("Button");
+          },;
+      },;
+    };
+  }
+}

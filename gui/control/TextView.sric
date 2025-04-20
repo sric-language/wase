@@ -1,0 +1,126 @@
+import sric::*;
+import waseGraphics::*;
+
+struct TextView : Widget
+{
+  readonly var text: String;
+
+  var lineHeightScale :Float= 1.3;
+  
+  //@Transient
+  private var lines : DArray$<String>;
+  //@Transient
+  private var lastWidth :Int= 0;
+  //@Transient
+  private var textDirty :Bool= true;
+  //@Transient
+  private var sizeCacheWidth :Int = -2;
+  //@Transient
+  private var sizeCache : Size;
+
+  var textAlign :Align= Align::Begin;
+  var autoWrap :Bool= true;
+  
+  fun setText(t: String) {
+    if (text != t) {
+      text = move t;
+      textDirty = true;
+      sizeCache { .w = 0; .h = 0; };
+      sizeCacheWidth = -2;
+      this.relayout();
+    }
+  }
+
+  //fun rowHeight(): Int { return (font.height * lineHeightScale).toInt }
+
+  fun new()
+  {
+    padding = Insets { .initAll(1); };
+    style = "TextView";
+  }
+
+  fun getLines() : raw* DArray$<String> {
+    return &lines;
+  }
+  
+  fun wrapText(g: &Graphics, lines : & DArray$<String>, w :Int) {
+    w = w-((padding.left + padding.right));
+    if (!textDirty && lastWidth == w) {
+        return;
+    }
+    textDirty = false;
+    lastWidth = w;
+    
+    lines = text.split("\n");
+    if (!autoWrap || w <= 0) return;
+    
+    var nlines : DArray$<String>;
+    for (var i=0; i<lines.size(); ++i) {
+        wrapLine(g, lines[i], w, nlines);
+    }
+    lines.swap(nlines);
+  }
+  
+  private fun wrapLine(g: &Graphics, line: & String , w: Int, lines : & DArray$<String> ) {
+    var aw = g.textWidth(line.c_str(), line.size());
+    if (aw <= w) {
+        lines.add(line.copy());
+        return;
+    }
+    //lines := Str[,]
+    var start = 0;
+    var end = 0;
+    for (; end<=line.size();) {
+        //t := line[start..<end];
+        var lw = 0f;
+        unsafe {
+            lw = g.textWidth(line.c_str() + start, end-start);
+        }
+        if (lw > w && (end-1>start)) {
+            end = end - 1;
+            var t0 = line.substr(start, end-start);
+            lines.add(move t0);
+            start = end;
+        }
+
+        ++end;
+        //utf8
+        while (end<=line.size()) {
+          var ch = line[end-1];
+          if ((ch & 0xC0) == 0x80) {
+            ++end;
+          }
+          else {
+            break;
+          }
+        }
+    }
+    if (start < line.size()) {
+        var t0 = line.substr(start);
+        lines.add(move t0);
+    }
+  }
+
+  protected override fun prefContentSize(g: &Graphics, hintsWidth :Int= -1,  hintsHeight :Int= -1): Size {
+
+    if (sizeCacheWidth == hintsWidth) return sizeCache;
+    sizeCacheWidth = hintsWidth;
+
+    g.setFont(getStyle().font);
+    g.setFontSize(getStyle().fontSize);
+    var metric: FontMetrics;
+    g.fontMetrics(metric);
+
+    wrapText(g, lines, hintsWidth);
+    var w: Float32 = 0f;
+    for (var i=0; i<lines.size(); ++i) {
+       var lw = g.textWidth(lines[i].c_str(), lines[i].size())+3;
+       w = max(w, lw);
+    }
+    var h = metric.height * lines.size();
+
+    //echo("prefSize:($w, $h), hintsWidth:$hintsWidth, $lines")
+    sizeCache = Size{.w = w as Int; .h = h as Int; };
+    return sizeCache;
+  }
+}

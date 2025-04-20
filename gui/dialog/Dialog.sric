@@ -1,0 +1,40 @@
+import sric::*;
+import waseGraphics::*;
+
+virtual struct Dialog : VBox
+{  
+  virtual fun show( parent : * Widget = Frame::cur())
+  {
+    var root = parent.getRootView();
+    var overlayer = root.topOverlayer(2);
+    overlayer.add(rawToOwn(this));
+    root.clearFocus();
+    overlayer.relayout();
+    
+    if (animType() == 1)
+        AnimUtil::expandAnim(this).start();
+    else
+        AnimUtil::moveInAnim(this, Direction::Bottom).start();
+  }
+  
+  protected virtual fun animType(): Int { return 0; }
+  
+  fun close() {
+    //parent := this.parent
+    //var self_ = this;
+    if (animType() == 1) {
+        var annim = AnimUtil::shrinkAnim(this);
+        annim.whenDone = fun() {
+            parent.detach();
+        };
+        annim.start();
+    }
+    else {
+        var annim = AnimUtil::moveOutAnim(this, Direction::Bottom);
+        annim.whenDone = fun() {
+            parent.detach();
+        };
+        annim.start();
+    }
+  }
+}

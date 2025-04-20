@@ -1,0 +1,30 @@
+import sric::*;
+import waseGui::*;
+import waseGraphics::*;
+
+struct EditTextTest : BasePage
+{
+  protected override fun view(): own* Widget {
+    return new VBox {
+      .margin = Insets{.initAll(10);};
+      .layout.height = Layout::matchParent;
+      
+      new EditText {
+        .hint = "EditText";
+      },
+      new EditText {
+        .setInputType(TextInput::inputTypePassword);
+        .hint = "Password";
+      },
+      new EditText {
+        .setInputType(TextInput::inputTypeMultiLine);
+        .hint = "MultiLine";
+        .layout.height = Layout::matchParent;
+      },
+      new EditText {
+        .hint = "EditText";
+        .layout.vAlign = Align::End;
+      };
+    };
+  }
+}

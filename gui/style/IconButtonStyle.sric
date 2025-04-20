@@ -1,0 +1,81 @@
+
+import sric::*;
+import waseGraphics::*;
+
+struct IconButtonStyle : WidgetStyle
+{
+  var selectedColor: Color = Color { .rgba = 0x666666ff; };
+  
+  fun new() {
+    background = Color { .rgba = 0xf2f2f2ff; };
+  }
+
+  override fun doPaint(widget: *Widget , g:& Graphics)
+  {
+    if (backgroundImage != null && backgroundImage.isReady()) {
+      var src = Rect {.x = 0 ; .y = 0; .w = backgroundImage.width(); .h = backgroundImage.height(); };
+      var dst = Rect {.x = 0; .y = 0; .w = widget.width; .h = widget.height; };
+  //    echo("src$src,dst$dst")
+      g.drawImageEx(backgroundImage, src, dst);
+    }
+
+    var btn = widget as * Button;
+
+    if (btn is *ToggleButton) {
+      var tb = btn as * ToggleButton;
+      if (tb.checked) {
+        g.setColor(selectedColor);
+        var arc = roundRadius;
+        g.fillRoundRect(btn.paddingLeft(), btn.paddingTop(), widget.contentWidth(), widget.contentHeight(), arc);
+      }
+    }
+
+    if (btn.state == Button::mouseDown) {
+        g.setColor(background);
+        g.globalAlpha(100/255.0);
+        g.fillRect(0, 0, widget.width, widget.height);
+        g.globalAlpha(1.0);
+    }
+
+    if (!btn.iconUri.isEmpty() && btn.icon == null) {
+      btn.icon = g.createImage();
+      btn.icon.load(btn.iconUri.c_str());
+    }
+
+    var vAlign: Align = Align::Center;
+    if (btn.icon != null && btn.icon.isReady()) {
+      //    echo("src$src,dst$dst")
+      var src = Rect {.x = 0 ; .y = 0; .w = btn.icon.width(); .h = btn.icon.height(); };
+      var size: Size = uninit;
+      if (btn.iconSize.w == 0 && btn.iconSize.h == 0) {
+        size.w = btn.icon.width();
+        size.h = btn.icon.height();
+      }
+      else {
+        size = btn.iconSize;
+      }
+      var dst = Rect { .x = widget.paddingLeft(); .y = widget.paddingTop(); .w = size.w; .h = size.h; };
+      switch (btn.iconPosition) {
+        case Direction::Left:
+          dst { .y = widget.height*0.5-size.h*0.5; };
+        case Direction::Top:
+          dst { .x = widget.width*0.5-size.w*0.5; };
+          vAlign = Align::End;
+      }
+      g.drawImageEx(btn.icon, src, dst);
+    }
+    
+    if (btn.rippleSize > 0.0) {
+        g.setColor(rippleColor);
+        var r = (btn.rippleSize * (100+btn.width)) as Int;
+        var alpha = ((1-btn.rippleSize));
+        if (alpha > 200/255.0) alpha = 200/255.0;
+        g.globalAlpha(alpha);
+        var w = r+r;
+        g.fillOval(btn.ripplePoint.x-r, btn.ripplePoint.y-r, w, w);
+        g.globalAlpha(1.0);
+    }
+
+    drawText(widget, g, btn.text, btn.textAlign, vAlign);
+  }
+}

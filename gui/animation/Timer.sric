@@ -1,0 +1,38 @@
+import sric::*;
+import waseGraphics::*;
+
+struct Timer
+{
+  var period: Int = 1000;
+
+  readonly var canceled : Bool = true;
+
+  private var onTimeOut: fun();
+
+  fun init( period: Int, onTimeOut: fun())
+  {
+    this.onTimeOut = onTimeOut;
+    this.period = period;
+  }
+
+  fun start()
+  {
+    canceled = false;
+    //var self_ = this;
+    setTimeout(period, fun(){ this.timeOut(); });
+  }
+
+  fun cancel()
+  {
+    canceled = true;
+  }
+
+  private fun timeOut()
+  {
+    if (canceled) return;
+    //var self_ = this;
+    setTimeout(period, fun(){ this.timeOut(); });
+    onTimeOut();
+  }
+
+}

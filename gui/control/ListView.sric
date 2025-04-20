@@ -1,0 +1,241 @@
+
+import sric::*;
+import waseGraphics::*;
+
+virtual struct ListView : ScrollPane
+{
+  //@Transient
+  private var rowHeight :Int= 100;
+
+  //@Transient
+  private var itemLayoutDirty :Bool= true;
+
+  //@Transient
+  readonly var model : own*? ListAdapter;
+  
+  fun setModel(m: own* ListAdapter) {
+    model = move m;
+  }
+
+  fun new ()
+  {
+    layout.height = Layout::matchParent;
+    super.autoScrollContent = false;
+    this.setContent(new Pane { .layout.height = Layout::matchParent; });
+  }
+
+  protected override fun viewportHeight() : Float32 {
+    return contentHeight();
+  }
+
+  protected override fun contentMaxHeight(g: &Graphics): Float32 {
+    var t = model.size() * rowHeight;
+    return t as Float32;
+  }
+
+  protected override fun prefContentSize(g: &Graphics, hintsWidth : Int = -1, hintsHeight : Int = -1): Size {
+    //r := super.prefContentSize(result)
+    return Size{ .w = (200); .h = contentMaxHeight(g) as Int; };
+  }
+
+  protected fun getView( i: Int): own* Widget {
+    return model.getView(i);
+  }
+
+  protected override fun onViewportChanged() { itemLayoutDirty = true; }
+
+  protected override fun paintChildren( clip: &Rect,  g: &Graphics) {
+    //result := Dimension(-1, -1)
+    
+    if (itemLayoutDirty) {
+      itemLayoutDirty = false;
+      layoutItem(g);
+    }
+
+    vbar.viewport = viewportHeight();
+    vbar.max = contentMaxHeight(g);
+    
+    super.paintChildren(clip, g);
+  }
+
+  protected virtual fun layoutItem(g: &Graphics) {
+    var x = paddingTop();
+    var y = paddingLeft();
+    var w = width;
+    var h = height;
+
+    var i = (offsetY / rowHeight) as Int;
+    var topOffset = offsetY - (i * rowHeight) as Int;
+    y -= topOffset;
+
+    var pane = content() as * Pane;
+
+    for (var i=0; i<pane.children.size(); ++i) {
+        var child:* own* Widget = pane.children.getPtr(i);
+        (*child).setParent(null);
+    }
+    pane.children.clear();
+
+    var count = 0;
+    if (i < 0) {
+      y += (-i * (rowHeight as Int));
+      i = 0;
+    }
+    var newHeight = 0;
+    for (; i< model.size(); ++i)
+    {
+      var view = getView(i);
+      view.layout.ignored = true;
+      view.setParent(pane);
+      
+      ++count;
+
+      var itemSize = view.bufferedPrefSize(g, w, h);
+      var cx = x + view.layout.prefX(w, h, itemSize.w);
+      view.setLayout(g, cx, y, itemSize.w, itemSize.h, false);
+      y += itemSize.h;
+      newHeight += itemSize.h;
+
+      pane.children.add(move view);
+      
+      if (y > h) {
+        break;
+      }
+    }
+
+    if (count == 0) {
+      return;
+    }
+    
+    rowHeight = newHeight/count;
+
+    model.flush();
+  }
+}
+
+protected struct ListItem {
+  var view: own*? Widget; 
+  var type :Int = 0;
+  var pos :Int = -1;
+  var mode :Int = -1;
+}
+
+protected struct ListItemPool {
+  private var freeList : HashMap$<Int, DArray$<own* ListItem>>;
+  private var activesMap : HashMap$<Int, own* ListItem>;
+  private var mode :Int= 0;
+
+  fun get(pos: Int): own*? ListItem {
+    var item = activesMap.getPtr(pos);
+    if (item != null) {
+      (*item).mode = mode;
+      return share(*item);
+    }
+    return null;
+  }
+
+  fun reuse( type: Int): own*? ListItem {
+    if (freeList.size() > 0) {
+      var list = freeList.getPtr(type);
+      if (list != null && (*list).size() > 0) {
+        return (*list).pop();
+      }
+    }
+    return null;
+  }
+
+  fun add(pos: Int, item: own* ListItem ) {
+    item.mode = mode;
+    activesMap[pos] = move item;
+  }
+
+  fun flush() {
+    var unactive: DArray$<*ListItem>;
+    var unactiveRef = &unactive;
+    //var self_ = this;
+    activesMap.eachWhile(fun(v: const & own* ListItem, k: const &Int): Bool{
+        if (v.mode != this.mode) {
+            unactiveRef.add(v);
+        }
+        return true;
+    });
+    for (var i=0; i<unactive.size(); ++i) {
+      freeList[unactive[i].type].add(refToOwn(unactive[i]));
+      activesMap.remove(unactive[i].pos);
+    }
+    mode = mode == 0 ? 1 : 0;
+  }
+}
+
+abstract struct ListAdapter
+{
+  private var itemPool : ListItemPool;
+
+  //private Bool dirty := true
+
+  abstract fun size(): Int;
+  
+  protected virtual fun getType(i: Int): Int { return 1; }
+
+  protected abstract fun bind(w: * Widget, data: Int);
+
+  protected abstract fun newView(type: Int): own* Widget;
+
+  fun flush() {
+    itemPool.flush();
+  }
+
+  protected virtual fun getView( pos: Int) : own* Widget {
+    var item = itemPool.get(pos);
+    if (item != null) {
+      //if (dirty) {
+      //  bind(item.view, item.data)
+      //}
+      return share(item.view);
+    }
+
+    var type = getType(pos);
+    
+    var reuseItem = itemPool.reuse(type);
+    if (reuseItem != null) {
+      item = move reuseItem;
+    } else {
+      item = new ListItem;
+      item.view = newView(type);
+      item.type = type;
+    }
+    //item.data = move data;
+    item.pos = pos;
+    bind(item.view, item.pos);
+    var res = share(item.view);
+    itemPool.add(pos, move item);
+    return res;
+  }
+}
+
+virtual struct SimpleListAdapter : ListAdapter
+{
+  var list: DArray$<String>;
+
+  var onClick : fun(t: Int) = null;
+
+  fun init(list: DArray$<String>) {
+    this.list = move list;
+  }
+
+  override fun size(): Int { return list.size(); }
+
+  protected override fun bind(w: * Widget, data: Int) {
+    var l = w as * Label;
+    if (l.text != list[data]) {
+      l.setText(list[data].copy());
+    }
+    //var self_ = this;
+    l.onClick = fun(t:* Widget){ if (this.onClick != null) this.onClick(data); };
+  }
+
+  protected override fun newView(type: Int): own* Widget {
+    //echo("new view")
+    return new Label { .padding = Insets{ .initAll(8); }; };
+  }
+}

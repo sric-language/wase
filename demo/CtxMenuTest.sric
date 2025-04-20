@@ -1,0 +1,49 @@
+import sric::*;
+import waseGui::*;
+import waseGraphics::*;
+import cstd::*;
+
+struct CtxMenuTest : BasePage
+{
+  protected override fun view(): own* Widget {
+    return new VBox {
+        new ComboBox {
+            .items.add("comboBox1"); .items.add("comboBox2"); .items.add("comboBox3"); .items.add("comboBox4"); .items.add("comboBox5");
+            .items.add("comboBox6"); .items.add("comboBox7"); .items.add("comboBox8"); .items.add("comboBox9"); .items.add("comboBox10");
+            .setSelIndex(-1);
+            .setText("ComboBox");
+        },
+        
+        new Button {
+           .setText("Long Press");
+           .onGestureEvent = fun(w: *Widget, e: &GestureEvent) {
+              if (e.type == GestureEvent::longPress) {
+                  printf("long press\n");
+                  new CtxMenu {
+                    .items.add("comboBox1"); .items.add("comboBox2"); .items.add("comboBox3"); .items.add("comboBox4"); .items.add("comboBox5");
+                    .items.add("comboBox6"); .items.add("comboBox7"); .items.add("comboBox8"); .items.add("comboBox9"); .items.add("comboBox10");
+                  }.show(w);
+              }
+           };
+        },
+
+        new Button {
+           .setText("Context Menu");
+           .onGestureEvent = fun(w: *Widget, e: &GestureEvent) {
+              if (e.type == GestureEvent::click && e.button == ButtonType::Right) {
+                  printf("right click: %d, %d\n", e.x, e.y);
+                  new CtxMenu {
+                    .layout.vAlign = Align::Begin;
+                    .layout.hAlign = Align::Begin;
+                    .layout.offsetX = (e.x);
+                    .layout.offsetY = (e.y);
+
+                    .items.add("comboBox1"); .items.add("comboBox2"); .items.add("comboBox3"); .items.add("comboBox4"); .items.add("comboBox5");
+                    .items.add("comboBox6"); .items.add("comboBox7"); .items.add("comboBox8"); .items.add("comboBox9"); .items.add("comboBox10");
+                  }.show(w);
+              }
+           };
+        },;
+    };
+  }
+}

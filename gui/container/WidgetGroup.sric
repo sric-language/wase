@@ -1,0 +1,237 @@
+import sric::*;
+import waseGraphics::*;
+import cstd::*;
+
+abstract struct WidgetGroup : Widget {
+
+    var children: DArray$<own*Widget> = DArray$<own*Widget>{};
+
+    virtual fun delete() {
+        for (var i=0; i<children.size(); ++i) {
+            children[i].setParent(null);
+        }
+    }
+
+    fun _onDeserialize() {
+        for (var i=0; i<children.size(); ++i) {
+            children[i].setParent(this);
+        }
+    }
+
+    fun remove(child:*? Widget, doRelayout: Bool = true): Bool {
+        if (child == null)
+            return false;
+
+        child.setParent(null);
+
+        var root = getRootView();
+        if (root != null) {
+            child.onRemove(root);
+        }
+
+        var ok = false;
+        for (var i=0; i<children.size(); ++i) {
+            if (children[i] == child) {
+                children.removeAt(i);
+                ok = true;
+                break;
+            }
+        }
+
+        if (!ok) {
+            printf("not find child %p", child as raw*? Widget);
+            return false;
+        }
+
+        if (doRelayout && root != null) {
+            this.relayout();
+        }
+        return true;
+    }
+
+    fun removeAll() {
+        var root = getRootView();
+        for (var i=0; i<children.size(); ++i) {
+            if (root != null) {
+                children[i].onRemove(root);
+            }
+            children[i].setParent(null);
+        }
+        children.clear();
+    }
+
+    virtual fun add(child: own* Widget): *WidgetGroup {
+        if (child.parent != null) {
+            printf("ERROR: already parented\n");
+        }
+        child.setParent(this);
+        children.add(move child);
+        return this;
+    }
+
+    fun replaceAt(at: Int, child: own* Widget, doRelayout: Bool = true) {
+        var c:* own* Widget = children.getPtr(at);
+        (*c).setParent(null);
+
+        var root = getRootView();
+        if (root != null) {
+            (*c).onRemove(root);
+        }
+
+        if (child.parent != null) {
+            printf("ERROR: already parented\n");
+        }
+
+        child.setParent(this);
+
+        children[at] = move child;
+
+        if (doRelayout && root != null)
+            this.relayout();
+    }
+
+    fun childrenNum(): Int {
+        return children.size();
+    }
+
+    fun getChild(i: Int): *? Widget {
+        if (i >=0 && i < children.size()) {
+            return children[i];
+        }
+        return null;
+    }
+
+    override fun findById(id: &const String): *? Widget {
+        if (id == this.id) {
+            return this;
+        }
+        for (var i=0; i<children.size(); ++i) {
+            var res = children[i].findById(id);
+            if (res != null) {
+                return res;
+            }
+        }
+        return null;
+    }
+
+    fun moveToTop(child: *Widget) {
+        var at = -1;
+        for (var i=0; i<children.size(); ++i) {
+            if (children[i] == child) {
+                at = i;
+                break;
+            }
+        }
+        if (at != -1) {
+            children.removeAt(at);
+            children.add(refToOwn(child));
+        }
+    }
+
+    override fun findAt(x: Int, y: Int): *? Widget {
+        if (!contains(x, y)) return null;
+        for (var i=0; i<children.size(); ++i) {
+            var r = children[i].findAt(x, y);
+            if (r != null) {
+                return r;
+            }
+        }
+        return this;
+    }
+
+    protected override fun onLayout(force: Bool) {
+        for (var i=children.size()-1; i>=0 && i<children.size(); --i) {
+            if (children[i].willRemoved) {
+                this.remove(children[i], false);
+            }
+        }
+    }
+
+    abstract protected override fun layoutChildren(g: &Graphics, force:Bool);
+
+    abstract protected override fun prefContentSize(g: &Graphics, hintsWidth: Int = -1, hintsHeight: Int = -1): Size;
+
+
+    protected override fun postGestureEvent(e: &GestureEvent) {
+        var px = e.relativeX;
+        var py = e.relativeY;
+        for (var i=children.size()-1; i>=0 && i<children.size(); --i) {
+            if (children[i].enabled && !e.consumed) {
+                e.relativeX = px - this.x;
+                e.relativeY = py - this.y;
+                if (children[i].contains(e.relativeX, e.relativeY)) {
+                    children[i].postGestureEvent(e);
+                    if (children[i].consumeEvent) break;
+                }
+            }
+        }
+        e.relativeX = px;
+        e.relativeY = py;
+        
+        if (e.consumed) return;
+        this.gestureEvent(e);
+    }
+
+    protected override fun postMotionEvent(e: &MotionEvent) {
+        var px = e.relativeX;
+        var py = e.relativeY;
+        for (var i=children.size()-1; i>=0 && i<children.size(); --i) {
+            if (children[i].enabled && !e.consumed) {
+                e.relativeX = px - this.x;
+                e.relativeY = py - this.y;
+                if (children[i].contains(e.relativeX, e.relativeY)) {
+                    children[i].postMotionEvent(e);
+                    if (children[i].consumeEvent) break;
+                }
+            }
+        }
+        e.relativeX = px;
+        e.relativeY = py;
+        
+        if (e.consumed) return;
+        this.motionEvent(e);
+    }
+
+    protected override fun onOpen() {
+        for (var i=0; i<children.size(); ++i) {
+            children[i].onOpen();
+        }
+    }
+    protected override fun onRemove(rootView: *? Frame) {
+        for (var i=0; i<children.size(); ++i) {
+            children[i].onRemove(rootView);
+        }
+        super.onRemove(rootView);
+    }
+
+    override fun resetStyle() {
+        super.resetStyle();
+        for (var i=0; i<children.size(); ++i) {
+            children[i].resetStyle();
+        }
+    }
+  
+    protected virtual override fun doPaint(clip: &Rect, g: &Graphics) {
+        super.doPaint(clip, g);
+        var localClip = Rect{ .x = clip.x-this.x; .y= clip.y-this.y;
+                .w = clip.w; .h = clip.h; };
+        paintChildren(localClip, g);
+    }
+
+
+    protected virtual fun paintChildren(localClip: &Rect, g: &Graphics)
+    {
+        for (var i=0; i<children.size(); ++i) {
+            var t:* own* Widget = children.getPtr(i);
+            if ((*t).visible)
+            {
+                if (localClip.intersects((*t).bounds())) {
+                    g.save();
+                    g.transform(Transform2D::makeTranslate((*t).x, (*t).y));
+                    (*t).paint(localClip, g);
+                    g.restore();
+                }
+            }
+        }
+    }
+}

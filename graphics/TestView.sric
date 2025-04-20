@@ -1,0 +1,42 @@
+
+
+struct TestView : View {
+    private var _window: * Window;
+
+    fun onPaint(g : & Graphics) {
+        var font = Font { .name = "fallback"; };
+        g.setFont(font);
+        g.setFontSize(20);
+        g.drawText(100, 100, "Hello世界", -1);
+        g.drawRoundRect(0, 0, 200, 30, 5);
+        
+    }
+
+    fun onMotionEvent(e : & MotionEvent) {
+
+    }
+
+    fun onKeyEvent(e : & KeyEvent) {
+
+    }
+
+    fun onWindowEvent(e : WindowEventType) {
+
+    }
+
+    fun onBack() : Bool {
+        return true;
+    }
+
+    fun host() : * Window {
+        return _window;
+    }
+
+    fun setHost(w: * Window) {
+        _window = w;
+    }
+
+    fun getPrefSize(hintsWidth : Int, hintsHeight : Int) : Size {
+        return Size { .w = 1920; .h = 768; };
+    }
+}

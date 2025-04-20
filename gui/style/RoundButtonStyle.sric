@@ -1,0 +1,94 @@
+import sric::*;
+import waseGraphics::*;
+
+
+struct RoundButtonStyle : WidgetStyle
+{
+  var overColor : Color;
+  var stroke : Bool = false;
+  var fill : Bool = true;
+
+  fun new() {
+    fontColor = Color {.rgba = 0xffffffff; };
+    overColor = color.lighter();
+    roundRadius = 20;
+  }
+
+  override fun doPaint(widget: * Widget , g:& Graphics)
+  {
+    var btn = widget as * Button;
+
+    var width = widget.width;
+    var height = widget.height;
+    
+    var arc = this.roundRadius;
+
+    // g.brush = outlineColor
+    // g.fillRoundRect(0, 0, width, height, arc, arc)
+
+    var offsetW = 8;
+    var offsetR = 4;
+    width -= offsetW;
+    height -= offsetW;
+    
+    if (btn.state == Button::mouseOver) {
+        g.setColor(overColor);
+    }
+    else {
+        g.setColor(color);
+    }
+    
+    if (!btn.enabled) {
+      g.setColor(disableColor);
+    }
+
+    if (fill || btn.state == Button::mouseOver) {
+        g.fillRoundRect(offsetR, offsetR, width, height, arc);
+    }
+
+    // if (btn.ripplePoint != null && btn.rippleSize > 0.0) {
+    //     g.brush = rippleColor
+    //     r := (btn.rippleSize * (100+btn.width.max(btn.height))).toInt
+    //     alpha := (256 * (1-btn.rippleSize)).toInt
+    //     if (alpha > 200) alpha = 200
+    //     g.alpha = alpha
+    //     w := r+r
+    //     g.fillOval(btn.ripplePoint.x-r, btn.ripplePoint.y-r, w, w)
+    //     g.alpha = 255
+    // }
+
+    if (lineWidth > 0 && stroke) {
+        g.setColor(outlineColor);
+        var lw = lineWidth;
+        g.strokeWidth(lw);
+        g.drawRoundRect(offsetR, offsetR, width-lw, height-lw, arc);
+    }
+
+    drawText(widget, g, btn.text, btn.textAlign);
+  }
+}
+
+virtual struct FlatButtonStyle : LabelStyle
+{
+  fun new() {
+    fontColor = color;//Color(0x5577CC)
+    font.bold = true;
+    background = Color { .rgba = 0xf2f2f2ff; };
+  }
+  
+  override fun doPaint(widget: * Widget , g:& Graphics)
+  {
+    var btn = widget as * Button;
+    if (btn.rippleSize > 0.0) {
+        g.setColor(rippleColor);
+        var r = (btn.rippleSize * (100+max(btn.width, btn.height))) as Int;
+        var alpha = ((1-btn.rippleSize));
+        if (alpha > 200/255.0) alpha = 200/255.0;
+        g.globalAlpha(alpha);
+        var w = r+r;
+        g.fillOval(btn.ripplePoint.x-r, btn.ripplePoint.y-r, w, w);
+        g.globalAlpha(1);
+    }
+    super.doPaint(widget, g);
+  }
+}

@@ -1,0 +1,86 @@
+import sric::*;
+import waseGraphics::*;
+
+struct ResizePane : Pane {
+    var highlight : Bool = false;
+    protected var mode: Int = 0;
+
+    fun new() {
+        padding = Insets{ .init(20, 10, 10, 10); };
+        dragAware = true;
+        mouseAware = true;
+        style = "ResizePane";
+    }
+
+    protected override fun onDrag(e: & GestureEvent) {
+        super.onDrag(e);
+        //echo("e.consumed:$e.consumed,e.type:$e.type, mode:$mode")
+        if (e.consumed) return;
+
+        if (e.type == GestureEvent::drag && mode != 0) {
+            switch (mode) {
+                case 1:
+                    if (layout.offsetY + (e.deltaY) > 0) {
+                        layout.offsetY += (e.deltaY);
+                    }
+                    layout.offsetX += (e.deltaX);
+                    
+                case 2:
+                    layout.width += (e.deltaX);
+                case 3:
+                    layout.height += (e.deltaY);
+                case 4:
+                    layout.offsetX += (e.deltaX);
+                    layout.width -= (e.deltaX);
+            }
+            e.consumed = true;
+            relayout();
+        }
+        else if (e.type == GestureEvent::drop && mode != 0) {
+            relayout(2);
+            mode = 0;
+        }
+    }
+
+    protected override fun motionEvent(e: &MotionEvent ) {
+        super.motionEvent(e);
+        //echo("e.consumed:$e.consumed,e.type:$e.type")
+        //if (e.consumed) return
+        
+        if (e.type == MotionEventType::MouseMove) {
+
+            if (e.relativeY < this.y+paddingTop()) {
+                mode = 1;
+            }
+            else if (e.relativeY > this.y+paddingTop()+contentHeight()) {
+                mode = 3;
+            }
+            else if (e.relativeX > this.x + paddingLeft() + contentWidth()) {
+                mode = 2;
+            }
+            else if (e.relativeX < this.x + this.paddingLeft()) {
+                mode = 4;
+            }
+            else {
+                mode = 0;
+            }
+
+            if (mode != 0 && !highlight) {
+                getRootView().mouseHover(this);
+            }
+        }
+        if (highlight) {
+            e.consumed = true;
+        }
+    }
+
+    override fun mouseExit() {
+        highlight = false;
+        repaint();
+    }
+
+    override fun mouseEnter() {
+        highlight = true;
+        repaint();
+    }
+}

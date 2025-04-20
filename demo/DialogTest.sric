@@ -1,0 +1,65 @@
+import sric::*;
+import waseGui::*;
+import waseGraphics::*;
+import cstd::*;
+
+struct DialogTest : BasePage
+{
+  protected override fun view(): own* Widget {
+    return new VBox
+    {
+      new Button {
+        .setText("Alert");
+        .onClick = fun(w:*Widget) {
+          new AlertDialog { .init("HI", "OK", "Cancel"); }.show();
+        };
+      },
+      new Button {
+        .setText("Alert2");
+        .onClick = fun(w:*Widget) {
+          var a = new AlertDialog{ .init("HI", ""); };
+          a.show();
+          var _a = a as *AlertDialog;
+          setTimeout(3000, fun(){
+            printf("close\n");
+            _a.close();
+          });
+        };
+      },
+      new Button {
+        .setText("Action");
+        .onClick = fun(w:*Widget) {
+            var items: DArray$<String>;
+            items.add("ABC");
+            items.add("1234");
+            items.add("5678");
+            new ActionDialog{ .init("HI", move items, "Cancel"); }.show();
+        };
+      },
+      new Button {
+        .setText("Time");
+        .onClick = fun(w:*Widget) {
+          new TimeDialog{ .init("OK", "Cancel");}.show();
+        };
+      },
+      new Button {
+        .setText("Date");
+        .onClick = fun(w:*Widget) {
+          new DateDialog{ .init("OK", "Cancel");}.show();
+        };
+      },
+      new Button {
+        .setText("Prompt");
+        .onClick = fun(w:*Widget) {
+          var p = new PromptDialog{
+            .init("Input", "OK", "Cancel");
+            .onAction = fun(msg:&String) {
+                Toast::showText(msg.copy());
+            };
+          };
+          p.show(w);
+        };
+      };
+    };
+  }
+}

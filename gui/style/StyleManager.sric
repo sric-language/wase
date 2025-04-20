@@ -1,0 +1,66 @@
+import sric::*;
+import waseGraphics::*;
+
+struct StyleManager {
+    var idMap: HashMap$<String, own* WidgetStyle>;
+
+    private var defStyle: own* WidgetStyle;
+
+    fun new() {
+        defStyle = new WidgetStyle;
+
+        idMap["Button"] = new RoundButtonStyle;
+        idMap["ImageView"] = new ImageStyle;
+        idMap["Label"] = new LabelStyle;
+        idMap["EditText"] = new EditTextStyle;
+        idMap["ToggleButton"] = new SwitchStyle;
+        idMap["RadioButton"] = new RadioButtonStyle;
+        idMap["ScrollBar"] = new ScrollBarStyle;
+        idMap["SliderBar"] = new SliderBarStyle;
+        idMap["ComboBox"] = new ComboBoxStyle;
+        //idMap["MenuItem"] = new MenuItemStyle;
+        idMap["Menu"] = new MenuStyle;
+        idMap["Toast"] = new ToastStyle;
+        idMap["ProgressView"] = new ProgressViewStyle;
+        idMap["Spinner"] = new SpinnerStyle;
+        idMap["RectView"] = new RectViewStyle;
+        idMap["TextView"] = new TextViewStyle;
+        idMap["CardIndicator"] = new CardIndicatorStyle;
+        idMap["Table"] = new TableStyle;
+        idMap["TreeView"] = new TreeStyle;
+        idMap["ResizePane"] = new ResizePaneStyle;
+
+
+
+
+        idMap["menuItem"] = new MenuItemStyle;
+        idMap["menuPane"] = new PaneStyle { .shadow = 0; .roundRadius = 0; .stroke = true; .fill = true; 
+            .outlineColor = Color { .rgba = 0x000000ff; }; .background = Color { .rgba = 0x535353ff; }; };
+        idMap["tableHeader"] = new TableHeaderStyle;
+        idMap["shadow"] = new PaneStyle { .shadow = 20; };
+        idMap["flatButton"] = new FlatButtonStyle;
+        idMap["iconButton"] = new IconButtonStyle;
+        idMap["progressBar"] = new ProgressBarStyle;
+        idMap["dialog"] = new PaneStyle { .shadow = 4; .roundRadius = 16; .stroke = false; };
+        idMap["tabItem"] = new TabItemStyle;
+        idMap["tabItemHighlight"] = new TabItemHighlightStyle;
+        idMap["checkBox"] = new CheckBoxStyle;
+        idMap["h1"] = new LabelStyle { .fontSize = (.fontSize * 2.0) as Int; };
+        idMap["h2"] = new LabelStyle { .fontSize = (.fontSize * 1.5) as Int; };
+        idMap["h3"] = new LabelStyle { .fontSize = (.fontSize * 1.2) as Int; };
+        idMap["h4"] = new LabelStyle { .fontSize = (.fontSize * 1.0) as Int; };
+        idMap["h5"] = new LabelStyle { .fontSize = (.fontSize * 0.83) as Int; };
+        idMap["h6"] = new LabelStyle { .fontSize = (.fontSize * 0.75) as Int; };
+        idMap["tooltip"] = new LabelStyle { .fill = true; };
+        idMap["bubbleTL"] = new BubbleStyle { .position = BubbleStyle::topLeft; };
+        idMap["bubbleTR"] = new BubbleStyle { .position = BubbleStyle::topRight; };
+        idMap["bubbleBL"] = new BubbleStyle { .position = BubbleStyle::bottomLeft; };
+        idMap["bubbleBR"] = new BubbleStyle { .position = BubbleStyle::bottomRight; };
+    }
+
+    fun find(widget: &Widget): * WidgetStyle {
+        var s = idMap.getPtr(widget.style);
+        if (s != null) return *s;
+        return defStyle;
+    }
+}

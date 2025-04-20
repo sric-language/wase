@@ -1,0 +1,19 @@
+
+trait PropertyAnimTarget {
+    abstract fun onUpdateAnim(v: Float32, field: Int);
+}
+
+struct PropertyAnimChannel : AnimChannel {
+  var target: * PropertyAnimTarget;
+  var field : Int = 0;
+  
+  var from :Float32= 0f;
+  var to :Float32= 1f;
+  
+  override fun update(elapsedTime: Int , frameTime: Int , percent: Float32 , blendWeight: Float32 ) {
+    var val = (to-from)*percent + from;
+    target.onUpdateAnim(val, field);
+  }
+  
+  override fun isFinish(): Bool { return false; }
+}

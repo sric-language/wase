@@ -1,0 +1,27 @@
+import sric::*;
+import waseGraphics::*;
+
+struct ProgressView : Widget
+{
+  //@Transient
+  protected var time : Int64 = 0;
+
+  var value : Float = 0f;
+
+  fun setValue(v: Float) {
+    value = v;
+    super.repaint();
+  }
+
+  fun new() {
+    style = "ProgressView";
+  }
+}
+
+struct RectView : Widget
+{
+  fun new() {
+    focusable = false;
+    style = "RectView";
+  }
+}

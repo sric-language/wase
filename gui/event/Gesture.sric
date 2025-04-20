@@ -1,0 +1,116 @@
+import sric::*;
+import waseGraphics::*;
+import cstd::*;
+
+struct GestureEvent {
+    static var click : const Int = 1;
+    static var longPress : const Int = 2;
+    static var doubleClick : const Int = 4;
+    static var drag : const Int = 5;
+    static var drop : const Int = 6;
+    static var multiTouch : const Int = 7;
+    static var shortPress : const Int = 8;
+
+    var x: Int = 0;
+    var y: Int = 0;
+    var deltaX: Int = 0;
+    var deltaY: Int = 0;
+
+    var pressure: Float32 = 0;
+    var size: Float32 = 0;
+
+    var speedX: Float32 = 0;
+    var speedY: Float32 = 0;
+
+    var button: ButtonType = ButtonType::Left;
+
+    var type: Int;
+
+    var relativeX: Int = 0;
+    var relativeY: Int = 0;
+
+    var consumed: Bool = false;
+
+    var flag : Int = 0;
+
+    //multi touch
+    var isMultiTouch: Bool = false;
+    var centerX: Float;
+    var centerY: Float;
+    var distance: Float;
+    var scale: Float;
+    var rotate: Float;
+    var offsetX: Float;
+    var offsetY: Float;
+}
+
+struct Gesture
+{
+  var history : DArray$<MotionEvent>;
+  var defaultState : own* GestureState;
+
+  readonly var currentState : own* GestureState;
+
+  var lastTouchTime :Int64= 0;
+  var firstTouchTime :Int64= 0;
+
+  var longPressTimeLimit :Int64= 600;
+  var shortPressTimeLimit :Int64= 150;
+  var doubleClickTimeLimt :Int64= 150;
+  //Bool supportDoubleClick := false
+
+  var onGestureEvent : fun(e: & GestureEvent);
+
+  fun new() {
+      //var self_ = rawToOwn(this);
+      defaultState = new NoneState { .init(this); };
+      currentState = share(defaultState);
+  }
+
+  fun setCurrentState(newState: own* GestureState , e: &MotionEvent) {
+    currentState.onExit(e);
+    newState.onEnter(e);
+    currentState = move newState;
+  }
+
+  private fun reset() {
+    currentState = share(defaultState);
+    lastTouchTime = 0;
+    firstTouchTime = 0;
+    history.clear();
+  }
+
+  fun onFinished(e: &MotionEvent) {
+    reset();
+  }
+
+  private fun isMultiTouch(e: &MotionEvent): Bool {
+    return e.pointers.get() != null && e.pointers.get().size() > 1;
+  }
+
+  fun onEvent(e: &MotionEvent)
+  {
+    if (!history.isEmpty() && !isMultiTouch(history[history.size()-1])
+      && e.type == MotionEventType::TouchMove && !isMultiTouch(e)) {
+      var last = history.getPtr(history.size()-1);
+      if (last.x == e.x && last.y == e.y) {
+        return;
+      }
+    }
+    if (history.isEmpty()) {
+      firstTouchTime = currentTimeMillis();
+    }
+
+    if (!(currentState is MultiTouchState) && isMultiTouch(e)) {
+      //echo("multiTouch")
+        //var self_ = rawToOwn(this);
+        var ns = new MultiTouchState { .init(this); };
+        this.setCurrentState(move ns, e);
+    } else {
+      currentState.onEvent(e);
+    }
+    //echo("raw e.type=>$e.type")
+    history.add(move e);
+    lastTouchTime = currentTimeMillis();
+  }
+}

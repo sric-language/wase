@@ -1,0 +1,160 @@
+
+import sric::*;
+import waseGraphics::*;
+
+struct TimeDialog : Dialog
+{  
+  var onAction: fun(hour:Int, minute: Int);
+  private var spinnerHour: *? Spinner;
+  private var spinnerMinute: *? Spinner;
+
+  fun init( okText :String = "OK", cancelText :String = "")
+  {
+    this.setStyle("dialog");
+    this.spacing = 0;
+    
+    //var self_ = this;
+
+    var hb = new HBox {
+        .spacing = 80;
+        .add(new Button {
+          .id = "timeDialog_ok";
+          .setStyle("flatButton");
+          .onClick = fun(w:*Widget) {
+            this.close();
+            if (this.onAction != null) {
+                this.onAction(this.spinnerHour.selIndex, this.spinnerMinute.selIndex);
+            }
+          };
+          .setText(move okText);
+        });
+    };
+    
+    if (cancelText.size() > 0) {
+        var bt = new Button {
+          .id = "timeDialog_cancel";
+          .setStyle("flatButton");
+          .onClick = fun(w:*Widget){
+            this.close();
+            if (this.onAction != null) {
+                this.onAction(-1, -1);
+            }
+          };
+          .setText(move cancelText);
+        };
+        hb.add(move bt);
+    }
+    
+    var spinnerHour = new Spinner{ .layout.width = Layout::matchParent; };
+    for (var i=0; i<24; ++i) {
+        spinnerHour.items.add(String::fromInt32(i));
+    }
+    spinnerHour.setSelIndex(12);
+    this.spinnerHour = spinnerHour;
+        
+    var spinnerMinute = new Spinner{ .layout.width = Layout::matchParent; };
+    for (var i=0; i<60; ++i) {
+        spinnerMinute.items.add(String::fromInt32(i));
+    }
+    spinnerMinute.setSelIndex(30);
+    this.spinnerMinute = spinnerMinute;
+    
+    var hb2 = new HBox {
+        .add(move spinnerHour); .add(move spinnerMinute);
+    };
+
+    //this.add(label)
+    this.add(move hb2);
+    this.add(new RectView { .layout.height = 3; .margin = Insets { .init(100, 6, 0, 6); }; });
+    this.add(move hb);
+    this.layout.hAlign = Align::Center;
+    this.layout.vAlign = Align::End;
+
+    this.layout.width = Layout::matchParent;//dpToPixel(500f)
+    //padding = Insets(30, 100)
+  }
+}
+
+
+struct DateDialog : Dialog
+{  
+  var onAction: fun(year: Int, month: Int, dya: Int);
+  private var spinnerYear: *? Spinner;
+  private var spinnerMonth: *? Spinner;
+  private var spinnerDay: *? Spinner;
+  private var baseYear :Int= 0;
+
+  fun init(okText :String= "OK", cancelText :String= "", year: Int = 2025, month: Int = 1, day: Int = 1)
+  {
+    this.setStyle("dialog");
+    this.spacing = 0;
+    //var self_ = this;
+
+    var hb = new HBox {
+        .spacing = 80;
+        .add(new Button {
+          .id = "timeDialog_ok";
+          .setStyle("flatButton");
+          .onClick = fun(w:*Widget){
+            this.close();
+            if (this.onAction != null) {
+                this.onAction(spinnerYear.selIndex+baseYear, spinnerMonth.selIndex+1, spinnerDay.selIndex+1);
+            }
+          };
+          .setText(move okText);
+        });
+    };
+    
+    if (cancelText.size() > 0) {
+        var bt = new Button {
+          .id = "timeDialog_cancel";
+          .setStyle("flatButton");
+          .onClick = fun(w:*Widget){
+            this.close();
+            if (this.onAction != null) {
+                this.onAction(-1,-1,-1);
+            }
+          };
+          .setText(move cancelText);
+        };
+        hb.add(move bt);
+    }
+    
+    baseYear = year - 80;
+    var spinnerYear = new Spinner{ .layout.width = Layout::matchParent; };
+    for (var i=0; i<100; ++i) {
+        spinnerYear.items.add(String::fromInt32(baseYear+i));
+    }
+    spinnerYear.setSelIndex(year - baseYear);
+    this.spinnerYear = spinnerYear;
+
+    var spinnerMonth = new Spinner{ .layout.width = Layout::matchParent; };
+    for (var i=0; i<12; ++i) {
+        spinnerMonth.items.add(String::fromInt32(1+i));
+    }
+    spinnerMonth.setSelIndex(month-1);
+    this.spinnerMonth = spinnerMonth;
+
+    var spinnerDay = new Spinner{ .layout.width = Layout::matchParent; };
+    for (var i=0; i<31; ++i) {
+        spinnerDay.items.add(String::fromInt32(1+i));
+    }
+    spinnerDay.setSelIndex(day-1);
+    this.spinnerDay = spinnerDay;
+    
+    var hb2 = new HBox { 
+        .add(move spinnerYear); .add(move spinnerMonth); .add(move spinnerDay);
+    };
+
+    //this.add(label)
+    this.add(move hb2);
+    this.add(new RectView { .layout.height = 3; .margin = Insets{ .init(100, 6, 0, 6); }; });
+    this.add(move hb);
+    this.layout.hAlign = Align::Center;
+    this.layout.vAlign = Align::End;
+
+    this.layout.width = Layout::matchParent;//dpToPixel(500f)
+    //padding = Insets(30, 100)
+  }
+
+}

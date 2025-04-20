@@ -1,0 +1,95 @@
+
+reflect enum Align {
+    Begin, Center, End
+}
+
+reflect enum Unit {
+    Dp, Percent, PercentW, PercentH, PercentMin
+}
+
+
+reflect struct Layout {
+    static var matchParent: const Int = 0;
+    static var wrapContent: const Int = -1;
+
+    var ignored: Bool = false;
+    var width: Int = matchParent;
+    var height: Int = wrapContent;
+    var weight: Float32 = 1;
+    var offsetX: Int = 0;
+    var offsetY: Int = 0;
+    var vAlign: Align = Align::Begin;
+    var hAlign: Align = Align::Begin;
+
+    var wUnit: Unit = Unit::Dp;
+    var hUnit: Unit = Unit::Dp;
+    var xUnit: Unit = Unit::Dp;
+    var yUnit: Unit = Unit::Dp;
+
+    private fun getPixel(val: Int, unit: Unit, parentSize: Int, selfSize: Int, parentW: Int, parentH: Int): Int {
+        switch (unit) {
+            case Unit::Dp:
+                return val;
+            case Unit::Percent:
+                return (val/100.0*parentSize) as Int;
+            case Unit::PercentW:
+                return (val/100.0*parentW) as Int;
+            case Unit::PercentH:
+                return (val/100.0*parentH) as Int;
+            case Unit::PercentMin:
+                var min = parentW > parentH ? parentH : parentW;
+                return (val/100.0*min) as Int;
+        }
+        return 0;
+    }
+
+    fun prefX(parentWidth:Int, parentHeight:Int, selfWidth: Int): Int {
+        var parent: Float32 = 0;
+        var anchor: Float32 = 0;
+        if (hAlign == Align::Center) {
+            parent = 0.5;
+            anchor = 0.5;
+        }
+        else if (hAlign == Align::End) {
+            parent = 1.0;
+            anchor = 1.0;
+        }
+        var offset = getPixel(offsetX, xUnit, parentWidth, selfWidth, parentWidth, parentHeight);
+        var x: Float32 = (parent * parentWidth) - (anchor * selfWidth) + offset;
+        return x as Int;
+    }
+
+    fun prefY(parentWidth:Int, parentHeight:Int, selfHeight: Int): Int {
+        var parent: Float32 = 0;
+        var anchor: Float32 = 0;
+        if (vAlign == Align::Center) {
+            parent = 0.5;
+            anchor = 0.5;
+        }
+        else if (vAlign == Align::End) {
+            parent = 1.0;
+            anchor = 1.0;
+        }
+        var offset = getPixel(offsetY, yUnit, parentHeight, selfHeight, parentWidth, parentHeight);
+        var x: Float32 = (parent * parentHeight) - (anchor * selfHeight) + offset;
+        return x as Int;
+    }
+
+    fun prefWidth(parentWidth: Int, parentHeight: Int, selfWidth: Int): Int {
+        if (width == matchParent)
+            return parentWidth;
+        if (width == wrapContent)
+            return selfWidth;
+        var w = getPixel(width, wUnit, parentWidth, selfWidth, parentWidth, parentHeight);
+        return w;
+    }
+
+    fun prefHeight(parentWidth: Int, parentHeight: Int, selfHeight: Int): Int {
+        if (height == matchParent)
+            return parentHeight;
+        if (height == wrapContent)
+            return selfHeight;
+        var h = getPixel(height, hUnit, parentHeight, selfHeight, parentWidth, parentHeight);
+        return h;
+    }
+}

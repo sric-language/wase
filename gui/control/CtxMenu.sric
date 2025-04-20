@@ -1,0 +1,85 @@
+import sric::*;
+import waseGraphics::*;
+
+struct CtxMenu : ScrollPane {
+    var items : DArray$<String>;
+    
+    private var inited :Bool = false;
+    var onSelect: fun(i: Int);
+
+    //@Transient
+    private var _overlayer: WeakPtr$<WidgetGroup>;
+    
+    //Void onAction(|Int| f) { clickCallback = f }
+    
+    fun new() {
+      layout.width = 400;
+      layout.height = 600;
+      layout.vAlign = Align::Center;
+      layout.hAlign = Align::Center;
+      
+      this.focusable = true;
+      
+//      onFocusChanged.add |e| {
+//        //echo("onFocusChanged: $e.data")
+//        if (e.data == false) {
+//          hide
+//        }
+//      }
+    }
+    
+    private fun init() {
+        if (inited) return;
+        inited = true;
+        
+        var pane = new VBox { .spacing = 2; .setStyle("menuPane"); };
+        for (var i =0; i<items.size(); ++i)
+        {
+          var name = items[i].copy();
+          var button = new Button {
+            .setText(move name);
+            .setStyle("menuItem");
+            .textAlign = Align::Begin;
+            .layout.width = Layout::matchParent;
+            //it.layout.widthVal = it.pixelToDp()
+            .padding = Insets { .initAll(15); };
+            //it.margin = Insets(2, 0, 0)
+            //var self_  = (this);
+            .onClick = fun(w:* Widget) {
+              if (this.onSelect != null)
+                this.onSelect(i);
+              this.hide();
+            };
+            .rippleEnable = false;
+          };
+          pane.add(move button);
+        }
+        this.add(move pane);
+    }
+    
+    fun show(w: * Widget = Frame::cur()) {
+        init();
+        var root = w.getRootView();
+        var overlayer = root.topOverlayer(1);
+        overlayer.add(rawToOwn(this));
+        this.relayout();
+        overlayer.relayout();
+        this.focus();
+
+        _overlayer = toWeak(rawToOwn(overlayer));
+    }
+    
+    fun hide()
+    {
+      if (this.parent == null) return;
+      
+      var root = this.getRootView();
+      if (root != null) {
+        root.clearFocus();
+      }
+      var overlayer = _overlayer.lock();
+      if (overlayer != null) {
+        overlayer.detach();
+      }
+    }
+}

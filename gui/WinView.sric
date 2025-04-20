@@ -1,0 +1,269 @@
+import sric::*;
+import waseGraphics::*;
+
+//@#include "Window.h"
+struct WinView : View {
+    private var _window: *? Window;
+
+    protected var curFrame: own*? Frame;
+    protected var oldFrame: own*? Frame;
+    private var frameOut : Bool = false;
+    private var stack: DArray$<own*Frame>;
+
+    private var width :Int= 0;
+    private var height :Int= 0;
+    protected var layoutDirty :Int= 1;
+
+    private var gesture: own* Gesture = ...;
+    private var frameAnimation: own*? Animation;
+
+    protected var densityBaseW: Float = 1080f;
+    protected var densityBaseH: Float = 1920f;
+    private var isOpened: Bool = false;
+    var autoScale: Bool = true;
+    var inverseScreenScale: Float = 1.0;
+    private var desityTransform : Transform2D;
+
+    fun init(frame: own* Frame) {
+        curFrame = move frame;
+        layoutDirty = 2;
+
+        gesture = new Gesture;
+        gesture.onGestureEvent = fun(e: & GestureEvent) {
+            e.relativeX = e.x;
+            e.relativeY = e.y;
+            if (this.oldFrame == null) {
+                if (e.type == GestureEvent::drag
+                    || e.type == GestureEvent::drop || e.type == GestureEvent::multiTouch) {
+                    this.curFrame.onDrag(e);
+                    if (e.type != GestureEvent::drop) return;
+                }
+                this.curFrame.postGestureEvent(e);
+            }
+        };
+    }
+
+    private fun update(g : & Graphics) {
+        if (layoutDirty > 0) {
+            var force = layoutDirty > 1;
+            layoutDirty = 0;
+            curFrame.setLayout(g, 0, 0, width, height, force);
+        }
+
+        if (!curFrame.isOpened()) {
+            curFrame.onOpen();
+        }
+    }
+
+    fun onPaint(g : & Graphics) {
+        if (!isOpened) {
+            isOpened = true;      
+            autoScale = getAutoScale();
+            inverseScreenScale = 1.0 / (getScreenScale() * 0.5);
+        }
+        // var font: Font;
+        // g.setFontSize(20);
+        // g.setFont(font);
+        // g.drawText(100, 100, "Hello世界", -1);
+        // g.drawRoundedRect(0, 0, 200, 30, 5);
+
+        var s = host().size();
+        if ((width == 0 && height == 0)) {
+            updateDensity(s.w, s.h);
+        }
+        var w = (s.w*inverseScreenScale) as Int;
+        var h = (s.h*inverseScreenScale) as Int;
+        if (width != w || height != h) {
+            this.width = w;
+            this.height = h;
+            //echo("layout $s")
+            layoutDirty = 2;
+            updateDensity(s.w, s.h);
+            desityTransform = Transform2D::makeScale(1/inverseScreenScale, 1/inverseScreenScale);
+        }
+        
+        g.transform(desityTransform);
+
+        update(g);
+        
+        var bounds = Rect{.x =0; .y= 0; .w= this.width; .h = this.height;};
+
+        if (oldFrame != null) {
+            oldFrame.onUpdate();
+        }
+        if (!frameOut && oldFrame != null) {
+            //DisplayMetrics.cur.autoScale = oldFrame.autoScale
+            g.save();
+            oldFrame.paint(bounds, g);
+            g.restore();
+            //DisplayMetrics.cur.autoScale = curFrame.autoScale
+        }
+        
+        curFrame.onUpdate();
+        curFrame.paint(bounds, g);
+    
+        if (frameAnimation == null && oldFrame != null) {
+            oldFrame = null;
+        }
+
+        if (frameOut && oldFrame != null) {
+            g.save();
+            oldFrame.paint(bounds, g);
+            g.restore();
+        }
+    }
+
+    fun onMotionEvent(e : & MotionEvent) {
+        var x: Float = e.x *inverseScreenScale;
+        var y: Float = e.y *inverseScreenScale;
+        e.x = x as Int;
+        e.y = y as Int;
+
+        e.relativeX = e.x;
+        e.relativeY = e.y;
+        //update(g);
+        if (oldFrame == null) curFrame.postMotionEvent(e);
+        //if (!e.consumed) {
+        gesture.onEvent(e);
+        //}
+    }
+
+    fun onKeyEvent(e : & KeyEvent) {
+        if (oldFrame == null) curFrame.keyEvent(e);
+    }
+
+    fun onWindowEvent(e : WindowEventType) {
+        if (oldFrame == null) curFrame.windowEvent(e);
+    }
+
+    fun onBack() : Bool {
+        return popFrame() != null;
+    }
+
+    fun host() : * Window {
+        return _window;
+    }
+
+    fun setHost(w: * Window) {
+        _window = w;
+    }
+
+    fun getPrefSize(hintsWidth : Int, hintsHeight : Int) : Size {
+        //var result = curFrame.prefSize(g, hintsWidth, hintsHeight);
+        var result = Size { .w = 1366; .h = 768; };
+        return result;
+    }
+
+    fun showFrame(frame: own* Frame , push: Bool , animation: Bool = true) {
+        if (push) stack.add(share$<Frame>(curFrame));
+
+        //the old animation not finised
+        if (frameAnimation != null) {
+            frameAnimation.stop();
+            frameAnimation = null;
+        }
+
+        oldFrame = move curFrame;
+        curFrame = move frame;
+        frameOut = false;
+
+        //DisplayMetrics.cur.autoScale = curFrame.autoScale
+
+        //animation for frame
+        if (oldFrame != null) {
+            //oldFrame.onDetach();
+            if (animation) {
+                frameAnimation = new TweenAnimation {
+                    .duration = 200;
+                    .add(new TranslateAnimChannel {
+                        .to = Point{.x=0; .y=0;}; .from = Point{.x=oldFrame.width; .y= 0;};
+                    });
+                    .bind(curFrame);
+                };
+
+                frameAnimation.whenDone = fun() {
+                    //oldFrame.animManager.clear
+                    this.oldFrame.detach();
+                    this.frameAnimation = null;
+                };
+                frameAnimation.start();
+            }
+            else {
+                oldFrame.detach();
+            }
+        }
+
+        layoutDirty = 2;
+        repaint();
+    }
+
+    fun popFrame(animation :Bool= true): *? Frame {
+        if (stack.size() == 0) {
+            scError("ui","nomore frame");
+            return null;
+        }
+        var frame = stack.pop();
+
+        if (frameAnimation != null) {
+            frameAnimation.stop();
+            frameAnimation = null;
+        }
+        curFrame.clearFocus();
+
+        oldFrame = move curFrame;
+        curFrame = move frame;
+        frameOut = true;
+
+        //DisplayMetrics.cur.autoScale = curFrame.autoScale
+
+        //frame animation
+        if (oldFrame != null) {
+            //oldFrame.onClosing.fire(null)
+            if (animation) {
+                frameAnimation = new TweenAnimation {
+                    .duration = 200;
+                    .add(new TranslateAnimChannel { .from = Point{.x=0; .y=0;}; .to = Point{.x=oldFrame.width; .y=0;};});
+                    .bind(oldFrame);
+                };
+                //frameAnimation = anim
+                frameAnimation.whenDone = fun() {
+                    //oldFrame.animManager.clear
+                    this.oldFrame.detach();
+                    //echo("oldFrame in done")
+                    this.frameAnimation = null;
+                };
+                frameAnimation.start();
+            }
+            else {
+                oldFrame.detach();
+            }
+        }
+
+        layoutDirty = 2;
+        repaint();
+        //echo("popFrame $frame")
+        return frame;
+    }
+
+    fun repaint() {
+        var bounds = Rect{.x =0; .y= 0; .w= this.width; .h = this.height;};
+        host().repaint(bounds);
+    }
+
+    private fun updateDensity(w: Int, h: Int ) {
+        if (autoScale) {
+            var m = 1.0;
+            if (w < h) {
+                var m1 = w / densityBaseW;
+                var m2 = h / densityBaseH;
+                m = min(m1, m2);
+            }
+            else {
+                var m1 = w / densityBaseH;
+                var m2 = h / densityBaseW;
+                m = min(m1, m2);
+            }
+            inverseScreenScale = 1/m;
+        }
+    }
+}

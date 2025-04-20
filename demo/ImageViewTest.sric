@@ -1,0 +1,44 @@
+import sric::*;
+import waseGui::*;
+import waseGraphics::*;
+
+struct ImageViewTest : BasePage
+{
+  protected override fun view(): own* Widget {
+    return new VBox {
+      .layout.height = Layout::matchParent;
+
+      new Label { .setText("Button with Image background:"); },
+      new Button {
+        .setText("Image Button");
+        .setIconUri("res/image.png");
+        .setStyle("iconButton");
+        .iconSize = Size {.w=40; .h=40; };
+        .textAlign = Align::End;
+        .onClick = fun(w:*Widget) { Toast::showText("hello world"); };
+        .padding = Insets{ .initAll(50); };
+        .layout.width = Layout::wrapContent;
+      },
+
+      new Button {
+        .setText("Image Button");
+        .setIconUri("res/image.png");
+        .setStyle("iconButton");
+        .iconSize = Size {.w=40; .h=40; };
+        .iconPosition = Direction::Top;
+        .onClick = fun(w:*Widget) { Toast::showText("hello world"); };
+        .padding = Insets{ .initAll(50); };
+        .layout.width = Layout::wrapContent;
+      },
+
+      new Label { .setText("Dragable ImageView:"); },
+      new ImageView {
+        .setUri("res/image.png");
+        .scaleType = ImageView::fitWidth;
+        //mask = maskCircle
+        .layout.height = Layout::matchParent;
+        .setDragable();
+      };
+    };
+  }
+}

@@ -1,0 +1,201 @@
+import sric::*;
+import waseGraphics::*;
+
+struct Caret
+{
+  var visible :Bool = false;
+  
+  // offset of line
+  var offset :Int = 0;
+}
+
+
+struct EditText : Widget
+{
+  readonly var text : String = "";
+  var onTextChange : fun(old: &String, text: &String);
+
+  //@Transient
+  protected var lines: DArray$<String>;
+
+  var hint :String = "";
+
+  //@Transient
+  var caret : Caret;
+
+  //@Transient
+  private var timer : own*? Timer;
+
+  //@Transient
+  protected var host: own*? TextInput;
+
+  readonly var inputType :Int = 1;
+  var editable :Bool= true;
+
+  fun setInputType(t: Int) { inputType = t; }
+  
+  fun setText(t: String, fire: Bool = true)
+  {
+      if (fire && onTextChange != null) {
+        onTextChange(text, t);
+      }
+      text = move t;
+      caret.offset = text.size();
+      if (t.contains("\n")) {
+        lines = t.split("\n");
+      }
+      else {
+        lines.clear();
+      }
+      if (fire) {
+        eventListeners.fire(EventType::TextChanged, this);
+      }
+  }
+
+  fun isPassword(): Bool { return inputType == TextInput::inputTypePassword; }
+
+  fun new()
+  {
+    //this.layout.width = font.height * 10
+    this.padding = Insets { .init(15, 30, 15, 30); };
+    focusable = true;
+    style = "EditText";
+  }
+
+  protected override fun setFocusState(f: Bool) {
+      super.setFocusState(f);
+      var focused = f;
+      if (focused)
+      {
+        //var self_ = this;
+        this.host = this.getRootView().host().textInput(this.inputType);
+        if (this.host != null) {
+          this.host.onTextChange = fun(text: raw*const Int8) {
+              this.setText(text, false);
+              //return move text;
+          };
+          this.host.onKeyAction = fun(text: raw*const Int8) {
+              this.setText(text, false);
+          };
+          this.updateHost();
+        }
+        else {
+          this.startCaret();
+        }
+      }
+      else
+      {
+        this.stopCaret();
+        this.caret.visible = false;
+        if (this.host != null) {
+          this.host.close();
+          this.host = null;
+        }
+        this.repaint();
+      }
+  }
+
+  private fun updateHost() {
+    if (host == null) return;
+    var lineNum = lines.size();
+    host.setType(lineNum, editable);
+    
+    var view = Window::getCur().view() as *WinView;
+    var s = 1/view.inverseScreenScale;
+    var p = this.posOnWindow();
+    var x = ((p.x + padding.left) * s) as Int;
+    var y = ((p.y + padding.top) * s) as Int;
+    var w = (contentWidth() * s) as Int;
+    var h = (contentHeight() * s) as Int;
+    host.setPos(x, y, w, h);
+
+    var style = getStyle();
+    var color = style.fontColor;
+    var bgColor = style.background;
+    host.setStyle(style.font, style.fontSize*s, color, bgColor);
+    //host.setStyle(font, Color.black, Color(0xe0e0e0))
+    host.setText(text.c_str());
+    host.focus();
+  }
+
+  protected override fun layoutChildren(g: &Graphics,  force: Bool) {
+    super.layoutChildren(g, force);
+    updateHost();
+  }
+
+  protected override fun prefContentSize(g: &Graphics, hintsWidth : Int = -1, hintsHeight : Int = -1): Size {
+    g.setFont(getStyle().font);
+    g.setFontSize(getStyle().fontSize);
+    var metric: FontMetrics;
+    g.fontMetrics(metric);
+    var w = g.textWidth(text.c_str(), text.size());
+    var h = metric.height;
+
+    if (lines.size() > 0) {
+        h *= lines.size();
+    }
+    return Size{.w=w as Int; .h = h as Int;};
+  }
+
+  private fun startCaret()
+  {
+    if (timer != null && !timer.canceled) return;
+
+    //show caret
+    caret.visible = true;
+    repaint();
+
+    //var self_ = this;
+    //caret blink
+    if (timer == null) {
+        timer = new Timer;
+    }
+    timer.init(500, fun() {
+      if (this.focused())
+      {
+        caret.visible = !caret.visible;
+        this.repaint();
+      }
+    });
+    timer.start();
+  }
+
+  private fun stopCaret() {
+    if (timer != null)
+        timer.cancel();
+  }
+
+
+  override fun keyEvent( e: &KeyEvent)
+  {
+    if (e.key == Key::Backspace)
+    {
+      if (e.type == KeyEventType::Press)
+      {
+        if (text.size() > 0)
+        {
+          text = text.substr(0, text.size()-1);
+          repaint();
+        }
+      }
+      return;
+    }
+
+    if (e.type != KeyEventType::Typed) return;
+
+    if (e.keyChar < 32) return;
+
+    //TODO
+    //text += e.keyChar;
+    repaint();
+  }
+
+  protected override fun gestureEvent( e: &GestureEvent)
+  {
+    if (e.type == GestureEvent::click)
+    {
+      focus();
+      e.consumed = true;
+    }
+  }
+}

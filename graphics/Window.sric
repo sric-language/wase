@@ -1,0 +1,82 @@
+import sric::*;
+import cstd::*;
+
+extern fun getScreenScale() : Float32;
+extern fun getAutoScale() : Bool;
+
+extern fun setTimeout(timeMillis : Int64, callback : fun());
+
+
+
+trait View {
+    abstract fun onPaint(g : & Graphics);
+
+    abstract fun onMotionEvent(e : & MotionEvent);
+
+    abstract fun onKeyEvent(e : & KeyEvent);
+
+    abstract fun onWindowEvent(e : WindowEventType);
+
+    abstract fun onBack() : Bool;
+
+    abstract fun host() : * Window;
+
+    abstract fun setHost(w: *Window);
+
+    abstract fun getPrefSize(hintsWidth : Int, hintsHeight : Int) : Size;
+
+}
+
+
+abstract struct TextInput {
+    static var inputTypeText: const Int = 1;
+    static var inputTypeIntNumber: const Int = 2;
+    static var inputTypeFloatNumber: const Int = 3;
+    static var inputTypePassword: const Int = 4;
+    static var inputTypeMultiLine: const Int = 5;
+
+    var onTextChange : fun(s: raw*const Int8);
+
+    var onKeyAction : fun(s: raw*const Int8);
+
+    var onKeyPress : fun(k: &KeyEvent);
+
+    abstract fun close();
+
+    abstract fun setPos(x : Int, y : Int, w : Int, h : Int);
+
+    abstract fun setStyle(font : &Font, fontSize: Float32, textColor : Color, backgroundColor : Color);
+
+    abstract fun setText(text : raw* const Int8);
+
+    abstract fun setType(lineNum:Int, editable : Bool);
+
+    abstract fun focus();
+
+    abstract fun select(start : Int, end : Int);
+
+    abstract fun caretPos() : Int;
+
+}
+
+
+extern struct Window {
+    fun view() : * View;
+
+    fun repaint(dirty : & Rect);
+
+    fun size() : Size;
+
+    fun hasFocus() : Bool;
+
+    fun focus();
+
+    fun textInput(inputType : Int) : own* TextInput;
+
+    fun fileDialog(isOpen : Bool, accept : raw* const Int8);
+
+    fun displayKeyboard(display : Bool);
+
+    static fun open(view: own* View, name: raw* const Int8): Int;
+    static fun getCur(): * Window;
+}

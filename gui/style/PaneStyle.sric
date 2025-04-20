@@ -1,0 +1,113 @@
+import sric::*;
+import waseGraphics::*;
+
+virtual struct PaneStyle : WidgetStyle
+{
+  var fill :Bool= true;
+  var stroke :Bool= false;
+  
+  var shadow :Int= 0;
+  var shadowColor :Color= Color::gray;
+  var alpha :Int= 255;
+  
+  fun new() {
+    outlineColor = Color::gray;
+  }
+
+  override fun doPaint(widget: *Widget , g:& Graphics)
+  {
+    var l = (shadow);
+    var x = l;
+    var y = l;
+    var w = widget.width - l - l;
+    var h = widget.height - l - l;
+    
+    var arc = this.roundRadius;
+
+    if (shadow > 0) {
+        fill = true;
+        g.setColor(shadowColor);
+        var alpha = 2/255.0;
+        
+        for (var i: Float32 = shadow; i>1.0; i = i*0.8 ) {
+            g.globalAlpha(alpha);
+            var a = (i*2);
+            //g.pen = Pen { width = a; cap = capRound }
+            g.strokeWidth(a);
+            var shift = a / 6;
+            //echo("draw $a, $alpha")
+            var r = arc + a / 2;
+            g.drawRoundRect(x+shift, y+shift, w, h, r);
+            //g.drawRect(x+shift, y+shift, w, h)
+            alpha = alpha + 5/255.0;
+            if (alpha > 1.0) alpha = 1;
+        }
+        g.globalAlpha(1.0);
+    }
+
+    g.globalAlpha(alpha);
+    
+    if (backgroundImage != null) {
+      var iw = backgroundImage.width();
+      var ih = backgroundImage.height();
+      var src = Rect{ .x = 0; .y= 0; .w = iw; .h = ih; };
+      var dst = Rect{ .x = 0; .y= 0; .w = widget.width; .h = widget.height; };
+  //    echo("src$src,dst$dst")
+      g.drawImageEx(backgroundImage, src, dst);
+    }
+    else if (fill){
+        g.setColor(background);
+        g.fillRoundRect(x, y, w, h, arc);
+    }
+    
+    if (lineWidth > 0) {
+      //echo("=== $x, $y, $w, $h, $a")
+      if (stroke) {
+        g.setColor(outlineColor);
+        var lw = (lineWidth);
+        g.strokeWidth(lw);
+        g.drawRoundRect(x, y, w-lw, h-lw, arc);
+      }
+    }
+
+    g.globalAlpha(1.0);
+  }
+}
+
+struct RectViewStyle : WidgetStyle {
+  fun new() {
+    background = Color { .rgba = 0xd9d9d9ff; };
+  }
+  
+  override fun doPaint(widget: *Widget , g:& Graphics)
+  {
+    var x = widget.paddingLeft();
+    var y = widget.paddingTop();
+    var w = widget.contentWidth();
+    var h = widget.contentHeight();
+    g.setColor(background);
+    g.fillRect(x, y, w, h);
+  }
+}
+
+struct ResizePaneStyle : PaneStyle {
+  var highlightColor : Color = Color { .rgba = 0x000000ff; };
+
+  override fun doPaint(widget: *Widget , g:& Graphics) {
+    super.doPaint(widget, g);
+    var p = widget as * ResizePane;
+    if (p.highlight) {
+      g.setColor(highlightColor);
+      switch (p.mode) {
+        case 1:
+          g.fillRect(0, 0, p.width, p.paddingTop());
+        case 2:
+          g.fillRect(p.paddingLeft()+p.contentWidth(), 0, p.width-p.paddingLeft()-p.contentWidth(), p.height);
+        case 3:
+          g.fillRect(0, p.paddingTop()+p.contentHeight(), p.width, p.height-p.paddingTop()-p.contentHeight());
+        case 4:
+          g.fillRect(0, 0, p.paddingLeft(), p.height);
+      }
+    }
+  }
+}

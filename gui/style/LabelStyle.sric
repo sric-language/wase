@@ -1,0 +1,81 @@
+import sric::*;
+import waseGraphics::*;
+
+
+virtual struct LabelStyle : WidgetStyle
+{
+  var fill :Bool= false;
+  var backgroundAlpha : Float32 = 1;
+
+  override fun doPaint(widget: *Widget , g:& Graphics)
+  {
+    var lab = widget as *Label;
+    if (fill) {
+      g.save();
+      var width = widget.width;
+      var height = widget.height;
+      g.setColor(background);
+      g.globalAlpha(backgroundAlpha);
+      var parc = roundRadius;
+      g.fillRoundRect(0, 0, width, height, parc);
+      g.restore();
+    }
+    drawText(widget, g, lab.text, lab.textAlign);
+  }
+}
+
+struct ToastStyle : WidgetStyle {
+
+  fun new() {
+    background = Color { .rgba = 0x434343ff; };
+    fontColor = Color { .rgba = 0xffffffff; };
+  }
+
+  override fun doPaint(widget: *Widget , g:& Graphics)
+  {
+    var lab = widget as * Toast;
+
+    var width = widget.width;
+    var height = widget.height;
+    g.setColor(background);
+    var arc = height/2;
+    g.fillRoundRect(0, 0, width, height, arc);
+
+    drawText(widget, g, lab.text, Align::Center);
+  }
+}
+
+struct TextViewStyle : WidgetStyle {
+  override fun doPaint(widget: *Widget , g:& Graphics)
+  {
+    var lab = widget as * TextView;
+    var lines: raw*DArray$<String> = lab.getLines();
+    
+    var x = widget.paddingLeft();
+    var y = widget.paddingTop();
+    
+    g.setColor(fontColor);
+    g.setFont(font);
+    g.setFontSize(fontSize);
+
+    var metric: FontMetrics;
+    g.fontMetrics(metric);
+    var lineh = metric.height;
+
+    var offset = metric.ascent;
+    y += offset as Int;
+    
+    //echo("paint $lab.text $lines contentWidth:$lab.contentWidth")
+    unsafe {
+    for (var i=0; i<lines.size(); ++i) {
+        var xoffset = 0f;
+        if (lab.textAlign == Align::Center) {
+          var w = g.textWidth((*lines)[i].c_str(), (*lines)[i].size());
+          xoffset = (lab.contentWidth() - w)/2;
+        }
+        g.drawText(x+xoffset, y, (*lines)[i].c_str(), (*lines)[i].size());
+        y += lineh as Int;
+    }
+    }
+  }
+}

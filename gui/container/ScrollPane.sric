@@ -1,0 +1,333 @@
+import sric::*;
+import waseGraphics::*;
+import cstd::*;
+
+
+
+virtual struct ContentPane : Pane {
+  //@Transient
+  protected var _content: *? Widget;
+
+  fun content(): *? Widget {
+    return _content;
+  }
+  fun setContent(w: own* Widget) {
+    remove(_content);
+    _content = w;
+    doAdd(move w);
+  }
+
+  override fun add(child: own* Widget ): *WidgetGroup
+  {
+    setContent(move child);
+    return this;
+  }
+
+  protected fun doAdd(child: own* Widget) {
+    super.add(move child);
+  }
+}
+
+virtual struct ScrollPane : ContentPane
+{
+  //@Transient
+  protected var hbar: own*? ScrollBar;
+
+  //@Transient
+  protected var vbar: own*? ScrollBar;
+
+  //@Transient
+  readonly var offsetX :Int= 0;
+
+  //@Transient
+  readonly var offsetY :Int= 0;
+
+  protected var barSize :Int= 30;
+
+  var autoScrollContent :Bool= true;
+
+  var autoResetOffset :Bool= false;
+
+  //@Transient
+  private var animation: own*? Animation;
+  
+  var onRefresh: fun(w: * Widget);
+  var onLoadMore: fun(w: * Widget);
+  var refreshTip: own*? Widget;
+
+  var dragable : Bool = true;
+
+  virtual fun setOffsetX(t: Int) {
+    offsetX = t;
+  }
+
+  virtual fun setOffsetY(t: Int) {
+    offsetY = t;
+  }
+
+  fun new()
+  {
+    isCliped = true;
+    //scroll bar
+    hbar = new ScrollBar { .setVertical(false); .barSize = this.barSize; .layout.ignored = true; };
+    vbar = new ScrollBar { .setVertical(true); .barSize = this.barSize; .layout.ignored = true; };
+
+    //var self_ = this;
+    hbar.onPosChanged = fun (oldVal: Float32, newVal: Float32)
+    {
+        this.setOffsetX(newVal as Int);
+
+        if (autoScrollContent) {
+          var dx = (newVal - oldVal);
+          if (_content != null) {
+            _content.x = round(_content.x - dx) as Int;
+          }
+        }
+        this.onViewportChanged();
+        //this.repaint();
+    };
+    vbar.onPosChanged = fun (oldVal: Float32, newVal: Float32)
+    {
+        this.setOffsetY(newVal as Int);
+
+        if (autoScrollContent) {
+          var dy = (newVal - oldVal);
+          if (_content != null) {
+            _content.y = round(_content.y - dy) as Int;
+          }
+        }
+        this.onViewportChanged();
+        //this.repaint();
+    };
+
+    doAdd(share$<ScrollBar>(hbar));
+    doAdd(share$<ScrollBar>(vbar));
+    layout.height = Layout::matchParent;
+    layout.width = Layout::matchParent;
+    //padding = Insets(0, barSize.toInt, barSize.toInt, 0)
+    padding = Insets{.init(0, 8, 8, 0);};
+    focusable = true;
+    dragAware = true;
+  }
+
+  protected virtual fun onViewportChanged() {}
+
+  protected virtual fun viewportWidth(): Float32 { return contentWidth(); }
+
+  protected virtual fun viewportHeight(): Float32 { return contentHeight(); }
+
+  protected virtual fun contentMaxWidth(g: &Graphics): Float32 {
+    var w = this.width-((padding.left + padding.right));
+    var h = this.height-((padding.top + padding.bottom));
+    var bs = prefContentSize(g, w, h);
+    return bs.w;
+  }
+
+  protected virtual fun contentMaxHeight(g: &Graphics): Float32 {
+    var w = this.width-((padding.left + padding.right));
+    var h = this.height-((padding.top + padding.bottom));
+    var bs = prefContentSize(g, w, h);
+    return bs.h;
+  }
+
+  private fun layoutScroolBar(g: &Graphics) {
+    var barSize = (this.barSize);
+    hbar.width = contentWidth() + barSize;
+    hbar.height = barSize;
+    hbar.x = paddingLeft();
+    hbar.y = height-barSize;
+    hbar.max = contentMaxWidth(g);
+    hbar.viewport = viewportWidth();
+
+    //echo("size$size, contentWidth$contentWidth, padding$padding")
+    if (hbar.max <= hbar.viewport)
+    {
+      hbar.enabled = false;
+      hbar.setVisible(false);
+      setOffsetX(0);
+      hbar.max = hbar.viewport;
+    }
+    else
+    {
+      hbar.enabled = true;
+      hbar.setVisible(true);
+    }
+
+    vbar.width = barSize;
+    vbar.height = contentHeight();
+    vbar.x = width-barSize;
+    vbar.y = paddingTop();
+    vbar.max = contentMaxHeight(g);
+    vbar.viewport = viewportHeight();
+
+    if (vbar.max <= vbar.viewport)
+    {
+      vbar.enabled = false;
+      vbar.setVisible(false);
+      //offsetY = 0
+      vbar.max = vbar.viewport;
+    }
+    else
+    {
+      vbar.enabled = true;
+      vbar.setVisible(true);
+    }
+
+    moveToTop(hbar);
+    moveToTop(vbar);
+  }
+
+  override fun layoutChildren(g: &Graphics, force: Bool )
+  {
+    //hbar.detach
+    //vbar.detach
+
+    super.layoutChildren(g, force);
+    layoutScroolBar(g);
+    if (autoResetOffset) {
+      if (!vbar.visible) setOffsetY(0);
+      if (!hbar.visible) setOffsetX(0);
+    }
+    //offset children
+    if (autoScrollContent) {
+      adjustContent();
+    }
+    //doAdd(hbar)
+    //doAdd(vbar)
+    onViewportChanged();
+  }
+
+  protected virtual fun adjustContent() {
+    if (content() != null) {
+      _content.x -= offsetX;
+      _content.y -= offsetY;
+    }
+  }
+
+  protected override fun motionEvent(e: &MotionEvent)
+  {
+    if (e.type == MotionEventType::Press) {
+      if (animation != null) {
+        animation.stop();
+      }
+      //this.focus
+      //actived = true
+    }
+    
+    super.motionEvent(e);
+    if (e.consumed) return;
+
+    if (vbar.max <= vbar.viewport) return;
+
+    if (e.type == MotionEventType::Wheel && e.delta != 0)
+    {
+      var pos = vbar.curPos + e.delta * (80);
+      vbar.setCurPos(pos, true);
+      vbar.repaint();
+      e.consumed = true;
+    }
+    else if (e.type == MotionEventType::TouchMove) {
+        if (refreshTip != null) {
+          if (vbar.curPos < -100) {
+            if (refreshTip.parent == null) {
+              this.doAdd(share$<Widget>(refreshTip));
+              this.relayout();
+            }
+          }
+          else if (refreshTip.parent != null) {
+            this.remove(refreshTip);
+            this.relayout();
+          }
+        }
+    }
+  }
+
+  private fun startAnimation(anim: own* Animation ) {
+    if (animation != null) {
+      animation.stop();
+    }
+    getRootView().animManager.add(share$<Animation>(anim));
+    anim.start();
+    animation = move anim;
+    this.repaint();
+  }
+
+  private fun animatOverScroll() {
+    if (vbar.isOverScroll()) {
+      var anim = new Animation {
+        .duration = 1500;
+        .add(new OverScrollAnimChannel {
+            .acceleration = vbar.overScrollVal()/10000.0;
+            .target = toWeak$<ScrollBar>(vbar);
+        });
+      };
+      startAnimation(move anim);
+    }
+  }
+  
+
+  protected override fun onDrag(e: &GestureEvent) {
+    super.onDrag(e);
+    if (e.consumed) return;
+    
+    if (!dragable) return;
+    
+    //if (!vbar.enabled) return
+    if (e.type == GestureEvent::drag) {
+      if (fabs(e.deltaY) > fabs(e.deltaX)) {
+        if (vbar.enabled) {
+          var overScrollFactor = 1-(fabs(vbar.overScrollVal())/200.0);
+          var pos = vbar.curPos - (e.deltaY*overScrollFactor);
+          vbar.setCurPos(pos, true, true);
+          vbar.repaint();
+          e.consumed = true;
+        }
+      }
+      else {
+        if (hbar.enabled) {
+          var overScrollFactor = 1-(fabs(hbar.overScrollVal())/200.0);
+          var pos = hbar.curPos - (e.deltaX*overScrollFactor);
+          hbar.setCurPos(pos, true);
+          hbar.repaint();
+          e.consumed = true;
+        }
+      }
+    }
+    else if (e.type == GestureEvent::drop) {
+      //actived = false
+      //echo("drop: $vbar.isOverScroll")
+      if (vbar.enabled && vbar.isOverScroll()) {
+        animatOverScroll();
+
+        //var self_ : *? Widget = this;
+        if (vbar.curPos < 0f) {
+           if (vbar.curPos < -(100)) {
+             if (onRefresh != null) onRefresh(this);
+             //echo("onRefresh")
+           }
+        }
+        else {
+           if (onLoadMore != null) onLoadMore(this);
+           //echo("onLoadMore")
+        }
+      }
+      else {
+        if (hbar.enabled && fabs(e.speedX) > fabs(e.speedY)) {
+          var anim = new Animation {
+            .duration = 2000;
+            .add(new ScrollAnimChannel { .target = toWeak$<ScrollBar>(hbar); .startV = e.speedX; });
+          };
+          startAnimation(move anim);
+        }
+        else if (vbar.enabled) {
+          var anim = new Animation {
+            .duration = 2000;
+            .add(new ScrollAnimChannel { .target = toWeak$<ScrollBar>(vbar); .startV = e.speedY; });
+          };
+          startAnimation(move anim);
+        }
+      }
+      vbar.repaint();
+    }
+  }
+}

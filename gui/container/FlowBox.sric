@@ -1,0 +1,76 @@
+import sric::*;
+import waseGraphics::*;
+
+virtual struct FlowBox : WidgetGroup
+{
+   var spacing : Int = 0;
+
+   var hAlign : Align = Align::Begin;
+
+  override fun layoutChildren(g: &Graphics, force: Bool )
+  {
+    var x = paddingLeft();
+    var y = paddingTop();
+    var hintsW = contentWidth();
+    var hintsH = contentHeight();
+    var spacing = this.spacing;
+
+    //calculate alignOffset
+    var alignOffset = 0;
+    var maxW = 0;
+    if (hAlign == Align::Center) {
+      var tx = 0;
+      for (var i=0; i<children.size(); ++i) {
+        var c:* own* Widget = children.getPtr(i);
+        var size = (*c).bufferedPrefSize(g, hintsW, hintsH);
+        if (tx+size.w > hintsW) {
+          if (tx-spacing > maxW) maxW = tx-spacing;
+          tx = 0;
+        }
+        tx += size.w + spacing;
+      }
+      if (tx-spacing > maxW) maxW = tx-spacing;
+      alignOffset = (hintsW-maxW)/2;
+    }
+
+    x += alignOffset;
+    var lineHeight = 0;
+    for (var i=0; i<children.size(); ++i) {
+      var c:* own* Widget = children.getPtr(i);
+      var size = (*c).bufferedPrefSize(g, hintsW, hintsH);
+      if (x+size.w > hintsW) {
+        x = paddingLeft() + alignOffset;
+        y += lineHeight + spacing;
+        lineHeight = 0;
+        (*c).setLayout(g, x, y, size.w, size.h, force);
+      }
+      else {
+        (*c).setLayout(g, x, y, size.w, size.h, force);
+      }
+      x += size.w + spacing;
+      if (lineHeight < size.h) lineHeight = size.h;
+      //echo("$hintsW,  $x, $y, $size")
+    }
+  }
+  
+  protected override fun prefContentSize(g: &Graphics, hintsW: Int = -1, hintsH: Int = -1): Size {
+    var x = 0;
+    var y = 0;
+    var spacing = (this.spacing);
+
+    var lineHeight = 0;
+    for (var i=0; i<children.size(); ++i) {
+      var c:* own* Widget = children.getPtr(i);
+      var size = (*c).bufferedPrefSize(g, hintsW, hintsH);
+      if (x+size.w > hintsW) {
+        x = paddingLeft();
+        y += lineHeight + spacing;
+        lineHeight = 0;
+      }
+      x += size.w + spacing;
+      if (lineHeight < size.h) lineHeight = size.h;
+      //echo("$x, $y, $lineHeight")
+    }
+    return Size { .w = hintsW; .h = y+lineHeight; };
+  }
+}

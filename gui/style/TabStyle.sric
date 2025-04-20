@@ -1,0 +1,24 @@
+import sric::*;
+import waseGraphics::*;
+
+struct TabItemStyle : FlatButtonStyle
+{
+  fun new() {
+    fontColor = Color { .rgba = 0x999999ff; };
+    //font = Font(35, "Arial", false)
+    font.bold = false;
+    fontSize = 30;
+    background = Color { .rgba = 0xe0e0e0ff; };
+  }
+}
+
+struct TabItemHighlightStyle : FlatButtonStyle
+{
+  fun new() {
+    fontColor = color;//Color(0x5577CC)
+    //font = Font(35, "Arial", true)
+    font.bold = false;
+    fontSize = 30;
+    background = Color { .rgba = 0xe0e0e0ff; };
+  }
+}

@@ -1,0 +1,297 @@
+import sric::*;
+import waseGraphics::*;
+import cstd::*;
+
+abstract struct GestureState
+{
+  readonly var machine: *? Gesture;
+
+  fun init(machine: * Gesture ) {
+    this.machine = machine;
+  }
+
+  static fun makeEvent(e: & MotionEvent, type: Int, ge: & GestureEvent) {
+    //var ge = GestureEvent { .type = type; };
+    ge.type = type;
+    ge.x = e.x;
+    ge.y = e.y;
+    ge.pressure = e.pressure;
+    ge.size = e.size;
+    ge.speedX = e.speed;
+    ge.speedY = e.speed;
+    //ge.rawEvent = e;
+    //return ge;
+  }
+
+  virtual fun onEnter(e: & MotionEvent) {}
+  virtual fun onExit(e: & MotionEvent) {}
+
+  abstract fun onEvent(e: & MotionEvent);
+}
+
+struct NoneState : GestureState {
+
+  override fun onEvent(e: & MotionEvent) {
+    if (e.type == MotionEventType::Press) {
+      var ns = new DownState { .init(machine); };
+      machine.setCurrentState(move ns, e);
+      
+      //ge := makeEvent(e, GestureEvent.pressed)
+      //machine.onGestureEvent.fire(ge)
+    }
+  }
+
+}
+
+struct DownState : GestureState {
+  private var longPressValid :Bool= true;
+  private var shortPressValid :Bool= true;
+  var lastX :Int= 0;
+  var lastY :Int= 0;
+
+  override fun onEnter(e: & MotionEvent) {
+    longPressValid = true;
+    shortPressValid = true;
+    lastX = e.x;
+    lastY = e.y;
+
+    var self_ : WeakPtr$<DownState> = toWeak(rawToOwn(this));
+    setTimeout(machine.longPressTimeLimit, fun(){
+      var _self = self_.lock();
+      //echo("check longPress ${longPressValid} ${machine.currentState === this}")
+      if (_self != null && _self.machine.currentState == _self && _self.longPressValid) {
+        var ge: GestureEvent;
+        makeEvent(e, GestureEvent::longPress, ge);
+        _self.machine.onGestureEvent(ge);
+        e.consumed = true;
+        _self.longPressValid = false;
+        _self.machine.onFinished(e);
+      }
+      
+    });
+    
+    setTimeout(machine.shortPressTimeLimit, fun(){
+        var _self = self_.lock();
+        if (_self != null && _self.shortPressValid) {
+          var ge: GestureEvent;
+          makeEvent(e, GestureEvent::shortPress, ge);
+          machine.onGestureEvent(ge);
+          _self.shortPressValid = false;
+        }
+    });
+  }
+
+  override fun onEvent(e: & MotionEvent) {
+    //ignore raw event
+    if (e.type == MotionEventType::LongPress || e.type == MotionEventType::Click) return;
+
+    if (e.type == MotionEventType::Release) {
+        if (shortPressValid) {
+            var ge: GestureEvent;
+            makeEvent(e, GestureEvent::shortPress, ge);
+            machine.onGestureEvent(ge);
+            shortPressValid = false;
+        }
+//      if (machine.supportDoubleClick) {
+        var ns = new OneClickState { .init(machine); };
+//      } else {
+//        //send click event
+//        ge := makeEvent(e, GestureEvent.click)
+//        machine.onGestureEvent.fire(ge)
+//        e.consume
+//        machine.onFinished(e)
+//      }
+        longPressValid = false;
+        machine.setCurrentState(move ns, e);
+    } else if (e.type == MotionEventType::TouchMove) {
+      var dx = e.x - lastX;
+      var dy = e.y - lastY;
+      var distance = sqrt(dx*dx + dy*dy);
+      //echo(distance)
+      if (distance > 30f) {
+        var ns = new DragState { .init(machine); };
+        e.consumed = true;
+        shortPressValid = false;
+        longPressValid = false;
+        machine.setCurrentState(move ns, e);
+      }
+    } else {
+      machine.onFinished(e);
+    }
+  }
+}
+
+
+struct OneClickState : GestureState {
+  private var valid :Bool= true;
+  var lastX :Int= 0;
+  var lastY :Int= 0;
+
+  override fun onEnter(e: & MotionEvent) {
+    valid = true;
+    lastX = e.x;
+    lastY = e.y;
+
+    var ge: GestureEvent;
+    makeEvent(e, GestureEvent::click, ge);
+    ge.button = e.button;
+    machine.onGestureEvent(ge);
+    e.consumed = true;
+
+    var self_ : WeakPtr$<OneClickState> = toWeak(rawToOwn(this));
+    setTimeout(machine.doubleClickTimeLimt, fun(){
+      var _self = self_.lock();
+      if (_self != null) {
+        if (_self.machine.currentState == _self && _self.valid) {
+          _self.valid = false;
+          _self.machine.onFinished(e);
+        }
+      }
+    });
+  }
+
+  override fun onEvent(e: & MotionEvent) {
+    //ignore raw event
+    if (e.type == MotionEventType::Other || e.type == MotionEventType::Click) return;
+
+    if (e.type == MotionEventType::Press) {
+      var ns = new TwoDownState{ .init(machine); };
+      machine.setCurrentState(move ns, e);
+    } else if (e.type == MotionEventType::TouchMove) {
+      var dx = e.x - lastX;
+      var dy = e.y - lastY;
+      var distance = sqrt(dx*dx + dy*dy);
+      //echo(distance)
+      if (distance > 30f) {
+        var ns = new DragState{ .init(machine); };
+        e.consumed = true;
+        valid = false;
+        machine.setCurrentState(move ns, e);
+      }
+    } else {
+      valid = false;
+      machine.onFinished(e);
+    }
+  }
+}
+
+
+struct TwoDownState : GestureState {
+  private var valid :Bool= true;
+
+  override fun onEnter(e: &MotionEvent) {
+    valid = true;
+    var self_ : WeakPtr$<TwoDownState> = toWeak(rawToOwn(this));
+    setTimeout(machine.longPressTimeLimit, fun(){
+      var _self = self_.lock();
+      if (_self != null) {
+        if (_self.machine.currentState == _self && _self.valid) {
+          var ge: GestureEvent;
+          makeEvent(e, GestureEvent::longPress, ge);
+          ge.flag = 1;
+          machine.onGestureEvent(ge);
+          e.consumed = true;
+          _self.valid = false;
+          machine.onFinished(e);
+        }
+      }
+    });
+  }
+
+  override fun onEvent(e: &MotionEvent) {
+    if (e.type == MotionEventType::LongPress) return;
+    if (e.type == MotionEventType::Release) {
+      valid = false;
+      var ge: GestureEvent;
+      makeEvent(e, GestureEvent::doubleClick, ge);
+      machine.onGestureEvent(ge);
+      e.consumed = true;
+      machine.onFinished(e);
+    } else if (e.type == MotionEventType::TouchMove) {
+      valid = false;
+      var ns = new DragState { .init(machine); };
+      ns.click = true;
+      machine.setCurrentState(move ns, e);
+    } else {
+      valid = false;
+      machine.onFinished(e);
+    }
+  }
+}
+
+
+struct DragState : GestureState {
+  var click :Bool= false;
+  var beginX :Int= 0;
+  var beginY :Int= 0;
+  var beginTime :Int64= 0;
+  
+  var lastX :Int= 0;
+  var lastY :Int= 0;
+  var lastTime :Int64= 0;
+  var lastSpeed :Float= 0.0;
+  var lastSpeedX :Float= 0.0;
+  var lastSpeedY :Float= 0.0;
+
+  override fun onEnter(e: &MotionEvent) {
+    beginX = e.x;
+    beginY = e.y;
+    lastX = e.x;
+    lastY = e.y;
+    beginTime = currentTimeMillis();
+  }
+
+  private fun fireDrop(e: &MotionEvent) {
+    var dx = e.x - beginX;
+    var dy = e.y - beginY;
+    //echo(lastSpeed)
+    var ge: GestureEvent;
+    makeEvent(e, GestureEvent::drop, ge);
+    ge.deltaX = dx;
+    ge.deltaY = dy;
+    if (click) {
+      ge.flag = 1;
+    }
+    ge.speedX = lastSpeedX;
+    ge.speedY = lastSpeedY;
+    machine.onGestureEvent(ge);
+    e.consumed = true;
+    machine.onFinished(e);
+  }
+
+  override fun onEvent(e: &MotionEvent) {
+    if (e.type == MotionEventType::TouchMove) {
+      var dx = e.x - lastX;
+      var dy = e.y - lastY;
+      lastX = e.x;
+      lastY = e.y;
+      
+      //update speed
+      var now = currentTimeMillis();
+      var elapsedTime = now - lastTime;
+      if (elapsedTime <= 0) elapsedTime = 1;
+      lastSpeed = sqrt(dx*dx + dy*dy)/elapsedTime;
+      lastSpeedX = (dx as Float)/elapsedTime;
+      lastSpeedY = (dy as Float)/elapsedTime;
+      lastTime = now;
+
+      var ge: GestureEvent;
+      makeEvent(e, GestureEvent::drag, ge);
+      ge.deltaX = dx;
+      ge.deltaY = dy;
+      if (click) {
+        ge.flag = 1;
+      }
+      machine.onGestureEvent(ge);
+      e.consumed = true;
+
+    } else if (e.type == MotionEventType::Release
+        || e.type == MotionEventType::Cancel) {
+      fireDrop(e);
+      //ge0 := makeEvent(e, GestureEvent.released)
+      //machine.onGestureEvent.fire(ge0)
+    } else {
+      machine.onFinished(e);
+    }
+  }
+}

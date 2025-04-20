@@ -1,0 +1,18 @@
+name = waseDemo
+summary = waseDemo
+outType = exe
+version = 1.0
+depends = jsonc 2.0, sric 1.0, waseGraphics 1.0, waseGui 1.0, serial 1.0
+srcDirs = ../../sric/output/waseDemo.cpp,./,nanovg/
+incDirs = ./
+extIncDirs = nanovg/,../../sric/output/
+defines = NVGSWU_GL3
+excludeSrc = .*(Win32|Plutovg).*
+
+extConfigs.linkflags= -sUSE_GLFW=3 -sMIN_WEBGL_VERSION=2 -sMAX_WEBGL_VERSION=2 -sFULL_ES2 -sFULL_ES3 -sFETCH \
+-sMODULARIZE -s EXPORT_NAME="createMyModule" -s TOTAL_MEMORY=1000MB \
+-sEXPORTED_FUNCTIONS=_main,_malloc,_free -sPTHREAD_POOL_SIZE=4 -sDEFAULT_LIBRARY_FUNCS_TO_INCLUDE=$stringToUTF8OnStack -sEXPORTED_RUNTIME_METHODS=ccall,cwrap,UTF8ToString \
+--js-library wasm/library.js --extern-pre-js wasm/util.js \
+--preload-file res@res 
+
+compiler = emcc

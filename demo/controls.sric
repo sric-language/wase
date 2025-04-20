@@ -1,0 +1,103 @@
+import sric::*;
+import waseGui::*;
+import waseGraphics::*;
+
+struct SliderBarTest : BasePage
+{
+  protected override fun view(): own* Widget {
+    return new VBox
+    {
+      .margin = Insets { .initAll(100); };
+      new Label { .id = "label"; .setText("Hello"); },
+      new SliderBar {
+        .setCurPos(50f);
+        .onPosChanged = fun(from : Float32, to : Float32) {
+          (Frame::cur().findById("label") as *Label).setText(String::format("%f", to));
+        };
+      },;
+    };
+  }
+}
+
+struct ProgressViewTest : BasePage
+{
+  protected override fun view(): own* Widget {
+    return new VBox
+    {
+      .margin = Insets { .initAll(100); };
+      new ProgressView {
+      },
+      new ProgressView {
+        .setStyle("progressBar");
+        .value = 0.3;
+      };
+    };
+  }
+}
+
+struct TextViewTest : BasePage
+{
+  protected override fun view(): own* Widget {
+    return new VBox {
+      .padding = Insets { .initAll(50); };
+      new Label {
+        .setStyle("h1");
+        .setText("H1");
+      },
+      new Label {
+        .setStyle("h2");
+        .setText("H2");
+      },
+      new Label {
+        .setStyle("h3");
+        .setText("H3");
+      },
+      new Label {
+        .setStyle("h4");
+        .setText("H4");
+      },
+      new TextView {
+        .autoWrap = false;
+        .setText("Hello1\nHello2");
+      },
+      
+      new TextView {
+        var s: String;
+        for (var i=0; i<100; ++i) {
+          var t = String::fromInt32(i);
+          s.add(t.c_str());
+          s.add(",");
+        }
+        .setText(move s);
+      };
+    };
+  }
+}
+
+struct SpinnerTest : BasePage
+{
+  
+  protected override fun view(): own* Widget {
+    var lab = new Label { .setText("Hello"); };
+    var spinner = new Spinner {
+        for (var i=0; i<100; ++i) { .items.add(String::format("item%d", i)); }
+        .setSelIndex(5);
+        .layout.hAlign = Align::Center;
+        .layout.vAlign = Align::Center;
+    };
+    var _lab = lab as *Label;
+    var _spinner: *Spinner = spinner;
+    
+    var p = new Pane {
+      .margin = Insets { .initAll(100); };
+      move spinner, move lab;
+    };
+
+    _spinner.onSelect = fun(i:Int) {
+        _lab.setText(String::fromInt32(i));
+        _lab.repaint();
+    };
+    
+    return p;
+  }
+}

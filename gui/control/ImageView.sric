@@ -1,0 +1,189 @@
+import sric::*;
+import waseGraphics::*;
+
+struct ImageView : Widget
+{
+  //@Transient
+  var image: own*? Image;
+  
+  var imgScaleX :Float32= 1.0;
+  var imgScaleY :Float32= 1.0;
+  var imgOffsetX :Float32= 0.0;
+  var imgOffsetY :Float32= 0.0;
+  
+  static var keepSize: const Int= 0;
+  static var stretch: const Int = 1;
+  static var fitWidth: const Int = 2;
+  static var fitHeight: const Int = 3;
+  static var containIn: const Int = 4;
+  static var clipFill: const Int = 5;
+
+  var scaleType: Int = containIn;
+
+  //static const Int maskCircle := 1
+  //Int mask := 0
+
+  readonly var uri: String;
+  
+  // Int imagePrefWidth := 240
+  // Int imagePrefHeight := 240
+
+  //@Transient
+  private var isInited : Bool = false;
+
+  fun new() {
+    style = "ImageView";
+  }
+
+  fun setUri(u: String) {
+    uri = move u;
+  }
+
+  fun init(force: Bool) {
+    if (image == null) return;
+    if (!image.isReady()) return;
+    if (isInited && !force) return;
+    isInited = true;
+
+    var type = scaleType;
+    if (scaleType == containIn || scaleType == clipFill) {
+      if (contentWidth()/(contentHeight() as Float) > image.width()/image.height()) {
+        if (scaleType == containIn) {
+          type = fitHeight;
+        }
+        else if (scaleType == clipFill) {
+          type = fitWidth;
+        }
+      }
+      else {
+        if (scaleType == containIn) {
+          type = fitWidth;
+        }
+        else if (scaleType == clipFill) {
+          type = fitHeight;
+        }
+      }
+    }
+
+    switch (type) {
+    case keepSize: 
+          imgScaleX = 1.0;
+          imgScaleY = 1.0;
+          imgOffsetX = 0.0;
+          imgOffsetY = 0.0;
+      
+    case stretch: 
+          imgOffsetX = 0.0;
+          imgOffsetY = 0.0;
+          imgScaleX = (contentWidth() as Float) / image.width();
+          imgScaleY = (contentHeight() as Float) / image.height();
+          //echo("width:$width, contentWidth:$contentWidth, size:$image.size")
+      
+    case fitWidth:
+          imgOffsetX = 0.0;
+          imgScaleX = (contentWidth() as Float) / image.width();
+          imgScaleY = imgScaleX;
+          imgOffsetY = -(image.height() * imgScaleX - contentHeight())/2.0;
+          //echo("$imgOffsetY, $imgScaleX")
+      
+    case fitHeight: 
+          imgOffsetX = 0.0;
+          imgOffsetY = 0.0;
+          imgScaleY = (contentHeight() as Float) / image.height();
+          imgScaleX = imgScaleY;
+          imgOffsetX = -(image.width() * imgScaleY - contentWidth())/2.0;
+      
+    default:
+      scError("ui", "unknow scaleType: %d", type);
+    }
+    
+    // if (mask == maskCircle) {
+    //     if (originImage == null) originImage = image
+    //     imgBuf := Image.make(originImage.size)
+    //     g := imgBuf.graphics
+        
+    //     g.fillOval(0, 0, originImage.size.w, originImage.size.h)
+    //     //g.composite = Composite.dstIn
+    //     g.composite = Composite.srcIn
+    //     g.drawImage(originImage, 0, 0)
+    //     g.dispose
+    //     image = imgBuf
+    // }
+  }
+  protected override fun layoutChildren(g: &Graphics, force: Bool) {
+    loadImage(g);
+    init(force);
+  }
+
+  fun imgToWidget(p: &Coord) {
+    p.x = (p.x * imgScaleX) + imgOffsetX + paddingLeft();
+    p.y = (p.y * imgScaleY) + imgOffsetY + paddingTop();
+  }
+  
+  fun widgetToImg(p: &Coord) {
+    p.x = (p.x - paddingLeft() - imgOffsetX) / imgScaleX;
+    p.y = (p.y - paddingTop() - imgOffsetY) / imgScaleY;
+  }
+
+  private fun loadImage(g: &Graphics) {
+    if (uri.size() > 0 && image == null) {
+      image = g.createImage();
+      image.load(uri.c_str());
+    }
+  }
+
+  fun setDragable() {
+    focusable = true;
+    dragAware = true;
+  }
+
+  protected override fun motionEvent(e:&MotionEvent)
+  {
+    super.motionEvent(e);
+    if (!focusable) return;
+    if (e.consumed) return;
+    if (e.type == MotionEventType::Wheel && e.delta != 0) {
+        var scale = e.delta > 0 ? 0.8 : 1.25;
+        var coord = Coord { .x = e.x; .y = e.y; };
+        mapToWidget(coord);
+        zoom(coord, scale);
+    }
+  }
+  
+  protected fun zoom(point: Coord, scale: Float32) {
+    //echo("zoom:$point, $scale")
+    var pos = Coord{ .x = point.x; .y = point.y; };
+    widgetToImg(pos);
+
+    imgScaleX *= scale;
+    imgScaleY *= scale;
+
+    imgToWidget(pos);
+
+    imgOffsetX -= pos.x - point.x;
+    imgOffsetY -= pos.y - point.y;
+    //echo("imgX:$imgX, xx:$xx, imgY:$imgY, yy:$yy")
+    this.repaint();
+  }
+  
+  protected override fun onDrag(e: &GestureEvent) {
+    super.onDrag(e);
+    if (!focusable) return;
+    if (e.consumed) return;
+    if (e.type == GestureEvent::drag) {
+      imgOffsetX += e.deltaX;
+      imgOffsetY += e.deltaY;
+      this.repaint();
+      //echo("imgScaleX:$imgScaleX, imgScaleY")
+      e.consumed = true;
+    }
+    if (e.type == GestureEvent::multiTouch) {
+        //var me = e;
+        //echo("multiTouch:$e")
+        var coord = Coord{.x = e.centerX; .y = e.centerY; };
+        mapToWidget(coord);
+        zoom(coord, e.scale);
+        e.consumed = true;
+    }
+  }
+}

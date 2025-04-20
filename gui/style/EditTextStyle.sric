@@ -1,0 +1,87 @@
+import sric::*;
+import waseGraphics::*;
+
+struct EditTextStyle : WidgetStyle
+{
+  var hintColor : Color = Color { .rgba = 0xd7d7d7ff; };
+
+  fun new() {
+    outlineColor = Color { .rgba = 0x858585ff; };
+    roundRadius = 20;
+  }
+
+  override fun doPaint(widget: *Widget , g:& Graphics)
+  {
+    var lab = widget as * EditText;
+    var top = widget.paddingTop();
+    var left = widget.paddingLeft();
+
+    g.setColor(outlineColor);
+    g.strokeWidth(lineWidth);
+
+    var lWidth = lineWidth;
+    var lineLeft = lWidth;
+    var bottom = top + widget.contentHeight()-lWidth;
+    var right = widget.width - lWidth;
+
+    g.setFont(font);
+    g.setFontSize(fontSize);
+
+    var metric: FontMetrics;
+    g.fontMetrics(metric);
+    var lineh = metric.height;
+
+    // g.drawLine(lineLeft, bottom, right-lWidth, bottom);
+    // var upSize = (lineh * 0.3f) as Int;
+    // g.drawLine(lineLeft, bottom, lineLeft, bottom-upSize);
+    // g.drawLine(right-lWidth, bottom, right-lWidth, bottom-upSize);
+    var round: Int = roundRadius;
+    if (lab.inputType != TextInput::inputTypeMultiLine) {
+      round = (widget.height - lineWidth)/2;
+    }
+
+    var lineWidth2 = lineWidth + lineWidth;
+    g.drawRoundRect(lineWidth, lineWidth, widget.width-lineWidth2, widget.height-lineWidth2, round);
+
+    var offset = metric.ascent;
+    var x = left;
+    var y = top;
+
+    if (!lab.text.isEmpty()) {
+      //g.brush = fontColor
+      g.setColor(fontColor);
+      //str := lab.text;
+      if (lab.isPassword()) {
+        var buf: String;
+        for (var i=0; i<lab.text.size(); ++i) {
+          buf.add("*");
+        }
+        g.drawText(x, y+offset, buf.c_str(), buf.size());
+      }
+      else if (lab.lines.size() <= 1) {
+        g.drawText(x, y+offset, lab.text.c_str(), lab.text.size());
+      }
+      else {
+        for (var i=0; i<lab.lines.size(); ++i) {
+            g.drawText(x, y+offset, lab.lines[i].c_str(), lab.lines[i].size());
+            y += lineh as Int;
+        }
+      }
+    }
+    else if (!lab.hint.isEmpty()) {
+      g.setColor(hintColor);
+      g.drawText(x+2, y+offset, lab.hint.c_str(), lab.hint.size());
+    }
+
+    if (lab.caret.visible)
+    {
+      var xOffset = 1f;
+      if (lab.text.size() > 0)
+      {
+        var t = lab.text.substr(0, lab.caret.offset);
+        xOffset = g.textWidth(t.c_str(), t.size());
+      }
+      g.drawLine(x+xOffset, y, x+xOffset, y+lineh);
+    }
+  }
+}

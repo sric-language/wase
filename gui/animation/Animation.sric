@@ -1,0 +1,100 @@
+import sric::*;
+
+trait AnimChannel {
+  abstract fun update(elapsedTime: Int , frameTime: Int , percent: Float32 , blendWeight: Float32 );
+  
+  abstract fun isFinish(): Bool;
+}
+
+virtual struct Animation {
+    var name : String;
+
+    var duration :Int= 1000;
+    var elapsedTime :Int= 0;
+    var speed :Float32= 1f;
+    var blendWeight :Float32= 1;
+    var repeat :Int= 0;
+    var delay :Int= 0;
+
+    readonly var isRuning :Bool= false;
+    readonly var isFinished :Bool= false;
+
+    protected var channelList : DArray$<own* AnimChannel>;
+
+    var whenDone: fun();
+
+    virtual fun add(child: own* AnimChannel) {
+        channelList.add(move child);
+    }
+
+    fun start() {
+        this.elapsedTime = -1;
+        this.isRuning = true;
+        onStart();
+    }
+
+    fun stop() {
+        this.isRuning = false;
+        onStop();
+    }
+
+    protected virtual fun onStart() {
+    }
+
+    protected virtual fun onStop() {
+        onFinished();
+    }
+
+    protected virtual fun onFinished() {
+        this.isRuning = false;
+        if (whenDone != null) {
+            whenDone();
+        }
+        isFinished = true;
+    }
+
+    fun update(frameTime: Int) {
+        var i: Int = 0;
+        if (!this.isRuning) {
+            return;
+        }
+        if (elapsedTime == -1) {
+            elapsedTime = 0;
+        }
+        else {
+            this.elapsedTime += (frameTime * speed) as Int;
+        }
+        
+        var elapsed = this.elapsedTime - delay;
+        if (elapsed < 0) return;
+
+        if (elapsed > this.duration) {
+            if (this.repeat > 1) {
+                elapsed %= this.duration;
+                --repeat;
+            } else {
+                //echo("Finish: $elapsed > $duration")
+                updateChannel(elapsed, frameTime, 1.0f);
+                onFinished();
+                return;
+            }
+        }
+
+        var percent = elapsed / (this.duration as Float);
+        updateChannel(elapsed, frameTime, percent);
+    }
+
+    private fun updateChannel(elapsed: Int , frameTime: Int , percent: Float32 ) {
+        var isFinish = true;
+        for (var i=0; i<this.channelList.size(); ++i) {
+            this.channelList[i].update(elapsed, frameTime, percent, this.blendWeight);
+            if (!this.channelList[i].isFinish()) {
+                isFinish = false;
+            }
+        }
+        
+        if (isFinish) {
+            onFinished();
+        }
+    }
+}

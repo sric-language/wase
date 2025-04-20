@@ -1,0 +1,127 @@
+import sric::*;
+import waseGui::*;
+import waseGraphics::*;
+
+abstract struct BasePage {
+    var frame : *? Frame;
+    var name: String = "unname";
+
+    protected abstract fun view(): own* Widget;
+    protected virtual fun init(frame: * Frame) {}
+
+    fun run() {
+        var frame = new Frame {
+            new VBox {
+                .layout.height = Layout::matchParent;
+                .margin = Insets{ .init(40, 0, 0, 0); };
+                .padding = Insets{ .initAll(8); };
+                new Button {
+                  .setText("<");
+                  .setStyle("flatButton");
+                  .rippleEnable = false;
+                  .textAlign = Align::Begin;
+                  .onClick = fun(w:*Widget) { this.pop(); };
+                },
+                view();
+            },;
+        };
+        init(frame);
+        this.frame = frame;
+        frame.show();
+    }
+
+    private fun pop() {
+        frame.pop();
+    }
+}
+
+struct Main
+{
+  var mainView: own* Frame;
+  var pages : DArray$<own*? BasePage>;
+  
+  fun new() {
+    // pages = [null,
+    //   ButtonTest(), StyleTest(), ImageViewTest(), ListViewTest(), BubbleViewTest(), CtxMenuTest(), DialogTest(), null,
+    //   SpinnerTest(), SliderBarTest(), ProgressViewTest(), TextViewTest(), null,
+    //   CardTest(), EdgeTest(), HBoxTest(), VBoxTest(), PaneTest(), FlowTest(), PushCardTest(), PercentTest(), AutoScaleTest(), null,
+    //   MenuTest(), TableTest(), TreeTest(), TooltipTest(), ResizePaneTest(), ColorPickerTest(), null,
+    //   EditTextTest(), FilePickerTest(), AudioTest(), VideoTest(), BindingTest(), GraphicsTest(), null,
+    // ]
+    pages.add(null);
+    pages.add(new ButtonTest { .name = "Button"; });
+    pages.add(new CtxMenuTest { .name = "CtxMenu"; });
+    pages.add(new EditTextTest { .name = "EditText"; });
+    pages.add(new SliderBarTest { .name = "SliderBar"; });
+    pages.add(new ProgressViewTest { .name = "ProgressView"; });
+    pages.add(new TextViewTest { .name = "TextView"; });
+    pages.add(new SpinnerTest { .name = "Spinner"; });
+    pages.add(new ListViewTest { .name = "ListView"; });
+    pages.add(new BubbleViewTest { .name = "BubbleView"; });
+    pages.add(new ImageViewTest { .name = "ImageView"; });
+    pages.add(new DialogTest { .name = "Dialog"; });
+    pages.add(new CardTest { .name = "Card"; });
+
+    pages.add(null);
+    pages.add(new MenuTest { .name = "Menu"; });
+    pages.add(new TooltipTest { .name = "Tooltip"; });
+    pages.add(new TableTest { .name = "Table"; });
+    pages.add(new TreeTest { .name = "Tree"; });
+    pages.add(new ResizePaneTest { .name = "ResizePane"; });
+    pages.add(new ColorPickerTest { .name = "ColorPicker"; });
+
+    pages.add(null);
+    pages.add(new VBoxTest { .name = "VBox"; });
+    pages.add(new HBoxTest { .name = "HBox"; });
+    pages.add(new PaneTest { .name = "Pane"; });
+    pages.add(new FlowTest { .name = "Flow"; });
+    pages.add(new PercentTest { .name = "Percent"; });
+
+    pages.add(null);
+    pages.add(new DecodeTest { .name = "Decode"; });
+    pages.add(new GraphicsTest { .name = "Graphics"; });
+    init();
+  }
+  
+  private fun init() {
+    mainView = new Frame {
+      .add(new ScrollPane {
+        .add(new VBox {
+          .margin = Insets { .init(40, 0, 0, 0); };
+          .padding = Insets { .initAll(40); };
+          .spacing = 15;
+          .add(new Label {
+            .setText("wase UI");
+            .setStyle("h1");
+          });
+          
+          for (var i =0; i<pages.size(); ++i) {
+            var p: *? BasePage = pages[i];
+            if (p == null) {
+              .add(new RectView { .layout.height = 3; });
+              continue;
+            }
+            var b = new Button {
+                .setStyle("flatButton");
+                .textAlign = Align::Begin;
+                .setText(p.name.copy());
+                .onClick = fun(w:* Widget) { p.run(); };
+            };
+            .add(move b);
+          }
+        });
+      });
+    };
+  }
+
+  fun show() {
+    mainView.show();
+  }
+}
+
+var app: const own* Main = new Main;
+
+fun main(): Int {
+    app.show();
+    return 0;
+}

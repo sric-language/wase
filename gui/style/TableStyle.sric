@@ -1,0 +1,92 @@
+import sric::*;
+import waseGraphics::*;
+
+struct TableHeaderStyle : WidgetStyle
+{
+  fun new()
+  {
+    background = Color { .init(254/255.0, 255/255.0, 200/255.0, 1.0); };
+  }
+
+  override fun doPaint(widget: * Widget , g:& Graphics)
+  {
+    var btn = widget as * Button;
+
+    //backgound
+    g.setColor(background);
+    g.fillRect(0, 0, widget.width, widget.height);
+    g.setColor(color);
+    g.drawRect(0, 0, widget.width, widget.height);
+
+    drawText(widget, g, btn.text, Align::Center);
+  }
+}
+
+virtual struct TableStyle : WidgetStyle
+{
+  var selectedColor : Color= Color { .rgba = 0xa6a6a6ff; };
+  
+  override fun doPaint(widget: * Widget , g:& Graphics)
+  {
+    var tab = widget as * Table;
+    var top = widget.paddingTop();
+    var left = widget.paddingLeft();
+    
+    g.setFont(font);
+    g.setFontSize(fontSize);
+
+    var metric: FontMetrics;
+    g.fontMetrics(metric);
+    //var lineh = metric.height;
+
+    var rowHeight = (tab.rowHeight);
+
+    // get num of cols
+    var numCols = tab.model.numCols();
+    var fontOffset = metric.ascent as Int;
+    fontOffset += ((rowHeight - metric.height) / 2) as Int;
+
+    var bottomLine = top+tab.contentHeight();
+    var rightLine = left+tab.contentWidth();
+
+    var start = tab.offsetY / rowHeight;
+    var topOffset = tab.offsetY - (start * rowHeight);
+
+    var y = -topOffset + rowHeight + top;
+    for (var i = start; i< tab.model.numRows(); ++i)
+    {
+      if (i >= 0) {
+        var x = -tab.offsetX + left;
+        var isSelected = i == tab.selectedRow;
+        
+        for (var j = 0; j<numCols; ++j)
+        {
+          var text = tab.model.text(j, i);
+          drawCell(g, x, y, tab.colWidthCache[j], rowHeight, text, fontOffset, isSelected);
+          x += tab.colWidthCache[j];
+          if (x > rightLine) {
+            break;
+          }
+        }
+      }
+
+      y += rowHeight;
+      if (y > bottomLine) {
+        break;
+      }
+    }
+  }
+
+  protected virtual fun drawCell(g:&Graphics , x:Int , y:Int , w:Int , h:Int , text:&String , fontOffset: Int , selected: Bool )
+  {
+    //backgound
+    g.setColor(selected ? selectedColor : background);
+    g.fillRect(x, y, w, h);
+    g.setColor(color);
+    g.drawRect(x, y, w, h);
+
+    //text
+    g.setColor(fontColor);
+    g.drawText(x+5, y+fontOffset, text.c_str(), text.size());
+  }
+}

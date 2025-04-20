@@ -1,0 +1,367 @@
+import sric::*;
+import cstd::*;
+
+
+enum CompositeOperation {
+	SourceOver,
+	SourceIn,
+	SourceOut,
+	Atop,
+	DestinationOver,
+	DestinationIn,
+    DestinationOut,
+    DesitnationAtop,
+    Lighter,
+    Copy,
+    Xor
+}
+
+enum LineCap {
+    Butt = 0, Round = 1, Square = 2
+}
+
+enum LineJoin {
+    Round = 1, Bevel = 3, Miter = 4
+}
+
+
+trait Image {
+    abstract fun setFlags(flags : Int);
+
+    abstract fun width() : Int;
+
+    abstract fun height() : Int;
+
+    abstract fun load(filename : raw* const Int8) : Bool;
+
+    abstract fun loadMem(data : raw* UInt8, ndata : Int) : Bool;
+
+    abstract fun initData(w : Int, h : Int, data : raw* const UInt8);
+
+    abstract fun updateData(data : raw* const UInt8);
+
+    abstract fun isReady(): Bool;
+}
+
+
+trait Paint {
+}
+
+// Creates and returns a linear gradient. Parameters (sx,sy)-(ex,ey) specify the start and end coordinates
+// of the linear gradient, icol specifies the start color and ocol the end color.
+// The gradient is transformed by the current transform when it is passed to nvgFillPaint() or nvgStrokePaint().
+struct LinearGradient: Paint {
+    var sx : Float32;
+
+    var sy : Float32;
+
+    var ex : Float32;
+
+    var ey : Float32;
+
+    var icol : Color;
+
+    var ocol : Color;
+}
+
+// Creates and returns a box gradient. Box gradient is a feathered rounded rectangle, it is useful for rendering
+// drop shadows or highlights for boxes. Parameters (x,y) define the top-left corner of the rectangle,
+// (w,h) define the size of the rectangle, r defines the corner radius, and f feather. Feather defines how blurry
+// the border of the rectangle is. Parameter icol specifies the inner color and ocol the outer color of the gradient.
+// The gradient is transformed by the current transform when it is passed to nvgFillPaint() or nvgStrokePaint().
+struct BoxGradient: Paint {
+    var x : Float32;
+
+    var y : Float32;
+
+    var w : Float32;
+
+    var h : Float32;
+
+    var r : Float32;
+
+    var f : Float32;
+
+    var icol : Color;
+
+    var ocol : Color;
+}
+
+
+// Creates and returns a radial gradient. Parameters (cx,cy) specify the center, inr and outr specify
+// the inner and outer radius of the gradient, icol specifies the start color and ocol the end color.
+// The gradient is transformed by the current transform when it is passed to nvgFillPaint() or nvgStrokePaint().
+struct RadialGradient: Paint {
+    var cx : Float32;
+
+    var cy : Float32;
+
+    var inr : Float32;
+
+    var outr : Float32;
+
+    var icol : Color;
+
+    var ocol : Color;
+}
+
+// Creates and returns an image pattern. Parameters (ox,oy) specify the left-top location of the image pattern,
+// (ex,ey) the size of one image, angle rotation around the top-left corner, image is handle to the image to render.
+// The gradient is transformed by the current transform when it is passed to nvgFillPaint() or nvgStrokePaint().
+struct ImagePattern: Paint {
+    var ox : Float32;
+
+    var oy : Float32;
+
+    var ex : Float32;
+
+    var ey : Float32;
+
+    var angle : Float32;
+
+    var image : own* Image;
+
+    var alpha : Float32;
+
+}
+
+
+trait GraphicsPath {
+    abstract fun clear();
+
+    abstract fun close();
+
+    abstract fun moveTo(x : Float32, y : Float32);
+
+    abstract fun lineTo(x : Float32, y : Float32);
+
+    abstract fun quadTo(cx : Float32, cy : Float32, x : Float32, y : Float32);
+
+    abstract fun cubicTo(cx1 : Float32, cy1 : Float32, cx2 : Float32, cy2 : Float32, x : Float32, y : Float32);
+
+    abstract fun arcTo(x1 : Float32, y1 : Float32, x2 : Float32, y2 : Float32, radius : Float32);
+
+    abstract fun arc( cx: Float32, cy: Float32, radius: Float32, startAngle: Float32, arcAngle: Float32);
+
+}
+
+
+struct Font {
+    var name : String;
+    var bold : Bool = false;
+    var italic: Bool = false;
+}
+
+struct FontMetrics {
+    var ascent: Float;
+    var descent: Float;
+    var height: Float;
+    var leading: Float;
+}
+
+struct Pen {
+    var miterLimit : Float32 = 3;
+    var cap : LineCap = LineCap::Butt;
+    var join : LineJoin = LineJoin::Miter;
+}
+
+fun signf(f:Float): Float {
+    if (f > 0) return 1;
+    if (f == 0f) return 0;
+    return -1;
+}
+
+
+abstract struct Graphics {
+    abstract fun compositeOperation(op : CompositeOperation);
+
+    abstract fun globalAlpha(alpha : Float32);
+
+    abstract fun antiAlias(enabled : Bool);
+
+    abstract fun save();
+
+    abstract fun restore();
+
+    abstract fun setColor(color : Color);
+
+    abstract fun strokeWidth(size : Float32);
+
+    abstract fun setPen(pen : & Pen);
+
+    abstract fun setPaint(brush : & Paint);
+
+    abstract fun transform(trans : & const Transform2D);
+
+    abstract fun clip(x : Float32, y : Float32, w : Float32, h : Float32);
+
+    abstract fun beginPath() : * GraphicsPath;
+
+    abstract fun fillPath(path : * GraphicsPath);
+
+    abstract fun drawPath(path : * GraphicsPath);
+
+    abstract fun setFont(font : & Font);
+
+    abstract fun setFontSize(s: Float32);
+
+    abstract fun drawText(x : Float32, y : Float32, str : raw* const Int8, size : Int);
+
+    abstract fun fontMetrics(metrics : & FontMetrics);
+
+    abstract fun textWidth(str : raw* const Int8, size : Int) : Float32;
+
+    abstract fun createImage() : own* Image;
+
+    /**
+    ** Draw an arc with the current pen and brush.  The angles
+    ** are measured in radius with 0 radius is 3 o'clock with
+    ** a counter-clockwise arcAngle.  The origin of the arc is
+    **/
+    virtual fun drawArc(cx : Float32, cy : Float32, r : Float32, startAngle : Float32, arcAngle : Float32) {
+        var rad = r;
+        var pa = beginPath();
+        pa.arc(cx, cy, rad, startAngle, arcAngle);
+        drawPath(pa);
+    }
+
+    /**
+    ** Fill an arc with the current brush.  The angles are
+    ** measured in radius with 0 radius is 3 o'clock with
+    ** a counter-clockwise arcAngle.  The origin of the arc is
+    **/
+    virtual fun fillArc(cx : Float32, cy : Float32, r : Float32, startAngle : Float32, arcAngle : Float32) {
+        var radius = r;
+        var startRads = startAngle;
+        var x1 = cx + (cos(-startRads) * radius);
+        var y1 = cy + (sin(-startRads) * radius);
+
+        var endRads = (startAngle + arcAngle);
+        var x2 = cx + (cos(-endRads) * radius);
+        var y2 = cy + (sin(-endRads) * radius);
+
+        var pa = beginPath();
+        pa.moveTo(cx, cy);
+        pa.lineTo(x1, y1);
+        pa.arc(cx, cy, radius, startAngle, arcAngle);
+        pa.lineTo(x2, y2);
+        pa.close();
+        fillPath(pa);
+    }
+
+    virtual fun drawRect(x : Float32, y : Float32, w : Float32, h : Float32) {
+        var pa = beginPath();
+        pa.moveTo(x,y);
+        pa.lineTo(x,y+h);
+        pa.lineTo(x+w,y+h);
+        pa.lineTo(x+w,y);
+        pa.close();
+        drawPath(pa);
+    }
+
+    virtual fun fillRect(x : Float32, y : Float32, w : Float32, h : Float32) {
+        var pa = beginPath();
+        pa.moveTo(x,y);
+        pa.lineTo(x,y+h);
+        pa.lineTo(x+w,y+h);
+        pa.lineTo(x+w,y);
+        pa.close();
+        fillPath(pa);
+    }
+
+    virtual fun drawRoundRect(x : Float32, y : Float32, w : Float32, h : Float32, r : Float32) {
+        drawRoundRectVarying(x, y, w, h, r, r, r, r);
+    }
+
+    virtual fun drawRoundRectVarying(x : Float32, y : Float32, w : Float32, h : Float32, radTopLeft : Float32, radTopRight : Float32, radBottomRight : Float32, radBottomLeft : Float32) {
+        if (radTopLeft < 1 && radTopRight < 1 && radBottomRight < 1 && radBottomLeft < 1) {
+            drawRect(x, y, w, h);
+            return;
+        }
+        var pa = roundedRectVaryingPath(x, y, w, h, radTopLeft , radTopRight, radBottomRight, radBottomLeft);
+        drawPath(pa);
+    }
+
+    protected virtual fun roundedRectVaryingPath(x : Float32, y : Float32, w : Float32, h : Float32, radTopLeft : Float32, radTopRight : Float32, radBottomRight : Float32, radBottomLeft : Float32): * GraphicsPath {
+        var halfw = fabs(w)*0.5f as Float32;
+		var halfh = fabs(h)*0.5f as Float32;
+		var rxBL = min(radBottomLeft, halfw) * signf(w); var ryBL = min(radBottomLeft, halfh) * signf(h);
+		var rxBR = min(radBottomRight, halfw) * signf(w); var ryBR = min(radBottomRight, halfh) * signf(h);
+		var rxTR = min(radTopRight, halfw) * signf(w); var ryTR = min(radTopRight, halfh) * signf(h);
+		var rxTL = min(radTopLeft, halfw) * signf(w); var ryTL = min(radTopLeft, halfh) * signf(h);
+
+        var pa = beginPath();
+        var KAPPA90: const Float = 0.5522847493f;
+        pa.moveTo(x, y + ryTL);
+        pa.lineTo(x, y + h - ryBL);
+        pa.cubicTo(x, y + h - ryBL*(1 - KAPPA90), x + rxBL*(1 - KAPPA90), y + h, x + rxBL, y + h);
+        pa.lineTo(x + w - rxBR, y + h);
+        pa.cubicTo(x + w - rxBR*(1 - KAPPA90), y + h, x + w, y + h - ryBR*(1 - KAPPA90), x + w, y + h - ryBR);
+        pa.lineTo(x + w, y + ryTR);
+        pa.cubicTo(x + w, y + ryTR*(1 - KAPPA90), x + w - rxTR*(1 - KAPPA90), y, x + w - rxTR, y);
+        pa.lineTo(x + rxTL, y);
+        pa.cubicTo(x + rxTL*(1 - KAPPA90), y, x, y + ryTL*(1 - KAPPA90), x, y + ryTL);
+        pa.close();
+        return pa;
+    }
+
+    virtual fun fillRoundRect(x : Float32, y : Float32, w : Float32, h : Float32, r : Float32) {
+        fillRoundRectVarying(x, y, w, h, r, r, r, r);
+    }
+
+    virtual fun fillRoundRectVarying(x : Float32, y : Float32, w : Float32, h : Float32, radTopLeft : Float32, radTopRight : Float32, radBottomRight : Float32, radBottomLeft : Float32) {
+        if (radTopLeft < 1 && radTopRight < 1 && radBottomRight < 1 && radBottomLeft < 1) {
+            fillRect(x, y, w, h);
+            return;
+        }
+        var pa = roundedRectVaryingPath(x, y, w, h, radTopLeft , radTopRight, radBottomRight, radBottomLeft);
+        fillPath(pa);
+    }
+
+    protected virtual fun oval(cx : Float32, cy : Float32, rx : Float32, ry : Float32): * GraphicsPath
+    {
+        // Public Domain by Christopher Clay - http://canvaspaint.org/blog/
+        var kappa = 4 * ((sqrt(2) -1) / 3);
+
+        var pa = beginPath();
+        pa.moveTo(cx, cy - ry);
+        pa.cubicTo(cx + (kappa * rx), cy - ry,  cx + rx, cy - (kappa * ry), cx + rx, cy);
+        pa.cubicTo(cx + rx, cy + (kappa * ry), cx + (kappa * rx), cy + ry, cx, cy + ry);
+        pa.cubicTo(cx - (kappa * rx), cy + ry, cx - rx, cy + (kappa * ry), cx - rx, cy);
+        pa.cubicTo(cx - rx, cy - (kappa * ry), cx - (kappa * rx), cy - ry, cx, cy - ry);
+        pa.close();
+        return pa;
+    }
+
+    virtual fun drawOval(cx : Float32, cy : Float32, rx : Float32, ry : Float32) {
+        drawPath(oval(cx, cy, rx, ry));
+    }
+
+    virtual fun fillOval(cx : Float32, cy : Float32, rx : Float32, ry : Float32) {
+        fillPath(oval(cx, cy, rx, ry));
+    }
+
+    virtual fun drawLine(x : Float32, y : Float32, x2 : Float32, y2 : Float32) {
+        var pa = beginPath();
+        pa.moveTo(x, y);
+        pa.lineTo(x2, y2);
+        drawPath(pa);
+    }
+    /**
+    /**
+    ** Copy a rectangular region of the image to the graphics
+    ** device.  If the source and destination don't have the
+    ** same size, then the copy is resized.
+    **/
+    */
+    abstract fun drawImageEx(image : * Image, src : & Rect, dest : & Rect);
+
+    virtual fun drawImage(image : * Image, x : Float32, y : Float32) {
+        if (!image.isReady()) {
+            return;
+        }
+        var src = Rect {.x = 0; .y=0; .w = image.width(); .h=image.height();};
+        var dest = Rect {.x = x; .y=y; .w = image.width(); .h=image.height();};
+        drawImageEx(image, src, dest);
+    }
+}

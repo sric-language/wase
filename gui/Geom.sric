@@ -1,0 +1,73 @@
+import sric::*;
+
+
+reflect struct Coord {
+    var x: Float32;
+    var y: Float32;
+
+    fun set(ax: Float32, ay: Float32) {
+        x = ax;
+        y = ay;
+    }
+}
+
+//@SimpleSerial
+reflect struct Insets {
+    var top: Int = 0;
+    var right: Int = 0;
+    var bottom: Int = 0;
+    var left: Int = 0;
+
+    fun init(top:Int, right:Int, bottom: Int, left: Int) {
+        this.top = top;
+        this.right = right;
+        this.bottom = bottom;
+        this.left = left;
+    }
+
+    fun initAll(a: Int) {
+        this.top = a;
+        this.right = a;
+        this.bottom = a;
+        this.left = a;
+    }
+
+    fun toString() : String {
+        if (top == bottom && right == left) {
+            if (top == right) {
+                 return String::format("%d", top);
+            }   
+            else {
+                 return String::format("%d %", top, right);
+            } 
+        }
+        return String::format("%d %d %d %d", top, right, bottom, left);
+    }
+
+    fun fromString(str: String): Bool {
+        var fs = str.split(" ");
+        if (fs.size() == 1) {
+            initAll(fs[0].toInt32());
+            return true;
+        }
+        else if (fs.size() == 2) {
+            top = fs[0].toInt32();
+            right = fs[1].toInt32();
+            bottom = top;
+            left = right;
+            return true;
+        }
+        else if (fs.size() == 4) {
+            top = fs[0].toInt32();
+            right = fs[1].toInt32();
+            bottom = fs[2].toInt32();
+            left = fs[3].toInt32();
+            return true;
+        }
+        return false;
+    }
+}
+
+enum Direction {
+    Top, Right, Bottom, Left
+}

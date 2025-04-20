@@ -1,0 +1,157 @@
+import sric::*;
+import waseGraphics::*;
+
+trait AnimUtil {
+  static fun fadeInAnim(self_: * Widget ,  time : Int = 300): own*Animation {
+    var a = new TweenAnimation {
+      .duration = time;
+      .add(new AlphaAnimChannel { .to = 1f; .from = 0f; });
+    };
+    a.bind(self_);
+    return a;
+  }
+  static fun fadeOutAnim(self_: * Widget,  time : Int = 300,  detach :Bool= true): own*Animation {
+    var a = new TweenAnimation {
+      .duration = time;
+      .add(new AlphaAnimChannel { .from = 1f; .to = 0f; });
+    };
+    a.whenDone = fun(){
+      if (detach) self_.detach();
+      else self_.setVisible(false);
+    };
+    a.bind(self_);
+    return a;
+  }
+  static fun moveInAnim(self_: * Widget ,  orig: Direction,  time :Int= 300): own*Animation {
+    var x = 0;
+    var y = 0;
+    var p = self_.posOnWindow();
+    var root = self_.getRootView();
+
+    switch (orig) {
+      case Direction::Top:
+        y = -(p.y + self_.height) as Int;
+      case Direction::Right:
+        x = root.width - p.x as Int;
+      case Direction::Bottom:
+        y = root.height - p.y as Int;
+      case Direction::Left:
+        x = -(p.x + self_.width) as Int;
+    }
+
+    var a = new TweenAnimation {
+      .duration = time;
+      .add(new TranslateAnimChannel { .to = Point{.x=0;.y=0;}; .from = Point{.x=x; .y=y;};});
+    };
+    a.bind(self_);
+    return a;
+  }
+  static fun moveOutAnim(self_: * Widget ,  orig: Direction,  time :Int= 300,  detach :Bool= true): own*Animation {
+
+    var x = 0;
+    var y = 0;
+    var p = self_.posOnWindow();
+    var root = self_.getRootView();
+
+    switch (orig) {
+      case Direction::Top:
+        y = -(p.y + self_.height) as Int;
+      case Direction::Right:
+        x = root.width - p.x as Int;
+      case Direction::Bottom:
+        y = root.height - p.y as Int;
+      case Direction::Left:
+        x = -(p.x + self_.width) as Int;
+    }
+
+    /*
+    switch (orig) {
+      Direction.top:
+        y = -100
+      Direction.right:
+        x = 1000
+      Direction.down:
+        y = 1000
+      Direction.left:
+        x = -100
+    }
+    */
+
+    var a = new TweenAnimation {
+      .duration = time;
+      .add(new TranslateAnimChannel { .from = Point{.x=0;.y=0;}; .to = Point{.x=x; .y= y;};});
+    };
+    a.whenDone = fun() {
+      if (detach) self_.detach();
+      else self_.setVisible(false);
+    };
+    a.bind(self_);
+    return a;
+  }
+
+  static fun shakeAnim(self_: * Widget ,  time :Int= 100,  repeat :Int= 10): own*Animation {
+    var a = new TweenAnimation {
+      .repeat = repeat;
+      .duration = time;
+      .add(new RotateAnimChannel { .to = -5f; .from = 5f; });
+    };
+    a.bind(self_);
+    return a;
+  }
+  static fun shrinkAnim(self_: * Widget,  time :Int= 300,  detach :Bool= true): own*Animation {
+//    if (p == null) {
+//      p = Coord(0f, 0f)
+//      self_.posOnWindow(p)
+//    }
+//
+//    self_.mapToWidget(p)
+
+    var a = new TweenAnimation {
+      .duration = time;
+      .add(new ScaleAnimChannel { .to = 0.1; .from = 1.0; });
+      //TranslateAnimChannel { to = Point(p.x.toInt, p.y.toInt); from = Point.defVal },
+      .add(new AlphaAnimChannel { .to = 0f; .from = 1f; });
+    };
+    a.whenDone = fun() {
+      if (detach) self_.detach();
+      else self_.setVisible(false);
+    };
+    a.bind(self_);
+    return a;
+  }
+  static fun expandAnim(self_: * Widget,  time :Int= 300): own*Animation {
+//    if (p == null) {
+//      p = Coord(0f, 0f)
+//      self_.posOnWindow(p)
+//    }
+//
+//    self_.mapToWidget(p)
+
+    var a = new TweenAnimation {
+      .duration = time;
+      .add(new ScaleAnimChannel { .from = 0.1; .to = 1.0; });
+      //TranslateAnimChannel { from = Point(p.x.toInt, p.y.toInt); to = Point.defVal },
+      .add(new AlphaAnimChannel { .to = 1f; .from = 0f; });
+    };
+    a.bind(self_);
+    return a;
+  }
+  static fun scaleAnim(self_: * Widget,  from :Float32= 0.1f,  time :Int= 300): own*Animation {
+    var a = new TweenAnimation {
+      .duration = time;
+      .add(new ScaleAnimChannel { .from = from; .to = 1.0f; });
+      //AlphaAnimChannel { to = 1f; from = 0f; },
+    };
+    a.bind(self_);
+    return a;
+  }
+  static fun offsetAnim(self_: * Widget,  offset :Float32= 5f,  time :Int= 300): own*Animation {
+    var px = offset as Int;
+    var a = new TweenAnimation {
+      .duration = time;
+      .add(new TranslateAnimChannel { .to = Point{.x=0;.y=0;}; .from = Point{.x=px; .y= px;};});
+    };
+    a.bind(self_);
+    return a;
+  }
+}

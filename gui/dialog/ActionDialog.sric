@@ -1,0 +1,60 @@
+
+import sric::*;
+import waseGraphics::*;
+
+struct ActionDialog : Dialog
+{
+  var items: DArray$<String>;
+  
+  var onAction: fun(i:Int);
+
+  fun init(msg: String, aitems: DArray$<String>, cancelText: String)
+  {
+    this.items = move aitems;
+    
+    var label = new Label {
+      .id = "actionBox_msg";
+      .setText(move msg);
+      .margin.initAll(20);
+      .textAlign = Align::Center;
+    };
+    this.add(move label);
+    
+    this.setStyle("dialog");
+    this.spacing = 0;
+    //var self_ = this;
+    
+    var vb = new VBox;
+    for (var i = 0; i<items.size(); ++i) {
+        var lab = new Button {
+          .setText(items[i].copy());
+          .setStyle("flatButton");
+          .onClick = fun(w:*Widget) {
+            this.close();
+            if (this.onAction != null) this.onAction(i);
+          };
+        };
+        vb.add(move lab);
+    }
+    this.add(move vb);
+    
+    if (cancelText.size() > 0) {
+        this.add(new RectView { .layout.height = 3; .margin = Insets { .init(0, 6, 0, 6); }; });
+        
+        var bt = new Button {
+          .id = "actionDialog_cancel";
+          .setStyle("flatButton");
+          .onClick = fun(w:*Widget) {
+            this.close();
+            if (this.onAction != null) this.onAction(-1);
+          };
+          .setText(move cancelText);
+        };
+        this.add(move bt);
+    }
+
+    this.layout.hAlign = Align::Center;
+    this.layout.vAlign = Align::End;
+  }
+
+}

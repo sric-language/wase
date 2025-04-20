@@ -1,0 +1,33 @@
+import sric::*;
+import waseGui::*;
+import waseGraphics::*;
+import serial::*;
+
+struct DecodeTest : BasePage
+{
+    protected override fun view(): own* Widget {
+        var stream = FileStream::open("res/view.himl", "rb");
+        var str = stream.readAllStr();
+
+        unsafe {
+            var decoder: Decoder;
+            var p = decoder.decode(str);
+            var obj: raw* Widget = unsafeCast$<raw*Widget>(p);
+            return rawToOwn(obj);
+        }
+    }
+
+    protected override fun init(frame: * Frame) {
+        var stream2 = FileStream::open("res/style.himl", "rb");
+        var str2 = stream2.readAllStr();
+        unsafe {
+            var decoder2: Decoder;
+            var p = decoder2.decodeMap(str2);
+            p.eachWhile(fun(v: const &  own*Void , k: const &  String): Bool{
+                var obj: raw* WidgetStyle = unsafeCast$<raw*WidgetStyle>(v);
+                frame.styleManager.idMap.set(k.copy(), rawToOwn(obj));
+                return true;
+            });
+        }
+    }
+}

@@ -1,0 +1,56 @@
+import sric::*;
+import waseGraphics::*;
+
+virtual struct Pane : WidgetGroup {
+
+    protected override fun layoutChildren(g: &Graphics, force:Bool) {
+        var x = paddingLeft();
+        var y = paddingTop();
+        var hintsW = contentWidth();
+        var hintsH = contentHeight();
+
+        for (var i=0; i<children.size(); ++i) {
+            //var c:* own* Widget = children.getPtr(i);
+            if (!children[i].layout.ignored) {
+                var size = children[i].bufferedPrefSize(g, hintsW, hintsH);
+                var posX = children[i].layout.prefX(hintsW, hintsH, size.w);
+                var posY = children[i].layout.prefY(hintsW, hintsH, size.h);
+
+                var cx = x + posX;
+                var cy = y + posY;
+
+                children[i].setLayout(g, cx, cy, size.w, size.h, force);
+            }
+        }
+    }
+
+    protected override fun prefContentSize(g: &Graphics, hintsWidth: Int = -1, hintsHeight: Int = -1): Size {
+        var maxX = 0;
+        var maxY = 0;
+        for (var i=0; i<children.size(); ++i) {
+            //var c:* own* Widget = children.getPtr(i);
+            if (!children[i].layout.ignored) {
+                var size = children[i].bufferedPrefSize(g, hintsWidth, hintsHeight);
+                var x = size.w;
+                var y = size.h;
+
+                var offsetX = (children[i].layout.offsetX);
+                var offsetY = (children[i].layout.offsetY);
+                if (offsetX > 0) {
+                    x += offsetX;
+                }
+                if (offsetY >0) {
+                    y += offsetY;
+                }
+
+                if (maxX < x) maxX = x;
+                if (maxY < y) maxY = y;
+            }
+        }
+
+        //echo("$maxX, $maxY")
+        return Size{.w=maxX; .h= maxY;};
+    }
+
+
+}

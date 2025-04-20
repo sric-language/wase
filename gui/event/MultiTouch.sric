@@ -1,0 +1,105 @@
+
+import sric::*;
+import waseGraphics::*;
+import cstd::*;
+
+struct MultiTouchState : GestureState {
+  var x0 :Int= 0;
+  var y0 :Int= 0;
+  var x1 :Int= 0;
+  var y1 :Int= 0;
+
+  var centerX :Float= 0f;
+  var centerY :Float= 0f;
+  var distance :Float= 0f;
+
+
+  override fun onEnter(e: & MotionEvent) {
+    var e1 = e.pointers.get().getPtr(0);
+    var e2 = e.pointers.get().getPtr(1);
+    x0 = e1.x;
+    y0 = e1.y;
+    x1 = e2.x;
+    y1 = e2.y;
+
+    distance = getDistance(x0, y0, x1, y1);
+    centerX = (x0+x1)/2f;
+    centerY = (y0+y1)/2f;
+  }
+
+  static fun getDistance(x1: Int, y1: Int , x2: Int , y2: Int ): Float {
+    var dx = x2 - x1;
+    var dy = y2 - y1;
+    return sqrt(dx*dx + dy*dy);
+  }
+
+  static fun dotProduct(x1: Int, y1: Int , x2: Int , y2: Int): Float {
+    return (x1*x2+y1*y2);
+  }
+
+  static fun getAngle(x1: Int, y1: Int , x2: Int , y2: Int): Float {
+    var product = dotProduct(x1, y1, x2, y2);
+    var len1 = sqrt(x1*x1 + y1*y1);
+    var len2 = sqrt(x2*x2 + y2*y2);
+
+    return product / (len1 * len2);
+  }
+
+  override fun onEvent(e: &MotionEvent ) {
+    if (e.pointers.get() != null && (e.pointers.get().size() <= 1)) {
+      //echo("endMultiTouch:$e")
+      machine.onFinished(e);
+      return;
+    }
+
+    //echo(e)
+
+    if (e.type == MotionEventType::TouchMove) {
+      var e1 = e.pointers.get().getPtr(0);
+      var e2 = e.pointers.get().getPtr(1);
+      var nx0 = e1.x;
+      var ny0 = e1.y;
+      var nx1 = e2.x;
+      var ny1 = e2.y;
+
+      var ndistance = getDistance(nx0, ny0, nx1, ny1);
+      var ncenterX = (nx0+nx1)/2f;
+      var ncenterY = (ny0+ny1)/2f;
+
+
+      var multiEvent = GestureEvent {
+        .distance = ndistance;
+        .centerX = ncenterX;
+        .centerY = ncenterY;
+        .x = nx0;
+        .y = ny0;
+        .relativeX = .x;
+        .relativeY = .y;
+      };
+
+      multiEvent.scale = ndistance / distance;
+      multiEvent.offsetX = ncenterX - centerX;
+      multiEvent.offsetY = ncenterY - centerY;
+
+      //compute sclae
+      var dx = x1 - x0;
+      var dy = y1 - y0;
+      var ndx = nx1 - nx0;
+      var ndy = ny1 - ny0;
+      var angle = getAngle(dx, dy, ndx, ndy);
+      multiEvent.rotate = angle;
+
+      x0 = nx0;
+      y0 = ny0;
+      x1 = nx1;
+      y1 = ny1;
+      distance = ndistance;
+      centerX = ncenterX;
+      centerY = ncenterY;
+
+      //multiEvent.rawEvent = e;
+      machine.onGestureEvent(multiEvent);
+      if (multiEvent.consumed) e.consumed = true;
+    }
+  }
+}

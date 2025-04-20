@@ -1,0 +1,173 @@
+import sric::*;
+import waseGraphics::*;
+
+struct Table : ScrollPane
+{
+  //@Transient
+  var model : own*? TableModel;
+  
+  readonly var selectedRow: Int = -1;
+  var onSelect: fun(r: Int);
+
+  
+  var colWidth :Int= 360;
+  var rowHeight :Int= 60;
+
+  //@Transient
+  protected var colWidthCache: DArray$<Int>;
+
+  //@Transient
+  protected var header : *? WidgetGroup;
+  
+  fun setModel(t: own* TableModel) {
+        model = move t; init();
+  }
+
+  fun selectRow(t: Int, fire: Bool = true) {
+      //var oldVal = selectedRow;
+      if (fire && onSelect != null) {
+          onSelect(t);
+      }
+      selectedRow = t;
+      this.repaint();
+
+      if (fire) {
+        eventListeners.fire(EventType::SelectChanged, this);
+      }
+  }
+
+
+  fun new()
+  {
+    var header = new HBox {
+        //it.vertical = false
+        .spacing = 0;
+        .layout.width = Layout::wrapContent;
+        //it.clip = false
+    };
+
+    layout.height = Layout::matchParent;
+    super.autoScrollContent = false;
+    this.header = header;
+    this.setContent(move header);
+    style = "Table";
+  }
+
+  private fun init() {
+    colWidthCache.clear();
+    header.removeAll();
+    var colWidth = (this.colWidth);
+    for (var i=0; i<model.numCols(); ++i)
+    {
+      var c = i;
+      var btn = new Button {
+        .setText(model.header(c));
+        .setStyle("tableHeader");
+        .padding.initAll(0);
+        .rippleEnable = false;
+      };
+      var w = model.prefWidth(c);
+      if (w == -1) w = colWidth;
+      colWidthCache.add(w);
+      //btn.layout.widthType = SizeType.fixed
+      btn.layout.width = (w);
+      //btn.layout.heightType = SizeType.fixed
+      btn.layout.height = rowHeight;
+      header.add(move btn);
+    }
+  }
+
+  override fun setOffsetX(t: Int)
+  {
+      header.x = -t; super.setOffsetX(t);
+  }
+  
+  override fun layoutChildren(g: &Graphics, force:Bool)
+  {
+    super.layoutChildren(g, force);
+    header.x -= offsetX;
+  }
+
+  protected override fun prefContentSize(g: &Graphics, hintsWidth :Int= -1,  hintsHeight :Int= -1): Size {
+    var w :Int= 0;
+    var colWidth :Int= (this.colWidth);
+    for (var i=0; i<model.numCols(); ++i)
+    {
+      var c = i;
+      var cw = model.prefWidth(c);
+      if (cw == -1) cw = colWidth;
+      w += cw;
+    }
+    var h = model.numRows() * (rowHeight) + (rowHeight);
+
+    return Size { .w = w; .h = h; };
+  }
+
+  protected override fun contentMaxHeight(g: &Graphics): Float32 {
+    var t = model.numRows() * (rowHeight);
+    //echo("contentMaxHeight$t")
+    return t as Float32;
+  }
+  protected override fun viewportHeight(): Float32 {
+    var t = super.viewportHeight() - (rowHeight);
+    //echo("viewportHeight$t, headerHeight$headerHeight, super.viewportHeight$super.viewportHeight")
+    return t as Float32;
+  }
+  
+  protected override fun gestureEvent( e: &GestureEvent)
+  {
+    if (e.type == GestureEvent::click) {
+        var y = e.relativeY - this.y + this.offsetY;
+        var r = (((y as Float) / (rowHeight)) as Int) - 1;
+        selectRow(r);
+    }
+    super.gestureEvent(e);
+  }
+}
+
+virtual struct TableModel
+{
+
+  /**
+  ** Get number of rows in table.
+  **/
+  virtual fun numRows(): Int { return 0; }
+
+  /**
+  ** Get number of columns in table.  Default returns 1.
+  **/
+  virtual fun numCols(): Int { return 1; }
+
+  /**
+  ** Get the header text for specified column.
+  **/
+  virtual fun header(col:Int ): String { return String::format("Header %d", col); }
+
+  /**
+  ** Return the preferred width in pixels for this column.
+  ** Return null (the default) to use the Tables default
+  ** width.
+  **/
+  virtual fun prefWidth(col: Int ): Int { return -1; }
+
+  /**
+  ** Get the text to display for specified cell.
+  **/
+  virtual fun text(col: Int , row:Int ): String { return String::format("%d:%d", row, col); }
+
+  /**
+  ** Get the image to display for specified cell or null.
+  **/
+  virtual fun image(col: Int , row:Int): *? Image { return null; }
+
+  /**
+  ** Compare two cells when sorting the given col.  Return -1,
+  ** 0, or 1 according to the same semanatics as `sys::Obj.compare`.
+  ** Default behavior sorts `text` using `sys::Str.localeCompare`.
+  ** See `fwt::Table.sort`.
+  **/
+  virtual fun sortCompare(col: Int , row1:Int,  row2: Int): Int
+  {
+    return text(col, row1).compare(text(col, row2));
+  }
+}

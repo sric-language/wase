@@ -1,0 +1,12 @@
+import sric::*;
+import waseGui::*;
+import waseGraphics::*;
+
+struct ColorPickerTest : BasePage
+{
+  protected override fun view(): own* Widget {
+    return new ColorPicker {
+
+    };
+  }
+}

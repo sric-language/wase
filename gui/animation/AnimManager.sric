@@ -1,0 +1,51 @@
+import sric::*;
+
+struct AnimManager {
+    var lastUpdateTime : Int64 = 0;
+
+    private var animationList : DArray$<own* Animation>;
+
+    fun updateFrame(): Bool {
+        if (lastUpdateTime == 0) {
+            lastUpdateTime = currentTimeMillis();
+        }
+        var now = currentTimeMillis();
+
+        var elapsedTime = now - lastUpdateTime;
+
+        if (elapsedTime >= 0) {
+            update(elapsedTime);
+        }
+
+        lastUpdateTime = now;
+        //echo("animationList:$animationList")
+        return hasAnimation();
+    }
+
+    fun update(frameTime: Int): Bool {
+        var n = animationList.size();
+        for (var i=0; i<n; ++i) {
+            animationList[i].update(frameTime);
+            if (animationList[i].isFinished) {
+                //echo("isFinished: $anim")
+                animationList.removeAt(i);
+                --i;
+                --n;
+            }
+        }
+        return animationList.size() > 0;
+    }
+
+    fun clear() {
+        animationList.clear();
+        lastUpdateTime = 0;
+    }
+
+    fun hasAnimation(): Bool {
+        return animationList.size() > 0;
+    }
+
+    fun add(a: own* Animation) {
+        animationList.add(move a);
+    }
+}

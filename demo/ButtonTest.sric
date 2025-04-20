@@ -1,0 +1,35 @@
+import sric::*;
+import waseGui::*;
+import waseGraphics::*;
+
+struct ButtonTest : BasePage
+{
+  protected override fun view(): own* Widget {
+    return new VBox
+    {
+      .padding = Insets { .initAll(50); };
+      .layout.height = Layout::matchParent;
+      .spacing = 15;
+      new Button {
+        .setText("Flat Button");
+        .setStyle("flatButton");
+        .onClick = fun(w:*Widget) { Toast::showText("hello world"); };
+       },
+      new Button {
+        .setText("Push Button");
+        .onClick = fun(w:*Widget) { Toast::showText("hello world"); };
+      },
+      new Button {
+        .setText("Disable Button");
+        .enabled = false;
+        .onClick = fun(w:* Widget) { Toast::showText("hello world"); };
+      },
+
+      new ToggleButton { .setText("switch"); },
+      new ToggleButton { .setText("checkBox"); .setStyle("checkBox"); },
+      new RadioButton { .setText("radio1"); },
+      new RadioButton { .setText("radio2"); };
+
+    };
+  }
+}
