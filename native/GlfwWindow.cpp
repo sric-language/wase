@@ -343,6 +343,15 @@ static bool doFrame(double time, void* userData) {
 	return true;
 }
 
+#ifdef __EMSCRIPTEN__
+EM_JS(bool, isMobile, (), {
+	if (/Mobi|Android|iPhone/i.test(navigator.userAgent)) {
+		return true;
+	}
+	return false;
+  });
+#endif
+
 int openWindow(const char* title, int w, int h, sric::OwnPtr<waseGraphics::View> view)
 {
 	GLFWwindow* window = NULL;
@@ -403,7 +412,7 @@ int openWindow(const char* title, int w, int h, sric::OwnPtr<waseGraphics::View>
 
 	getContentScale(window);
 	g_screenScle = lastXScale;
-	g_autoScale = false;
+	g_autoScale = isMobile();
 
 
 #if __EMSCRIPTEN__
