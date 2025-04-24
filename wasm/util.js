@@ -1,7 +1,10 @@
 var mgpFontContext;
 function getFontContext() {
   if (!mgpFontContext) {
-    mgpFontContext = document.createElement("canvas").getContext("2d", { willReadFrequently: true });
+    var canvas = document.createElement("canvas")
+    canvas.width = 512;
+    canvas.height = 512;
+    mgpFontContext = canvas.getContext("2d", { willReadFrequently: true });
   }
   //mgpFontContext.textBaseline = "top";
   return mgpFontContext;

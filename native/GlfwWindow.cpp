@@ -318,7 +318,7 @@ static bool doFrame(double time, void* userData) {
 	glfwGetWindowSize(window, &winWidth, &winHeight);
 	glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
 	// Calculate pixel ration for hi-dpi devices.
-	pxRatio = (float)fbWidth / (float)winWidth;
+	pxRatio = 1;//(float)fbWidth / (float)winWidth;
 
 	// Update and render
 	glViewport(0, 0, fbWidth, fbHeight);
@@ -350,6 +350,10 @@ EM_JS(bool, isMobile, (), {
 	}
 	return false;
   });
+#else
+  bool isMobile() {
+	return false;
+  }
 #endif
 
 int openWindow(const char* title, int w, int h, sric::OwnPtr<waseGraphics::View> view)

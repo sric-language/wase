@@ -68,14 +68,26 @@ struct Canvas : Widget {
       canvas.drawImage(image4, 0, 600);
 
       //canvas.pen = Pen { it.width = 4 }
-      canvas.strokeWidth(4.0);
+      canvas.strokeWidth(2.0);
       canvas.setColor(Color { .rgba = 0xff0000ff; });
       canvas.drawLine(0, 300, 600, 300);
       canvas.drawLine(300, 0, 300, 600);
 
-      canvas.setFontSize(34);
-      canvas.strokeWidth(1.0);
-      canvas.drawText(250, 35, "Hi", -1);
+      canvas.setFontSize(66);
+
+      var metric: FontMetrics;
+      canvas.fontMetrics(metric);
+      var lineh = metric.height;
+      var offset = metric.ascent;
+
+      canvas.strokeWidth(2.0);
+      canvas.drawLine(250, 300+lineh, 250+canvas.textWidth("Hi", -1), 300+lineh);
+
+      canvas.setColor(Color { .rgba = 0x00ff00ff; });
+      canvas.drawLine(250, 300+offset, 250+canvas.textWidth("Hi", -1), 300+offset);
+
+      canvas.setColor(Color { .rgba = 0x0000ffff; });
+      canvas.drawText(250, 300+offset, "Hi", -1);
   }
 }
 

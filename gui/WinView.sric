@@ -1,5 +1,6 @@
 import sric::*;
 import waseGraphics::*;
+import cstd::*;
 
 //@#include "Window.h"
 struct WinView : View {
@@ -17,8 +18,8 @@ struct WinView : View {
     private var gesture: own* Gesture = ...;
     private var frameAnimation: own*? Animation;
 
-    protected var densityBaseW: Float = 1080f;
-    protected var densityBaseH: Float = 1920f;
+    protected var densityBaseW: Float = 640f;
+    protected var densityBaseH: Float = 960f;
     private var isOpened: Bool = false;
     var autoScale: Bool = true;
     var inverseScreenScale: Float = 1.0;
@@ -264,6 +265,7 @@ struct WinView : View {
                 m = min(m1, m2);
             }
             inverseScreenScale = 1/m;
+            printf("autoScale: w:%d, h:%d s:%f\n", w, h, m);
         }
     }
 }

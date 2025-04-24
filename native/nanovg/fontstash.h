@@ -444,7 +444,7 @@ void fons__tt_getFontVMetrics(FONSttFontImpl *font, int *ascent, int *descent, i
 	*ascent = out[4];
 	*lineGap = 4;
 	int h = out[2];
-	*descent = h - *ascent;
+	*descent = -(h - *ascent);
 
 	//printf("ascent:%d, descent:%d, lineGap:%d\n", *ascent, *descent, *lineGap);
 }
@@ -452,6 +452,7 @@ void fons__tt_getFontVMetrics(FONSttFontImpl *font, int *ascent, int *descent, i
 float fons__tt_getPixelHeightScale(FONSttFontImpl *font, float size)
 {
 	font->fontSize = size;
+	//printf("fons__tt_getPixelHeightScale:%f\n", size);
 	return 1;
 }
 
@@ -474,7 +475,7 @@ int fons__tt_buildGlyphBitmap(FONSttFontImpl *font, int glyph, float size, float
 	int width = ceil(out[1]);
 	int rows = ceil(out[2]);
 	*x0 = 0;
-	*y0 = -ascent - rows;
+	*y0 = -ascent;
     *x1 = width;
     *y1 = *y0 + rows;
     *lsb = out[3];

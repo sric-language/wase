@@ -20,13 +20,13 @@ mergeInto(LibraryManager.library, {
       Module.HEAPF32[p++] = w;
       Module.HEAPF32[p++] = h;
       Module.HEAPF32[p++] = 0;
-      Module.HEAPF32[p++] = m.actualBoundingBoxAscent;
+      Module.HEAPF32[p++] = m.fontBoundingBoxAscent;
   
       var iw = Math.ceil(w);
       var ih = Math.ceil(h);
       cx.clearRect(0, 0, iw, ih);
       cx.fillStyle = "rgba(255,0,0,1)";
-      cx.fillText(text, 0, m.actualBoundingBoxAscent+2);
+      cx.fillText(text, 0, m.fontBoundingBoxAscent);
       var imageData = cx.getImageData(0, 0, iw, ih);
       var imageBuf = imageData.data;
   
@@ -55,7 +55,7 @@ mergeInto(LibraryManager.library, {
       Module.HEAPF32[p++] = w;
       Module.HEAPF32[p++] = h;
       Module.HEAPF32[p++] = 0;
-      Module.HEAPF32[p++] = m.actualBoundingBoxAscent;
+      Module.HEAPF32[p++] = m.fontBoundingBoxAscent;
       return 1;
     },
     fontKerning: function(uniChar, fontName, bold, fontSize, previous) {
