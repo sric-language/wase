@@ -1,3 +1,4 @@
+set -e
 
 sric graphics/module.scm -fmake -debug
 sric gui/module.scm -fmake -debug

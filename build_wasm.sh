@@ -1,3 +1,5 @@
+set -e
+
 sric graphics/module.scm
 sric gui/module.scm
 sric demo/module.scm
