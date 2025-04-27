@@ -1,6 +1,6 @@
 import sric::*;
 import waseGraphics::*;
-
+import serial::*;
 
 struct ModalLayer : Pane {
     var level: Int;
@@ -264,5 +264,42 @@ struct Frame : Pane {
         var t: * WidgetGroup = topLayer;
         this.add(move topLayer);
         return t;
+    }
+
+    fun loadView(fileName: raw* const Int8) {
+        var view = loadViewFile(fileName);
+        if (view is own* Frame) {
+            (view as *Frame).show(false);
+        }
+        else {
+            this.removeAll();
+            this.add(move view);
+        }
+    }
+
+    static fun loadViewFile(fileName: raw* const Int8): own* Widget {
+        var stream = FileStream::open(fileName, "rb");
+        var str = stream.readAllStr();
+
+        unsafe {
+            var decoder: Decoder;
+            var p = decoder.decode(str);
+            var obj: raw* Widget = unsafeCast$<raw*Widget>(p);
+            return rawToOwn(obj);
+        }
+    }
+
+    fun loadStyle(fileName: raw* const Int8) {
+        var stream2 = FileStream::open(fileName, "rb");
+        var str2 = stream2.readAllStr();
+        unsafe {
+            var decoder2: Decoder;
+            var p = decoder2.decodeMap(str2);
+            p.eachWhile(fun(v: const &  own*Void , k: const &  String): Bool{
+                var obj: raw* WidgetStyle = unsafeCast$<raw*WidgetStyle>(v);
+                this.styleManager.idMap.set(k.copy(), rawToOwn(obj));
+                return true;
+            });
+        }
     }
 }

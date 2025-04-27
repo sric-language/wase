@@ -124,7 +124,12 @@ class PlutovgGraphics : public Graphics {
 public:
     PlutovgGraphics(plutovg_canvas_t* vg) : vg(vg) {
         defaultFont = plutovg_font_face_load_from_file("C:/Windows/Fonts/msyh.ttc", 0);
-        plutovg_canvas_set_font_face(vg, defaultFont);
+        if (defaultFont == NULL) {
+            defaultFont = plutovg_font_face_load_from_file("res/Roboto-Regular.ttf", 0);
+        }
+        if (defaultFont != NULL) {
+            plutovg_canvas_set_font_face(vg, defaultFont);
+        }
     }
 
     void compositeOperation(CompositeOperation op) {

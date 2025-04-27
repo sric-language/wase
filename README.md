@@ -1,6 +1,15 @@
 
 Sric/C++ cross-platform GUI library.
 
+- Supported platforms: Windows, WebAssembly.
+- Support GPU or CPU render backend.
+
+[Online Demo](https://sric.fun/wase/run.html)
+
+![image](screenshot/wase.png)
+
+
+## Example Code
 ### C++
 ```
 #include "waseGui.h"
@@ -37,4 +46,31 @@ fun main(): Int {
     frame.show();
     return 0;
 }
+```
+
+### HiML
+```
+waseGui::VBox
+{
+  style = "paneBack"
+  padding = waseGui::Insets { top = 50, right = 50, bottom = 50, left = 50 }
+  layout = waseGui::Layout { height = 0 }
+  spacing = 15
+
+  waseGui::Label { text = Hello }
+
+  waseGui::Button {
+    id = button
+    text = "Push Button"
+  }
+}
+```
+
+
+## Build
+
+[Third-party dependencies](https://gitee.com/chunquedong/third-party)
+
+```
+build.sh
 ```

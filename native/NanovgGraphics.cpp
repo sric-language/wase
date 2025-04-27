@@ -112,11 +112,16 @@ class NanovgGraphics : public Graphics {
 public:
     NanovgGraphics(NVGcontext* vg) : vg(vg) {
 #ifdef __EMSCRIPTEN__
-        defaultFont = nvgCreateFont(vg, "fallback", "res/sans.ttf");
+        defaultFont = nvgCreateFont(vg, "fallback", "res/Roboto-Regular.ttf");
 #else
         defaultFont = nvgCreateFont(vg, "fallback", "C:/Windows/Fonts/msyh.ttc");
+        if (defaultFont == -1) {
+            defaultFont = nvgCreateFont(vg, "fallback", "res/Roboto-Regular.ttf");
+        }
 #endif
-        nvgAddFallbackFontId(vg, defaultFont, defaultFont);
+        if (defaultFont != -1) {
+            nvgAddFallbackFontId(vg, defaultFont, defaultFont);
+        }
     }
 
     void compositeOperation(CompositeOperation op) {
