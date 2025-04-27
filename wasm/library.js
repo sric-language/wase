@@ -15,6 +15,7 @@ mergeInto(LibraryManager.library, {
       var w = m.width;
       var h = m.fontBoundingBoxDescent + m.fontBoundingBoxAscent;
       if (w == 0) w = 1;
+      if (h == 0) h = 1;
       var p = out >> 2;
       Module.HEAPF32[p++] = w+1;
       Module.HEAPF32[p++] = w;
@@ -50,6 +51,7 @@ mergeInto(LibraryManager.library, {
       var w = m.width;
       var h = m.fontBoundingBoxDescent + m.fontBoundingBoxAscent;
       if (w == 0) w = 1;
+      if (h == 0) h = 1;
       var p = out >> 2;
       Module.HEAPF32[p++] = w+1;
       Module.HEAPF32[p++] = w;

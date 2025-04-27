@@ -119,9 +119,11 @@ struct Main
   }
 }
 
-var app: const own* Main = new Main;
+unsafe var app: const own* Main = new Main;
 
 fun main(): Int {
-    app.show();
+    unsafe {
+      app.show();
+    }
     return 0;
 }

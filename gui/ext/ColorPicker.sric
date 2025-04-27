@@ -46,7 +46,7 @@ protected struct ColorRect : Widget {
     var valueX: Float = 1.0;
     var valueY: Float = 1.0;
     var colorLine: *? ColorLine;
-    var step : Int = (5);
+    var step : Int = (8);
 
     protected override fun doPaint(clip: &Rect,  g: &Graphics) {
         var w = this.contentWidth();
