@@ -52,8 +52,8 @@ fun main(): Int {
 ```
 waseGui::VBox
 {
-  style = "paneBack"
-  padding = waseGui::Insets { top = 50, right = 50, bottom = 50, left = 50 }
+  style = paneBack
+  padding = "50 50 50 50"
   layout = waseGui::Layout { height = 0 }
   spacing = 15
 
@@ -69,8 +69,9 @@ waseGui::VBox
 
 ## Build
 
-[Third-party dependencies](https://gitee.com/chunquedong/third-party)
-
+1. [Install Sric](https://sric.fun/book/Start.html)
+2. [Third-party dependencies](https://gitee.com/chunquedong/third-party)
+3. Build Wase
 ```
 build.sh
 ```
