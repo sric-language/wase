@@ -46,16 +46,16 @@ struct RoundButtonStyle : WidgetStyle
         g.fillRoundRect(offsetR, offsetR, width, height, arc);
     }
 
-    // if (btn.ripplePoint != null && btn.rippleSize > 0.0) {
-    //     g.brush = rippleColor
-    //     r := (btn.rippleSize * (100+btn.width.max(btn.height))).toInt
-    //     alpha := (256 * (1-btn.rippleSize)).toInt
-    //     if (alpha > 200) alpha = 200
-    //     g.alpha = alpha
-    //     w := r+r
-    //     g.fillOval(btn.ripplePoint.x-r, btn.ripplePoint.y-r, w, w)
-    //     g.alpha = 255
-    // }
+    if (btn.rippleSize > 0.0) {
+        g.setColor(rippleColor);
+        var r = (btn.rippleSize * (100+max(btn.width, btn.height))) as Int;
+        var alpha = ((1-btn.rippleSize));
+        if (alpha > 200/255.0) alpha = 200/255.0;
+        g.globalAlpha(alpha);
+        var w = r+r;
+        g.fillOval(btn.ripplePoint.x-r, btn.ripplePoint.y-r, w, w);
+        g.globalAlpha(1);
+    }
 
     if (lineWidth > 0 && stroke) {
         g.setColor(outlineColor);

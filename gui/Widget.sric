@@ -324,7 +324,7 @@ reflect abstract struct Widget {
     }
 
     fun paint(clip: Rect, g: & Graphics) {
-        if (!visible) return;
+        if (!visible || willRemoved) return;
         if (width < 0 || height < 0) {
             return;
         }
