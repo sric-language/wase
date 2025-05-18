@@ -48,7 +48,7 @@ fun main(): Int {
 }
 ```
 
-### HiML
+### HiML (XML like format)
 ```
 waseGui::VBox
 {
