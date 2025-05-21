@@ -46,7 +46,7 @@ struct MultiTouchState : GestureState {
   }
 
   override fun onEvent(e: &MotionEvent ) {
-    if (e.pointers.get() != null && (e.pointers.get().size() <= 1)) {
+    if (e.pointers.getPtr() != null && (e.pointers.get().size() <= 1)) {
       //echo("endMultiTouch:$e")
       machine.onFinished(e);
       return;

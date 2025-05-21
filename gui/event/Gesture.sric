@@ -85,7 +85,7 @@ struct Gesture
   }
 
   private fun isMultiTouch(e: &MotionEvent): Bool {
-    return e.pointers.get() != null && e.pointers.get().size() > 1;
+    return e.pointers.getPtr() != null && e.pointers.get().size() > 1;
   }
 
   fun onEvent(e: &MotionEvent)

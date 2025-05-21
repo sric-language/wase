@@ -153,9 +153,9 @@ virtual struct Button : Label, PropertyAnimTarget {
         });
     };
     anim.whenDone = fun() {
-        rippleSize = -1.0;
-        ripplePoint.x = 0;
-        ripplePoint.y = 0;
+        this.rippleSize = -1.0;
+        this.ripplePoint.x = 0;
+        this.ripplePoint.y = 0;
     };
     var _anim = anim as * Animation;
     this.getRootView().animManager.add(move anim);

@@ -119,7 +119,7 @@ struct Main
   }
 }
 
-unsafe var app: const own* Main = new Main;
+unsafe var app: own* Main = new Main;
 
 fun main(): Int {
     unsafe {
