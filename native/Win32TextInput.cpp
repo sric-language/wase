@@ -63,7 +63,7 @@ std::string UTF8ToLocal(const std::string& utf8Str)
     return result;
 }
 
-void Win32TextInput::init(HWND hWnd, int type) {
+void Win32TextInput::init(HWND hWnd, int type) SC_NOTHROW {
     this->hWnd = hWnd;
     int style = WS_CHILD | WS_VISIBLE;//WS_BORDER | 
     if (type == TextInput::inputTypeMultiLine) {
@@ -87,15 +87,15 @@ void Win32TextInput::init(HWND hWnd, int type) {
     }
 }
 
-void Win32TextInput::close() {
+void Win32TextInput::close() SC_NOTHROW {
     ShowWindow(textInputHandle, SW_HIDE);
     DestroyWindow(textInputHandle);
     textInputHandle = 0;
 }
-void Win32TextInput::setPos(int x, int y, int w, int h) {
+void Win32TextInput::setPos(int x, int y, int w, int h) SC_NOTHROW {
     SetWindowPos(textInputHandle, HWND_TOP, x, y, w, h, SWP_ASYNCWINDOWPOS);
 }
-void Win32TextInput::setStyle(waseGraphics::Font& font, float fontSize, waseGraphics::Color textColor, waseGraphics::Color backgroundColor) {
+void Win32TextInput::setStyle(waseGraphics::Font& font, float fontSize, waseGraphics::Color textColor, waseGraphics::Color backgroundColor) SC_NOTHROW {
     NONCLIENTMETRICS ncm;
     ncm.cbSize = sizeof(NONCLIENTMETRICS);
     SystemParametersInfo(SPI_GETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICS), &ncm, 0);
@@ -112,24 +112,24 @@ void Win32TextInput::setStyle(waseGraphics::Font& font, float fontSize, waseGrap
     //SetTextColor(textInputHandle, RGB(0, 0, 255));
     //SetBkColor(textInputHandle, RGB(255, 255, 200));
 }
-void Win32TextInput::setText(const char* text) {
+void Win32TextInput::setText(const char* text) SC_NOTHROW {
     std::string localStr = UTF8ToLocal(text);
     SetWindowText(textInputHandle, localStr.c_str());
 }
-void Win32TextInput::setType(int lineNum, bool editable) {
+void Win32TextInput::setType(int lineNum, bool editable) SC_NOTHROW {
     if (textInputHandle != 0) {
         EnableWindow(textInputHandle, editable);
     }
 }
-void Win32TextInput::focus() {
+void Win32TextInput::focus() SC_NOTHROW {
     SetFocus(textInputHandle);
     SendMessage(textInputHandle, EM_SETSEL, 0, -1);
 }
 
-void Win32TextInput::select(int start, int end) {
+void Win32TextInput::select(int start, int end) SC_NOTHROW {
     SendMessage(textInputHandle, EM_SETSEL, start, end);
 }
-int Win32TextInput::caretPos() {
+int Win32TextInput::caretPos() SC_NOTHROW {
     DWORD dwStart, dwEnd;
     SendMessage(textInputHandle, EM_GETSEL, (WPARAM)&dwStart, (LPARAM)&dwEnd);
     return dwStart;

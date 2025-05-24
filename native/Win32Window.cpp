@@ -25,7 +25,7 @@ public:
     sric::OwnPtr<Win32TextInput> _textInput;
     bool _dirty = true;
 
-    void init(sric::OwnPtr<waseGraphics::View> view, Size size) {
+    void init(sric::OwnPtr<waseGraphics::View> view, Size size) SC_NOTHROW {
         _size = size;
         surface = plutovg_surface_create(size.w, size.h);
         vg = plutovg_canvas_create(surface);
@@ -36,20 +36,20 @@ public:
         _view->setHost(self);
     }
 
-    ~Win32Window() {
+    ~Win32Window() SC_NOTHROW {
         plutovg_canvas_destroy(vg);
         plutovg_surface_destroy(surface);
     }
 
-    sric::RefPtr<View> view() {
+    sric::RefPtr<View> view() SC_NOTHROW {
         return _view;
     }
 
-    void repaint(Rect& dirty) {
+    void repaint(Rect& dirty) SC_NOTHROW {
         _dirty = true;
     }
 
-    Size size() {
+    Size size() SC_NOTHROW {
         /*RECT rect;
         GetClientRect(hWnd, &rect);
         Size s;
@@ -59,29 +59,29 @@ public:
         return _size;
     }
 
-    bool hasFocus() {
+    bool hasFocus() SC_NOTHROW {
         return true;
     }
 
-    void focus() {
+    void focus() SC_NOTHROW {
 
     }
 
-    sric::OwnPtr<TextInput> textInput(int inputType) {
+    sric::OwnPtr<TextInput> textInput(int inputType) SC_NOTHROW {
         _textInput = sric::new_<Win32TextInput>();
         _textInput->init(this->hWnd, inputType);
         return _textInput.share();
     }
 
-    void fileDialog(bool isOpen, const char* accept) {
+    void fileDialog(bool isOpen, const char* accept) SC_NOTHROW {
 
     }
 
-    void displayKeyboard(bool display) {
+    void displayKeyboard(bool display) SC_NOTHROW {
 
     }
 
-    void onResize(int w, int h) {
+    void onResize(int w, int h) SC_NOTHROW {
         plutovg_canvas_destroy(vg);
         plutovg_surface_destroy(surface);
 
@@ -99,7 +99,7 @@ sric::OwnPtr<Win32Window> g_window;
 
 int openWindow(const char* title, int w, int h);
 
-int Window::open(sric::OwnPtr<waseGraphics::View> view, const char* name) {
+int Window::open(sric::OwnPtr<waseGraphics::View> view, const char* name) SC_NOTHROW {
     if (!g_window.isNull()) {
         return -1;
     }
@@ -109,7 +109,7 @@ int Window::open(sric::OwnPtr<waseGraphics::View> view, const char* name) {
     return openWindow(name, size.w, size.h);
 }
 
-sric::RefPtr<Window> Window::getCur() {
+sric::RefPtr<Window> Window::getCur() SC_NOTHROW {
     return g_window;
 }
 

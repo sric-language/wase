@@ -50,23 +50,23 @@ float g_screenScle = 1;
 bool g_autoScale = true;
 EventTimer _eventTimer;
 
-void waseGraphics::setTimeout(int64_t timeMillis, std::function<void()> callback) {
+void waseGraphics::setTimeout(int64_t timeMillis, std::function<void()> callback) SC_NOTHROW {
     _eventTimer.setTimeout(timeMillis, callback);
 }
 
-float waseGraphics::getScreenScale() {
+float waseGraphics::getScreenScale() SC_NOTHROW {
     return g_screenScle;
 }
 
-bool waseGraphics::getAutoScale() {
+bool waseGraphics::getAutoScale() SC_NOTHROW {
     return g_autoScale;
 }
 
-void waseGraphics::fireTimeEvents() {
+void waseGraphics::fireTimeEvents() SC_NOTHROW {
     _eventTimer.fireTimeEvents();
 }
 
-void waseGraphics::Window::paint(Graphics& g) {
+void waseGraphics::Window::paint(Graphics& g) SC_NOTHROW {
     if (view() != nullptr) {
         g.save();
         view()->onPaint(g);

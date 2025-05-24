@@ -16,17 +16,17 @@ struct Win32TextInput : waseGraphics::TextInput
     HWND hWnd = 0;
     LONG_PTR custemProc = 0;
 
-    void init(HWND hWnd, int type);
-    void close();
+    void init(HWND hWnd, int type) SC_NOTHROW;
+    void close() SC_NOTHROW;
 
-    void setPos(int x, int y, int w, int h);
-    void setStyle(waseGraphics::Font& font, float fontSize, waseGraphics::Color textColor, waseGraphics::Color backgroundColor);
-    void setText(const char* text);
-    void setType(int lineNum, bool editable);
-    void focus();
+    void setPos(int x, int y, int w, int h) SC_NOTHROW;
+    void setStyle(waseGraphics::Font& font, float fontSize, waseGraphics::Color textColor, waseGraphics::Color backgroundColor) SC_NOTHROW;
+    void setText(const char* text) SC_NOTHROW;
+    void setType(int lineNum, bool editable) SC_NOTHROW;
+    void focus() SC_NOTHROW;
 
-    void select(int start, int end);
-    int caretPos();
+    void select(int start, int end) SC_NOTHROW;
+    int caretPos() SC_NOTHROW;
 };
 
 #endif

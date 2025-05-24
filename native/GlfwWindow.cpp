@@ -55,7 +55,7 @@ public:
 	Size _size;
 	sric::OwnPtr<TextInput> _textInput;
 
-	void init(GLFWwindow* window, NVGcontext* vg, sric::OwnPtr<waseGraphics::View> view) {
+	void init(GLFWwindow* window, NVGcontext* vg, sric::OwnPtr<waseGraphics::View> view) SC_NOTHROW {
 		this->window = window;
 		this->vg = vg;
 		graphics = waseGraphics::createNanovgGraphics(vg);
@@ -64,27 +64,27 @@ public:
 		_view->setHost(self);
 	}
 
-	sric::RefPtr<View> view() {
+	sric::RefPtr<View> view() SC_NOTHROW {
 		return _view;
 	}
 
-	void repaint(Rect& dirty) {
+	void repaint(Rect& dirty) SC_NOTHROW {
 
 	}
 
-	Size size() {
+	Size size() SC_NOTHROW {
 		return _size;
 	}
 
-	bool hasFocus() {
+	bool hasFocus() SC_NOTHROW {
 		return true;
 	}
 
-	void focus() {
+	void focus() SC_NOTHROW {
 
 	}
 
-	sric::OwnPtr<TextInput> textInput(int inputType) {
+	sric::OwnPtr<TextInput> textInput(int inputType) SC_NOTHROW {
 #ifdef _WIN32
 		sric::OwnPtr<Win32TextInput> textInput = sric::new_<Win32TextInput>();
 		textInput->custemProc = (LONG_PTR)EditSubclassProc;
@@ -102,15 +102,15 @@ public:
 #endif
 	}
 
-	void fileDialog(bool isOpen, const char* accept) {
+	void fileDialog(bool isOpen, const char* accept) SC_NOTHROW {
 
 	}
 
-	void displayKeyboard(bool display) {
+	void displayKeyboard(bool display) SC_NOTHROW {
 
 	}
 
-	void onResize(int w, int h) {
+	void onResize(int w, int h) SC_NOTHROW {
 		_size.w = w;
 		_size.h = h;
 	}
@@ -121,7 +121,7 @@ sric::OwnPtr<GlfwWindow> g_window;
 int openWindow(const char* title, int w, int h, sric::OwnPtr<waseGraphics::View> view);
 
 
-int Window::open(sric::OwnPtr<waseGraphics::View> view, const char* name) {
+int Window::open(sric::OwnPtr<waseGraphics::View> view, const char* name) SC_NOTHROW {
 	if (!g_window.isNull()) {
 		return -1;
 	}
@@ -130,7 +130,7 @@ int Window::open(sric::OwnPtr<waseGraphics::View> view, const char* name) {
 	return openWindow(name, size.w, size.h, std::move(view));
 }
 
-sric::RefPtr<Window> Window::getCur() {
+sric::RefPtr<Window> Window::getCur() SC_NOTHROW {
 	return g_window;
 }
 

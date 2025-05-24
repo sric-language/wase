@@ -4,6 +4,6 @@
 #include "waseGraphics.h"
 
 namespace waseGraphics {
-	Graphics* createPlutovgGraphics(void* vg);
+	Graphics* createPlutovgGraphics(void* vg) SC_NOTHROW;
 }
 #endif

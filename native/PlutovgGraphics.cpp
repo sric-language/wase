@@ -16,16 +16,16 @@ class PlutovgImage : public Image {
 public:
     plutovg_surface_t* image = NULL;
 
-    int width() {
+    int width() SC_NOTHROW {
         return w;
     }
-    int height() {
+    int height() SC_NOTHROW {
         return h;
     }
-    void setFlags(int flags) {
+    void setFlags(int flags) SC_NOTHROW {
         imageFlags = flags;
     }
-    bool load(const char* filename) {
+    bool load(const char* filename) SC_NOTHROW {
         image = plutovg_surface_load_from_image_file(filename);
         if (image) {
             w = plutovg_surface_get_width(image);
@@ -33,7 +33,7 @@ public:
         }
         return image != NULL;
     }
-    bool loadMem(unsigned char* data, int ndata) {
+    bool loadMem(unsigned char* data, int ndata) SC_NOTHROW {
         image = plutovg_surface_load_from_image_data(data, ndata);
         if (image) {
             w = plutovg_surface_get_width(image);
@@ -41,7 +41,7 @@ public:
         }
         return image != NULL;
     }
-    void initData(int w, int h, const unsigned char* data) {
+    void initData(int w, int h, const unsigned char* data) SC_NOTHROW {
         int stride = w * 4;
         image = plutovg_surface_create_for_data((unsigned char*)data, w, h, stride);
         if (image) {
@@ -49,14 +49,14 @@ public:
             h = plutovg_surface_get_height(image);
         }
     }
-    void updateData(const unsigned char* data) {
+    void updateData(const unsigned char* data) SC_NOTHROW {
         //nvgUpdateImage(vg, image, data);
     }
-    virtual ~PlutovgImage() {
+    virtual ~PlutovgImage() SC_NOTHROW {
         plutovg_surface_destroy(image);
         image = NULL;
     }
-    bool isReady() {
+    bool isReady() SC_NOTHROW {
         return image != NULL;
     }
 };
@@ -65,34 +65,34 @@ class PlutovgGraphicsPath : public GraphicsPath {
 public:
     plutovg_canvas_t* vg = NULL;
 
-    void clear() {
+    void clear() SC_NOTHROW {
         plutovg_canvas_new_path(vg);
     }
-    void close() {
+    void close() SC_NOTHROW {
         plutovg_canvas_close_path(vg);
     }
-    void moveTo(float x, float y) {
+    void moveTo(float x, float y) SC_NOTHROW {
         plutovg_canvas_move_to(vg, x, y);
     }
-    void lineTo(float x, float y) {
+    void lineTo(float x, float y) SC_NOTHROW {
         plutovg_canvas_line_to(vg, x, y);
     }
-    void quadTo(float cx, float cy, float x, float y) {
+    void quadTo(float cx, float cy, float x, float y) SC_NOTHROW {
         plutovg_canvas_quad_to(vg, cx, cy, x, y);
     }
-    void cubicTo(float cx1, float cy1, float cx2, float cy2, float x, float y) {
+    void cubicTo(float cx1, float cy1, float cx2, float cy2, float x, float y) SC_NOTHROW {
         plutovg_canvas_cubic_to(vg, cx1, cy1, cx2, cy2, x, y);
     }
-    void arcTo(float x1, float y1, float x2, float y2, float radius) {
+    void arcTo(float x1, float y1, float x2, float y2, float radius) SC_NOTHROW {
         //TODO radius to angle
         plutovg_canvas_arc_to(vg, x1, y1, radius, true, true, x2, y2);
     }
-    void arc(float cx, float cy, float radius, float startAngle, float arcAngle) {
+    void arc(float cx, float cy, float radius, float startAngle, float arcAngle) SC_NOTHROW {
         plutovg_canvas_arc(vg, cx, cy, radius, (startAngle), (startAngle+arcAngle), true);
     }
 };
 
-void toNVPaint(plutovg_canvas_t* vg, Paint* brush) {
+void toNVPaint(plutovg_canvas_t* vg, Paint* brush) SC_NOTHROW {
     if (LinearGradient* p = dynamic_cast<LinearGradient*>(brush)) {
         plutovg_gradient_stop_t stops[2] = {
             {0, toNVColor(p->icol)},{1, toNVColor(p->ocol)}
@@ -122,7 +122,7 @@ class PlutovgGraphics : public Graphics {
     sric::OwnPtr<PlutovgGraphicsPath> curPath;
     plutovg_font_face_t* defaultFont = 0;
 public:
-    PlutovgGraphics(plutovg_canvas_t* vg) : vg(vg) {
+    PlutovgGraphics(plutovg_canvas_t* vg) SC_NOTHROW : vg(vg) {
         defaultFont = plutovg_font_face_load_from_file("C:/Windows/Fonts/msyh.ttc", 0);
         if (defaultFont == NULL) {
             defaultFont = plutovg_font_face_load_from_file("res/Roboto-Regular.ttf", 0);
@@ -132,7 +132,7 @@ public:
         }
     }
 
-    void compositeOperation(CompositeOperation op) {
+    void compositeOperation(CompositeOperation op) SC_NOTHROW {
         plutovg_operator_t p = PLUTOVG_OPERATOR_CLEAR;
         switch (op)
         {
@@ -174,28 +174,28 @@ public:
         }
         plutovg_canvas_set_operator(vg, p);
     }
-    void globalAlpha(float alpha) {
+    void globalAlpha(float alpha) SC_NOTHROW {
         plutovg_canvas_set_opacity(vg, alpha);
     }
-    void antiAlias(bool enabled) {
+    void antiAlias(bool enabled) SC_NOTHROW {
         //nvgShapeAntiAlias(vg, enabled);
     }
 
-    void save() {
+    void save() SC_NOTHROW {
         plutovg_canvas_save(vg);
     }
-    void restore() {
+    void restore() SC_NOTHROW {
         plutovg_canvas_restore(vg);
     }
 
-    void setColor(Color color) {
+    void setColor(Color color) SC_NOTHROW {
         plutovg_canvas_set_rgba(vg, color.r(), color.g(), color.b(), color.a());
     }
 
-    void strokeWidth(float size) {
+    void strokeWidth(float size) SC_NOTHROW {
         plutovg_canvas_set_line_width(vg, size);
     }
-    void setPen(Pen& pen) {
+    void setPen(Pen& pen) SC_NOTHROW {
         plutovg_line_cap_t cap = PLUTOVG_LINE_CAP_ROUND;
         switch (pen.cap)
         {
@@ -232,22 +232,22 @@ public:
         plutovg_canvas_set_miter_limit(vg, pen.miterLimit);
     }
 
-    void setPaint(Paint& brush) {
+    void setPaint(Paint& brush) SC_NOTHROW {
         toNVPaint(vg, &brush);
     }
 
     //Transform2D getTransform();
-    void transform(const Transform2D& trans) {
+    void transform(const Transform2D& trans) SC_NOTHROW {
         plutovg_matrix_t matrix;
         plutovg_matrix_init(&matrix, trans.a, trans.b, trans.c, trans.d, trans.e, trans.f);
         plutovg_canvas_transform(vg, &matrix);
     }
 
-    void clip(float x, float y, float w, float h) {
+    void clip(float x, float y, float w, float h) SC_NOTHROW {
         plutovg_canvas_clip_rect(vg, x, y, w, h);
     }
 
-    sric::RefPtr<GraphicsPath> beginPath() {
+    sric::RefPtr<GraphicsPath> beginPath() SC_NOTHROW {
         plutovg_canvas_new_path(vg);
         if (curPath.isNull()) {
             curPath = sric::new_<PlutovgGraphicsPath>();
@@ -255,26 +255,26 @@ public:
         }
         return curPath;
     }
-    void fillPath(sric::RefPtr<GraphicsPath> path) {
+    void fillPath(sric::RefPtr<GraphicsPath> path) SC_NOTHROW {
         sc_assert(path.get() == curPath.get(), "Must Current Path");
         plutovg_canvas_fill(vg);
     }
-    void drawPath(sric::RefPtr<GraphicsPath> path) {
+    void drawPath(sric::RefPtr<GraphicsPath> path) SC_NOTHROW {
         sc_assert(path.get() == curPath.get(), "Must Current Path");
         plutovg_canvas_stroke(vg);
     }
 
-    void setFont(Font& font) {
+    void setFont(Font& font) SC_NOTHROW {
         //nvgFontFace(vg, font->name);
         plutovg_canvas_set_font_face(vg, defaultFont);
     }
-    void setFontSize(float size) {
+    void setFontSize(float size) SC_NOTHROW {
         plutovg_canvas_set_font_size(vg, size);
     }
-    void drawText(float x, float y, const char* str, int size = -1) {
+    void drawText(float x, float y, const char* str, int size = -1) SC_NOTHROW {
         plutovg_canvas_fill_text(vg, str, size, PLUTOVG_TEXT_ENCODING_UTF8, x, y);
     }
-    void fontMetrics(FontMetrics& metric) {
+    void fontMetrics(FontMetrics& metric) SC_NOTHROW {
         float ascender; float descender; float lineGap;
         plutovg_rect_t rect;
         plutovg_canvas_font_metrics(vg, &ascender, &descender, &lineGap, &rect);
@@ -283,13 +283,13 @@ public:
         metric.height = std::max(rect.h, (ascender - descender + lineGap));
         metric.leading = lineGap;
     }
-    float textWidth(const char* str, int size = -1) {
+    float textWidth(const char* str, int size = -1) SC_NOTHROW {
         plutovg_rect_t bounds;
         float w = plutovg_canvas_text_extents(vg, str, size, PLUTOVG_TEXT_ENCODING_UTF8, &bounds);
         return ceill(w);
     }
 
-    sric::OwnPtr<Image> createImage() {
+    sric::OwnPtr<Image> createImage() SC_NOTHROW {
         sric::OwnPtr<PlutovgImage> image = sric::new_<PlutovgImage>();
         //image->vg = vg;
         return image;
@@ -300,7 +300,7 @@ public:
     ** device.  If the source and destination don't have the
     ** same size, then the copy is resized.
     **/
-    void drawImageEx(sric::RefPtr<Image> image, Rect& src, Rect& dest) {
+    void drawImageEx(sric::RefPtr<Image> image, Rect& src, Rect& dest) SC_NOTHROW {
         if (!image->isReady()) {
             return;
         }
@@ -337,7 +337,7 @@ public:
     }
 };
 
-Graphics* waseGraphics::createPlutovgGraphics(void* vg)
+Graphics* waseGraphics::createPlutovgGraphics(void* vg) SC_NOTHROW
 {
     return new PlutovgGraphics((plutovg_canvas_t*)vg);
 }

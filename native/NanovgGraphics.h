@@ -6,6 +6,6 @@
 struct NVGcontext;
 
 namespace waseGraphics {
-	Graphics* createNanovgGraphics(NVGcontext* vg);
+	Graphics* createNanovgGraphics(NVGcontext* vg) SC_NOTHROW;
 }
 #endif

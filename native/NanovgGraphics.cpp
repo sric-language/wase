@@ -15,43 +15,43 @@ public:
     int image = 0;
     NVGcontext* vg;
 
-    int width() {
+    int width() SC_NOTHROW {
         return w;
     }
-    int height() {
+    int height() SC_NOTHROW {
         return h;
     }
-    void setFlags(int flags) {
+    void setFlags(int flags) SC_NOTHROW {
         imageFlags = flags;
     }
-    bool load(const char* filename) {
+    bool load(const char* filename) SC_NOTHROW {
         image = nvgCreateImage(vg, filename, imageFlags);
         if (image) {
             nvgImageSize(vg, image, &w, &h);
         }
         return image != 0;
     }
-    bool loadMem(unsigned char* data, int ndata) {
+    bool loadMem(unsigned char* data, int ndata) SC_NOTHROW {
         image = nvgCreateImageMem(vg, imageFlags, data, ndata);
         if (image) {
             nvgImageSize(vg, image, &w, &h);
         }
         return image != 0;
     }
-    void initData(int w, int h, const unsigned char* data) {
+    void initData(int w, int h, const unsigned char* data) SC_NOTHROW {
         image = nvgCreateImageRGBA(vg, w, h, imageFlags, data);
         if (image) {
             nvgImageSize(vg, image, &w, &h);
         }
     }
-    void updateData(const unsigned char* data) {
+    void updateData(const unsigned char* data) SC_NOTHROW {
         nvgUpdateImage(vg, image, data);
     }
-    virtual ~NanovgImage() {
+    virtual ~NanovgImage() SC_NOTHROW {
         nvgDeleteImage(vg, image);
         image = 0;
     }
-    bool isReady() {
+    bool isReady() SC_NOTHROW {
         return image != 0;
     }
 };
@@ -60,33 +60,33 @@ class NanovgGraphicsPath : public GraphicsPath {
 public:
     NVGcontext* vg;
 
-    void clear() {
+    void clear() SC_NOTHROW {
         nvgBeginPath(vg);
     }
-    void close() {
+    void close() SC_NOTHROW {
         nvgClosePath(vg);
     }
-    void moveTo(float x, float y) {
+    void moveTo(float x, float y) SC_NOTHROW {
         nvgMoveTo(vg, x, y);
     }
-    void lineTo(float x, float y) {
+    void lineTo(float x, float y) SC_NOTHROW {
         nvgLineTo(vg, x, y);
     }
-    void quadTo(float cx, float cy, float x, float y) {
+    void quadTo(float cx, float cy, float x, float y) SC_NOTHROW {
         nvgQuadTo(vg, cx, cy, x, y);
     }
-    void cubicTo(float cx1, float cy1, float cx2, float cy2, float x, float y) {
+    void cubicTo(float cx1, float cy1, float cx2, float cy2, float x, float y) SC_NOTHROW {
         nvgBezierTo(vg, cx1, cy1, cx2, cy2, x, y);
     }
-    void arcTo(float x1, float y1, float x2, float y2, float radius) {
+    void arcTo(float x1, float y1, float x2, float y2, float radius) SC_NOTHROW {
         nvgArcTo(vg, x1, y1, x2, y2, radius);
     }
-    void arc(float cx, float cy, float radius, float startAngle, float arcAngle) {
+    void arc(float cx, float cy, float radius, float startAngle, float arcAngle) SC_NOTHROW {
         nvgArc(vg, cx, cy, radius, (startAngle), (startAngle+arcAngle), NVG_CCW);
     }
 };
 
-NVGpaint toNVPaint(NVGcontext* vg, Paint* brush) {
+NVGpaint toNVPaint(NVGcontext* vg, Paint* brush) SC_NOTHROW {
     if (LinearGradient* p = dynamic_cast<LinearGradient*>(brush)) {
         return nvgLinearGradient(vg, p->sx, p->sy, p->ex, p->ey, toNVColor(p->icol), toNVColor(p->ocol));
     }
@@ -110,7 +110,7 @@ class NanovgGraphics : public Graphics {
     sric::OwnPtr<NanovgGraphicsPath> curPath;
     int defaultFont = 0;
 public:
-    NanovgGraphics(NVGcontext* vg) : vg(vg) {
+    NanovgGraphics(NVGcontext* vg) SC_NOTHROW : vg(vg) {
 #ifdef __EMSCRIPTEN__
         defaultFont = nvgCreateFont(vg, "fallback", "res/Roboto-Regular.ttf");
 #else
@@ -124,53 +124,53 @@ public:
         }
     }
 
-    void compositeOperation(CompositeOperation op) {
+    void compositeOperation(CompositeOperation op) SC_NOTHROW {
         nvgGlobalCompositeOperation(vg, (int)op);
     }
-    void globalAlpha(float alpha) {
+    void globalAlpha(float alpha) SC_NOTHROW {
         nvgGlobalAlpha(vg, alpha);
     }
-    void antiAlias(bool enabled) {
+    void antiAlias(bool enabled) SC_NOTHROW {
         nvgShapeAntiAlias(vg, enabled);
     }
 
-    void save() {
+    void save() SC_NOTHROW {
         nvgSave(vg);
     }
-    void restore() {
+    void restore() SC_NOTHROW {
         nvgRestore(vg);
     }
 
-    void setColor(Color color) {
+    void setColor(Color color) SC_NOTHROW {
         nvgStrokeColor(vg, toNVColor(color));
         nvgFillColor(vg, toNVColor(color));
     }
 
-    void strokeWidth(float size) {
+    void strokeWidth(float size) SC_NOTHROW {
         nvgStrokeWidth(vg, size);
     }
-    void setPen(Pen& pen) {
+    void setPen(Pen& pen) SC_NOTHROW {
         nvgLineCap(vg, (int)pen.cap);
         nvgLineJoin(vg, (int)pen.join);
         nvgMiterLimit(vg, pen.miterLimit);
     }
 
-    void setPaint(Paint& brush) {
+    void setPaint(Paint& brush) SC_NOTHROW {
         NVGpaint nvgp = toNVPaint(vg, &brush);
         nvgStrokePaint(vg, nvgp);
         nvgFillPaint(vg, nvgp);
     }
 
     //Transform2D getTransform();
-    void transform(const Transform2D& trans) {
+    void transform(const Transform2D& trans) SC_NOTHROW {
         nvgTransform(vg, trans.a, trans.b, trans.c, trans.d, trans.e, trans.f);
     }
 
-    void clip(float x, float y, float w, float h) {
+    void clip(float x, float y, float w, float h) SC_NOTHROW {
         nvgIntersectScissor(vg, x, y, w, h);
     }
 
-    sric::RefPtr<GraphicsPath> beginPath() {
+    sric::RefPtr<GraphicsPath> beginPath() SC_NOTHROW {
         nvgBeginPath(vg);
         if (curPath.isNull()) {
             curPath = sric::new_<NanovgGraphicsPath>();
@@ -178,31 +178,31 @@ public:
         }
         return curPath;
     }
-    void fillPath(sric::RefPtr<GraphicsPath> path) {
+    void fillPath(sric::RefPtr<GraphicsPath> path) SC_NOTHROW {
         sc_assert(path.get() == curPath.get(), "Must Current Path");
         nvgFill(vg);
     }
-    void drawPath(sric::RefPtr<GraphicsPath> path) {
+    void drawPath(sric::RefPtr<GraphicsPath> path) SC_NOTHROW {
         sc_assert(path.get() == curPath.get(), "Must Current Path");
         nvgStroke(vg);
     }
 
-    void setFont(Font& font) {
+    void setFont(Font& font) SC_NOTHROW {
         //nvgFontFace(vg, font->name);
         nvgFontFaceId(vg, defaultFont);
         nvgFontBlur(vg, font.bold ? 1 : 0);
     }
-    void setFontSize(float size) {
+    void setFontSize(float size) SC_NOTHROW {
         nvgFontSize(vg, size);
     }
-    void drawText(float x, float y, const char* str, int size = -1) {
+    void drawText(float x, float y, const char* str, int size = -1) SC_NOTHROW {
         const char* end = NULL;
         if (size != -1) {
             end = str + size;
         }
         nvgText(vg, x, y, str, end);
     }
-    void fontMetrics(FontMetrics& metric) {
+    void fontMetrics(FontMetrics& metric) SC_NOTHROW {
         float ascender; float descender; float lineh;
         nvgTextMetrics(vg, &ascender, &descender, &lineh);
         metric.ascent = ascender;
@@ -210,7 +210,7 @@ public:
         metric.height = lineh;
         metric.leading = lineh - ascender - descender;
     }
-    float textWidth(const char* str, int size = -1) {
+    float textWidth(const char* str, int size = -1) SC_NOTHROW {
         const char* end = NULL;
         if (size != -1) {
             end = str + size;
@@ -220,7 +220,7 @@ public:
         return bounds[2];
     }
 
-    sric::OwnPtr<Image> createImage() {
+    sric::OwnPtr<Image> createImage() SC_NOTHROW {
         sric::OwnPtr<NanovgImage> image = sric::new_<NanovgImage>();
         image->vg = vg;
         return image;
@@ -231,7 +231,7 @@ public:
     ** device.  If the source and destination don't have the
     ** same size, then the copy is resized.
     **/
-    void drawImageEx(sric::RefPtr<Image> image, Rect& src, Rect& dest) {
+    void drawImageEx(sric::RefPtr<Image> image, Rect& src, Rect& dest) SC_NOTHROW {
         if (!image->isReady()) {
             return;
         }
@@ -269,7 +269,7 @@ public:
     }
 };
 
-Graphics* waseGraphics::createNanovgGraphics(NVGcontext* vg)
+Graphics* waseGraphics::createNanovgGraphics(NVGcontext* vg) SC_NOTHROW
 {
     return new NanovgGraphics(vg);
 }
