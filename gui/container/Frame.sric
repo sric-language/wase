@@ -134,8 +134,10 @@ struct Frame : Pane {
     protected override fun doPaint(clip: &Rect , g:&Graphics ) {
         //beginTime := Duration.nowTicks
         //g.antialias = antialias
-        g.setColor(background);
-        g.fillRect(0, 0, width, height);
+        if (background.ia() != 0) {
+            g.setColor(background);
+            g.fillRect(0, 0, width, height);
+        }
         super.doPaint(clip, g);
     }
 
