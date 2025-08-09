@@ -74,7 +74,7 @@ mergeInto(LibraryManager.library, {
       return res;
     },
   
-    editTextCreate: function(inputType, text, textBox) {
+    editTextCreate: function(inputType, text, textBox, callback) {
       var elem = this._editText;
       if (elem) {
         elem.parentNode.removeChild(elem);
@@ -102,7 +102,8 @@ mergeInto(LibraryManager.library, {
   
       field.addEventListener("input", function() {
         //view.textChange(field.value);
-        Module.ccall('editTextOnTextChange', null, ["number", "string"], 
+        var callbackName = Module.UTF8ToString(callback);
+        Module.ccall(callbackName, null, ["number", "string"], 
               [textBox, field.value]);
       });
   

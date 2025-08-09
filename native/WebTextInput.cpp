@@ -7,11 +7,11 @@ using namespace waseGraphics;
 #include <emscripten.h>
 
 extern "C" {
-  extern void editTextCreate(int type, const char* text, void* textBox);
+  extern void editTextCreate(int type, const char* text, void* textBox, const char* callback);
   extern void editTextRemove();
   extern void editTextUpdate(int x, int y, int w, int h, int fontSize);
 
-  void EMSCRIPTEN_KEEPALIVE editTextOnTextChange(void* textBox, const char* text) {
+  void EMSCRIPTEN_KEEPALIVE editTextOnTextChangeWase(void* textBox, const char* text) {
       ((WebTextInput*)textBox)->onTextChange(text);
   }
 }
@@ -42,7 +42,7 @@ void WebTextInput::setText(const char* text) SC_NOTHROW {
 void WebTextInput::setType(int lineNum, bool editable) SC_NOTHROW {
 }
 void WebTextInput::focus() SC_NOTHROW {
-    editTextCreate(type, text.c_str(), this);
+    editTextCreate(type, text.c_str(), this, "editTextOnTextChangeWase");
     editTextUpdate(x, y, w, h, fontSize);
 }
 
