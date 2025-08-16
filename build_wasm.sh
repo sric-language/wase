@@ -11,3 +11,4 @@ fan fmake ../sric/output/serial.fmake -c emcc
 fan fmake ../sric/output/waseGraphics.fmake -c emcc 
 fan fmake ../sric/output/waseGui.fmake -c emcc 
 fan fmake native/demoWasm.fmake -c emcc
+fan fmake native/waseWasm.fmake -c emcc

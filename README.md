@@ -73,5 +73,7 @@ waseGui::VBox
 2. [Third-party dependencies](https://gitee.com/chunquedong/third-party)
 3. Build Wase
 ```
-build.sh
+sh build.sh
+sh build_debug.sh
+sh build_wasm.sh
 ```
