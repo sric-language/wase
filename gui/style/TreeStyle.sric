@@ -1,77 +1,67 @@
 import sric::*;
 import waseGraphics::*;
 
-virtual struct TreeStyle : WidgetStyle
+virtual struct TreeItemStyle : WidgetStyle
 {
   var dropColor : Color = Color { .rgba = 0x807455ff; };
+  var arrowSize: Int = 10;
+  var arrowLineWidth: Int = 1;
+  var indent :Int= 40;
   
   fun new() {
-    background = Color { .rgba = 0xe9e9e9ff; };
+    background = Color { .rgba = 0xe9f9ffff; };
   }
   
   override fun doPaint(widget: * Widget , g:& Graphics)
   {
-    var tree = widget as * TreeView;
-    var start = tree.offsetY / tree.rowHeight;
-    var topOffset = tree.offsetY - (start * tree.rowHeight);
-    
-    g.setFont(font);
-    g.setFontSize(fontSize);
+    var item = widget as * TreeItem;
+    g.setColor(color);
+    //var lWidth = (lineWidth);
+    //g.strokeWidth(lWidth);
 
-    var metric: FontMetrics;
-    g.fontMetrics(metric);
-    //var lineh = metric.height;
-
-    var fontOffset = metric.ascent as Int;
     var top = widget.paddingTop();
-    var left = widget.paddingLeft();
-    var bottom = (widget.padding.bottom);
-    
-    //g.brush = Color.red
-    //g.fillRect(widget.x, widget.y, widget.width, widget.height)
+    var left = widget.paddingLeft() + item.level * indent;
+    var bottom = top + widget.contentHeight();
+    var right =  left + widget.contentWidth();
+    var vcenter = (top + bottom) / 2;
 
-    g.setColor(fontColor);
-    var y = -topOffset + top;
-    var bottomLine = tree.height - bottom;
-    var treeX = - tree.offsetX + left;
-    for (var i = start; i< tree.items.size(); ++i)
-    {
-      if (i >= 0) {
-        var x = tree.items[i].level * (tree.indent) + treeX;
-        drawItem(g, tree.items[i], tree, treeX, x, y, fontOffset);
-      }
-      y += tree.rowHeight;
-      if (y > bottomLine) {
-//        echo("topOffset$topOffset")
-        break;
-      }
+    if (item.isSelected()) {
+      g.setColor(background);
+      g.fillRect(0, 0, widget.width, widget.height);
+    }
+
+    if (item.isDragDropDst()) {
+      g.setColor(dropColor);
+      g.fillRect(0, 0, widget.width, widget.height);
+    }
+
+    if (item.hasChildren()) {
+      g.setColor(color);
+      drawArrow(g, left+arrowSize, vcenter, item);
+    }
+
+    if (item.text.size() > 0) {
+      drawText(widget, g, item.text, Align::Begin, Align::Center, left+arrowSize*2+20);
     }
   }
 
-  protected virtual fun drawItem(g:&Graphics , item:&TreeItem 
-    , tree:*TreeView , treeX:Int , itemX:Int , itemY:Int , fontOffset:Int )
-  {
-    //backgound
-    if (item.node == tree.selectedItem) {
-       g.setColor(background);
-       g.fillRect(treeX, itemY, tree.contentWidth(), tree.rowHeight);
-       g.setColor(fontColor);
+  fun drawArrow(g:& Graphics, cx: Float32, cy: Float32, item: *TreeItem) {
+    g.strokeWidth(arrowLineWidth);
+    var pa = g.beginPath();
+    var s = arrowSize * 0.5;
+    if (item.expanded) {
+      //draw v
+      pa.moveTo(cx - s*2, cy-s);
+      pa.lineTo(cx, cy+s);
+      pa.lineTo(cx + s*2, cy-s);
     }
-    else if (item.node == tree.dragDropItem) {
-       g.setColor(dropColor);
-       g.fillRect(treeX, itemY, tree.contentWidth(), tree.rowHeight);
-       g.setColor(fontColor);
+    else {
+      //draw >
+      pa.moveTo(cx - s, cy-s*2);
+      pa.lineTo(cx + s, cy);
+      pa.lineTo(cx - s, cy+s*2);
     }
-
-    //text
-    var text = item.text();
-    if (item.hasChildren()) {
-      if (item.expanded) text = asStr("- ") + text;
-      else text = asStr("+ ") + text;
-      g.drawText(itemX, itemY+fontOffset, text.c_str(), text.size());
-    } else {
-      text =  asStr("  ")+text;
-      g.drawText(itemX, itemY+fontOffset, text.c_str(), text.size());
-    }
+    //pa.close();
+    g.drawPath(pa);
   }
 }

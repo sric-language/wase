@@ -1,16 +1,14 @@
 import sric::*;
 import waseGraphics::*;
+import cstd::*;
 
-struct TreeView : ScrollPane
+struct TreeView : VBox
 {
   /**
   ** Backing data model of tree.
   **/
   //@Transient
   var model : own*? TreeModel;
-
-  //@Transient
-  protected var items : DArray$<TreeItem>;
   
   //@Transient
   readonly var selectedItem: Int = -1;
@@ -21,11 +19,6 @@ struct TreeView : ScrollPane
 
   var onSelect: fun(t:Int, event:Int);
   var onDragDrop: fun(f:Int, t:Int);
-
-  var rowHeight: Int = 32;
-
-  var minWidth :Int= 600;
-  var indent :Int= 60;
 
   fun setModel(t: own*TreeModel) {
     model = move t;
@@ -39,67 +32,39 @@ struct TreeView : ScrollPane
 
   fun new()
   {
-    super.autoScrollContent = false;
-    autoResetOffset = true;
-    style = "TreeView";
+    dragAware = true;
   }
-
-  protected override fun contentMaxWidth(g: &Graphics): Float32 {
-    var  w :Int= (minWidth);
-    var  indent :Int= (this.indent);
- 
-    g.setFont(getStyle().font);
-    g.setFontSize(getStyle().fontSize);
-
-    for (var i=0; i<items.size(); ++i) {
-        var text = items[i].text();
-        var fw = g.textWidth(text.c_str(), text.size());
-        var x = items[i].level * indent + fw + indent;
-        if (w < x) {
-            w = x as Int;
-        }
-    }
-    return w as Float;
-  }
-
-  protected override fun prefContentSize(g: &Graphics, hintsWidth :Int= -1,  hintsHeight :Int= -1): Size {
-    var w :Int= (minWidth);
-    var h :Int= items.size() * rowHeight;
-    return Size { .w = w; .h = h; };
-  }
-
-  // private fun indexSame(item: * TreeItem): Int {
-  //   for (var i=0; i<items.size(); ++i) {
-  //       if (&items[i] == item) {
-  //           return i;
-  //       }
-  //   }
-  //   return -1;
-  // }
 
   private fun removeRange(begin: Int, end: Int) {
+    var root = getRootView();
     for (var i = end-1; i>=begin; --i) {
-        items.removeAt(i);
+      if (root != null) {
+          children[i].onRemove(root);
+      }
+      children[i].setParent(null);
+      this.children.removeAt(i);
     }
   }
 
-  fun expanded(i: Int)
+  fun expanded(index: Int)
   {
-    var item: * TreeItem = items.getPtr(i);
+    var item: * TreeItem = getChild(index) as *TreeItem;
     if (!item.hasChildren()) return;
 
     if (item.expanded)
     {
       //close
       //var i = indexSame(item) + 1;
-      var start = i + 1;
-      var p = i + 1;
-      for (var n = items.size(); p<n; ++p)
+      var start = index + 1;
+      var p = index + 1;
+      for (var n = children.size(); p<n; ++p)
       {
-        if (items[p].level <= item.level) break;
+        var child: * TreeItem = getChild(p) as *TreeItem;
+        if (child.level <= item.level) break;
       }
       item.expanded = !item.expanded;
       removeRange(start, p);
+      relayout();
       return;
     }
     else
@@ -107,7 +72,13 @@ struct TreeView : ScrollPane
       //expand
       //var i = indexSame(item);
       item.expanded = !item.expanded;
-      items.insertAll(i+1, item.children());
+
+      var nlist = item.getChildren();
+      for (var i = 0; i< nlist.size(); ++i) {
+        nlist[i].setParent(this);
+      }
+      children.insertAll(index+1, move nlist);
+      relayout();
       return;
     }
   }
@@ -117,13 +88,14 @@ struct TreeView : ScrollPane
   **/
   private fun init()
   {
-    items.clear();
+    this.removeAll();
     var roots = model.roots();
     for (var i=0; i<roots.size(); ++i) {
         var subNode:Int = roots[i];
-        var item = TreeItem { .init(this, subNode, 0); };
-        items.add(move item);
+        var item = new TreeItem { .init(this, subNode, 0); };
+        this.add(move item);
     }
+    relayout();
   }
   
   protected override fun motionEvent( e: & MotionEvent) {
@@ -131,29 +103,34 @@ struct TreeView : ScrollPane
     
     if (e.type == MotionEventType::Press) {
         var i = findItemAt(e.relativeY);
-        if (i != -1 && selectedItem == items[i].node) {
+        if (i != -1) {
+          var item: * TreeItem = getChild(i) as *TreeItem;
+          if (selectedItem == item.node) {
             draging = true;
             dragDropItem = -1;
+            //printf("start draging\n");
+          }
         }
     }
   }
   
   private fun findItemAt(eventY:Int ): Int {
-    var sy = eventY - y;
-    var i = (offsetY + sy) / rowHeight;
-    if (i < items.size()) {
+    var relativeY = eventY - this.y;
+    for (var i = 0; i<this.childrenNum(); ++i)
+    {
+      if (this.children[i].y < relativeY && this.children[i].y + this.children[i].height > relativeY) {
         return i;
+      }
     }
-    else {
-        return -1;
-    }
+    return -1;
   }
   
   protected override fun onDrag( e:&GestureEvent) {
     if (e.type == GestureEvent::drag) {
       if (draging) {
         var i = findItemAt(e.relativeY);
-        dragDropItem = i == -1 ? -1 : items[i].node;
+        dragDropItem = i == -1 ? -1 : (getChild(i) as *TreeItem).node;
+        //printf("dragDropItem: %d\n", dragDropItem);
         e.consumed = true;
         this.repaint();
       }
@@ -161,7 +138,8 @@ struct TreeView : ScrollPane
     else if (e.type == GestureEvent::drop) {
       draging = false;
       var i = findItemAt(e.relativeY);
-      dragDropItem = i == -1 ? -1 : items[i].node;
+      dragDropItem = i == -1 ? -1 : (getChild(i) as *TreeItem).node;
+      //printf("drag end: %d\n", dragDropItem);
       if (selectedItem != -1 && dragDropItem != -1 && selectedItem != dragDropItem) {
         if (onDragDrop != null)
             onDragDrop(selectedItem, dragDropItem);
@@ -172,14 +150,30 @@ struct TreeView : ScrollPane
     }
   }
 
+  fun clearSelection() {
+    // for (var i = 0; i<this.childrenNum(); ++i) {
+    //   var child: * TreeItem = getChild(i) as *TreeItem;
+    //   if (child.isSelected) {
+    //     child.isSelected = false;
+    //     break;
+    //   }
+    // }
+    this.selectedItem = -1;
+  }
+
   protected override fun gestureEvent(e: &GestureEvent )
   {
+    super.gestureEvent(e);
+    if (e.consumed) return;
+
     if ((e.type == GestureEvent::click || e.type == GestureEvent::doubleClick) && e.button == ButtonType::Left)
     {
       var i = findItemAt(e.relativeY);
-      selectedItem = i == -1 ? -1 : items[i].node;
+      selectedItem = i == -1 ? -1 : (getChild(i) as *TreeItem).node;
       if (i != -1)
       {
+        //clearSelection();
+        //(getChild(i) as *TreeItem).isSelected = true;
         expanded(i);
         this.relayout();
         e.consumed = true;
@@ -199,7 +193,7 @@ struct TreeView : ScrollPane
 }
 
 
-struct TreeItem
+struct TreeItem : Pane
 {
   //@Transient
   private var tree: *? TreeView;
@@ -207,48 +201,81 @@ struct TreeItem
   var node: Int64;
   var parentItem: *? TreeItem;
 
-  var level :Int= 0;
-  var expanded :Bool= false;
-
-  fun text(): String { return tree.model.text(node); }
+  var level : Int = 0;
+  var expanded : Bool = false;
+  var text: String;
 
   fun init( tree: * TreeView, node: Int64,  level: Int)
   {
     this.tree = tree;
     this.node = node;
     this.level = level;
+    this.style = "TreeItem";
+    this.layout.height = Layout::wrapContent;
+    this.layout.width = Layout::matchParent;
+    this.padding.top = 4;
+    this.padding.bottom = 4;
+    tree.model.initView(this);
+    //this.layout.offsetX = tree.indent * level;
+
+  }
+
+  fun isDragDropDst(): Bool {
+    return this.tree.dragDropItem == this.node;
+  }
+
+  fun isSelected(): Bool {
+    return this.tree.selectedItem == this.node;
   }
 
   fun hasChildren(): Bool { return tree.model.hasChildren(node); }
 
-  fun children(): DArray$<TreeItem>
+  fun getChildren(): DArray$<own* Widget>
   {
-    var list : DArray$<TreeItem>;
+    var list : DArray$<own* Widget>;
     var children = tree.model.children(node);
     for (var i=0; i<children.size(); ++i)
     {
       var subNode: Int64 = children[i];
-      var item = TreeItem { .init(tree, subNode, level+1); };
-      item.parentItem = this;
+      var item = new TreeItem { .init(tree, subNode, level+1); .parentItem = this; };
       list.add(move item);
     }
     return list;
+  }
+
+  protected override fun prefContentSize(g: &Graphics, hintsWidth : Int = -1, hintsHeight : Int = -1): Size {
+      g.setFont(getStyle().font);
+      g.setFontSize(getStyle().fontSize);
+      var metric: FontMetrics;
+      g.fontMetrics(metric);
+      var w = g.textWidth(text.c_str(), text.size())+3;
+      var h = metric.height;
+      var sizeCache = Size{.w=w as Int; .h = h as Int;};
+      return sizeCache;
   }
 }
 
 
 virtual struct TreeModel
 {
+  var checkable : Bool = true;
+
   virtual fun roots(): DArray$<Int64> {
     var p : DArray$<Int64>;
     return p;
   }
 
-  virtual fun text(p: Int64): String {
-    return String::format("%d", p);
+  virtual fun initView(view: *TreeItem) {
+    view.text = String::format("%d", view.node);
+    if (checkable) {
+      view.add(new ToggleButton {
+        .setText(""); .setStyle("checkBox");
+        .layout.width = Layout::wrapContent;
+        .layout.height = Layout::matchParent;
+        .layout.hAlign = Align::End;
+      });
+    }
   }
-
-  virtual fun image(node: Int64): own*? Image { return null; }
 
   virtual fun hasChildren(node: Int64): Bool { return !children(node).isEmpty(); }
 

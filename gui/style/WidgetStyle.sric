@@ -36,7 +36,7 @@ reflect virtual struct WidgetStyle {
     
     protected virtual fun doPaint(widget: *Widget, g: &Graphics) {}
 
-    protected fun drawText(widget: *Widget, g: &Graphics, text: &String, align: Align, vAlign: Align = Align::Center) {
+    protected fun drawText(widget: *Widget, g: &Graphics, text: &String, align: Align, vAlign: Align = Align::Center, xOffset: Int = 0) {
         if (text.size() == 0) return;
         
         var top = widget.paddingTop();
@@ -75,6 +75,7 @@ reflect virtual struct WidgetStyle {
             x = left + (widget.contentWidth()) - w;
         }
 
+        x += xOffset;
         g.drawText(x, y, text.c_str(), text.size());
   }
 }

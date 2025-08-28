@@ -27,11 +27,11 @@ struct StyleManager {
         idMap["TextView"] = new TextViewStyle;
         idMap["CardIndicator"] = new CardIndicatorStyle;
         idMap["Table"] = new TableStyle;
-        idMap["TreeView"] = new TreeStyle;
+        idMap["TreeItem"] = new TreeItemStyle;
         idMap["ResizePane"] = new ResizePaneStyle;
 
 
-
+        idMap["collapseTitle"] = new RoundButtonStyle { .roundRadius =0; .fill = false; .stroke = true; .fontColor.rgba = 0x33b5e5ff; };
 
         idMap["menuItem"] = new MenuItemStyle;
         idMap["menuPane"] = new PaneStyle { .shadow = 0; .roundRadius = 0; .stroke = true; .fill = true; 
