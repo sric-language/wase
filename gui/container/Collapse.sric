@@ -1,0 +1,189 @@
+import sric::*;
+import waseGraphics::*;
+import cstd::*;
+
+
+virtual struct Collapse : ContentPane, PropertyAnimTarget {
+  readonly var title: String = "Title";
+  readonly var isCollapsed: Bool = false;
+  var autoCollapse : Bool = true;
+
+  var onCollapsed : fun(toCollapse: Bool);
+
+  fun new() {
+    layout.height = Layout::matchParent;
+    layout.minHeightEnabled = true;
+    setupTitle();
+  }
+
+  protected virtual fun setupTitle() {
+    if (this.childrenNum() > 0) {
+        var btn = this.getChild(0) as *Button;
+        btn.setText(title.copy());
+    }
+    else {
+      var btn = new Button { .setText(title.copy()); .setStyle("collapseTitle"); };
+      btn.onClick = fun(w:*Widget) { this.setCollapsed(!this.isCollapsed, true, true); };
+      doAdd(move btn);
+    }
+  }
+
+  override fun setContent(w: own* Widget) {
+    w.setVisible(!isCollapsed);
+    super.setContent(move w);
+  }
+
+  fun setTitle(s: String) {
+    title = move s;
+    setupTitle();
+  }
+
+  override fun layoutChildren(g: &Graphics, force: Bool )
+  {
+    var x = paddingLeft();
+    var y = paddingTop();
+    var hintsW = contentWidth();
+    var hintsH = contentHeight();
+    var spacing = 1;
+    for (var i=0; i<children.size(); ++i) {
+      var c:* own* Widget = children.getPtr(i);
+      var size = (*c).bufferedPrefSize(g, hintsW, hintsH);
+      var cx = x;
+      var cy = y;
+
+    //   if (i == 0) {
+    //     this.minSize = size.h;
+    //   }
+
+      var cw = size.w;
+      var ch = size.h;
+      
+      if ((*c).layout.height == Layout::matchParent) {
+        ch = hintsH - cy - spacing;
+      }
+      y += ch + spacing;
+      cx += (*c).layout.prefX(hintsW, hintsH, size.w);
+    
+      (*c).setLayout(g, cx, cy, cw, ch, force);
+    }
+  }
+
+  protected override fun prefContentSize(g: &Graphics, hintsWidth: Int = -1, hintsHeight: Int = -1): Size {
+    var w = 0;
+    var h = 0;
+    var spacing = 1;
+    for (var i=0; i<children.size(); ++i) {
+      var c:* own* Widget = children.getPtr(i);
+      var size = (*c).bufferedPrefSize(g, hintsWidth, hintsHeight);
+      //echo("size$size")
+      w = max(w, size.w);
+      h += size.h;
+      if (i > 0) h += spacing;
+      if (this.layout.minHeightEnabled) {
+        break;
+      }
+    }
+
+    return Size { .w = w; .h = h; };
+  }
+
+  private fun relayoutAll() {
+    if (this.parent == null) {
+        relayout();
+        return;
+    }
+    for (var i=0; i<this.parent.childrenNum(); ++i) {
+      var c:* Widget = this.parent.getChild(i);
+      c.relayout();
+    }
+  }
+
+  private fun tryClollapseOthers(animation: Bool) {
+      if (this.parent == null) {
+        return;
+      }
+      //auto collapse others
+      for (var i=0; i<this.parent.childrenNum(); ++i) {
+        var c:* Widget = this.parent.getChild(i);
+        if (c is * Collapse) {
+          var p = (c as *Collapse);
+          if (p == this) {
+            continue;
+          }
+          if (p.autoCollapse && !p.isCollapsed) {
+            p.setCollapsed(true, false, animation);
+          }
+        }
+      }
+  }
+
+  fun setCollapsed(toCollapse: Bool, collapseOthers: Bool = true, animation: Bool = false) {
+    if (this.isCollapsed == toCollapse) {
+      return;
+    }
+    this.isCollapsed = toCollapse;
+
+    if (onCollapsed != null) {
+      onCollapsed(toCollapse);
+    }
+
+    if (!animation) {
+        if (toCollapse) {
+          layout.weight = 0;
+        }
+        else {
+          layout.weight = 1;
+        }
+
+        if (this.content() != null) {
+            this.content().setVisible(!toCollapse);
+        }
+
+        if (collapseOthers) {
+          tryClollapseOthers(animation);
+        }
+        relayoutAll();
+        return;
+    }
+
+    if (this.content() == null) {
+        return;
+    }
+
+    if (collapseOthers) {
+      tryClollapseOthers(animation);
+    }
+
+    var from = 0.0;
+    var to = 1.0;
+    if (toCollapse) {
+        from = 1.0;
+        to = 0.0;
+    }
+    else {
+        this.content().setVisible(true);
+    }
+
+    var anim = new Animation {
+        .duration = 300;
+        .add(new PropertyAnimChannel {
+          .target = this;
+          .from = from; .to = to;
+        });
+    };
+    anim.whenDone = fun() {
+        if (toCollapse) {
+            this.content().setVisible(false);
+        }
+    };
+    var _anim = anim as * Animation;
+    this.getRootView().animManager.add(move anim);
+    _anim.start();
+    this.repaint();
+  }
+
+  override fun onUpdateAnim(v: Float32, field: Int) {
+    this.layout.weight = v;
+    this.relayoutAll();
+  }
+}

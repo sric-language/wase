@@ -61,6 +61,7 @@ struct Main
     pages.add(new ImageViewTest { .name = "ImageView"; });
     pages.add(new DialogTest { .name = "Dialog"; });
     pages.add(new CardTest { .name = "Card"; });
+    pages.add(new AccordionTest { .name = "AccordionText"; });
 
     pages.add(null);
     pages.add(new MenuTest { .name = "Menu"; });
@@ -78,7 +79,7 @@ struct Main
     pages.add(new PercentTest { .name = "Percent"; });
 
     pages.add(null);
-    pages.add(new DecodeTest { .name = "Decode"; });
+    pages.add(new DecodeTest { .name = "DecodeHiml"; });
     pages.add(new GraphicsTest { .name = "Graphics"; });
     init();
   }

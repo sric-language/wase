@@ -27,6 +27,10 @@ virtual struct VBox : WidgetGroup
         if (this.layout.height == Layout::wrapContent) {
           scError("ui","parent size depends on chilren");
         }
+        if ((*c).layout.minHeightEnabled) {
+          var size = (*c).bufferedPrefSize(g, -1, -1);
+          spaceUsage += size.h;
+        }
       }
       else if ((*c).layout.height == Layout::wrapContent) {
         var size = (*c).bufferedPrefSize(g, -1, -1);
@@ -37,6 +41,10 @@ virtual struct VBox : WidgetGroup
         spaceUsage += size.h;
       }
       if (i > 0) spaceUsage += spacing;
+    }
+
+    if (allWeight < 1) {
+      allWeight = 1;
     }
 
     weightSpace = 1f;
@@ -75,6 +83,9 @@ virtual struct VBox : WidgetGroup
       
       if ((*c).layout.height == Layout::matchParent) {
         ch = ((*c).layout.weight*weightSpace) as Int;
+        if ((*c).layout.minHeightEnabled) {
+          ch += size.h;
+        }
       }
       y += ch + spacing;
       cx += (*c).layout.prefX(hintsW, hintsH, size.w);

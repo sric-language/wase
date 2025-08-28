@@ -119,7 +119,10 @@ struct MyTreeModel : TreeModel
     //["1", "2", "3", "4", "5", "6", "7", "8", "9"]
   }
   override fun text(node: Int64): String { return String::fromInt64(node); }
-  override fun hasChildren(node: Int64): Bool { return true; }
+  override fun hasChildren(node: Int64): Bool {
+     if (node > 10000) return false;
+     return true;
+  }
   override fun children(node: Int64): DArray$<Int64> {
     var p : DArray$<Int64>;
     p.add(node*10+1);

@@ -1,0 +1,36 @@
+
+import sric::*;
+import waseGui::*;
+import waseGraphics::*;
+
+
+struct AccordionTest : BasePage
+{
+  protected override fun view(): own* Widget {
+    var r = new VBox {
+        .margin = Insets{ .initAll(50); };
+        .layout.height = Layout::matchParent;
+        new Collapse {
+            .setTitle("Title1");
+            .setCollapsed(true);
+            new Button
+            {
+                .setText("page1");
+                .layout.width = Layout::matchParent;
+                .layout.height = Layout::matchParent;
+            },;
+        },
+        new Collapse {
+            .setTitle("Title2");
+            new Button
+            {
+                .setText("page2");
+                .layout.width = Layout::matchParent;
+                .layout.height = Layout::matchParent;
+            },;
+        };
+    };
+    return r;
+  }
+
+}

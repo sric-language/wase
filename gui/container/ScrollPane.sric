@@ -11,7 +11,7 @@ virtual struct ContentPane : Pane {
   fun content(): *? Widget {
     return _content;
   }
-  fun setContent(w: own* Widget) {
+  virtual fun setContent(w: own* Widget) {
     remove(_content);
     _content = w;
     doAdd(move w);

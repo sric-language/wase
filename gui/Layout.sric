@@ -26,6 +26,8 @@ reflect struct Layout {
     var xUnit: Unit = Unit::Dp;
     var yUnit: Unit = Unit::Dp;
 
+    var minHeightEnabled: Bool = false;
+
     private fun getPixel(val: Int, unit: Unit, parentSize: Int, selfSize: Int, parentW: Int, parentH: Int): Int {
         switch (unit) {
             case Unit::Dp:
@@ -85,6 +87,9 @@ reflect struct Layout {
     }
 
     fun prefHeight(parentWidth: Int, parentHeight: Int, selfHeight: Int): Int {
+        if (minHeightEnabled) {
+            return selfHeight;
+        }
         if (height == matchParent)
             return parentHeight;
         if (height == wrapContent)
