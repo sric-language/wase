@@ -28,6 +28,16 @@ struct AccordionTest : BasePage
                 .layout.width = Layout::matchParent;
                 .layout.height = Layout::matchParent;
             },;
+        },
+        new Collapse {
+            .setTitle("Title3");
+            .setCollapsed(true);
+            new Button
+            {
+                .setText("page3");
+                .layout.width = Layout::matchParent;
+                .layout.height = Layout::matchParent;
+            },;
         };
     };
     return r;

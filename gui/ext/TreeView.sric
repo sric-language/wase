@@ -204,6 +204,7 @@ struct TreeItem : Pane
   var level : Int = 0;
   var expanded : Bool = false;
   var text: String;
+  var isHover : Bool = false;
 
   fun init( tree: * TreeView, node: Int64,  level: Int)
   {
@@ -215,9 +216,22 @@ struct TreeItem : Pane
     this.layout.width = Layout::matchParent;
     this.padding.top = 4;
     this.padding.bottom = 4;
+    this.padding.left = 4;
+    this.padding.right = 4;
     tree.model.initView(this);
     //this.layout.offsetX = tree.indent * level;
+    mouseAware = true;
+  }
 
+  
+  override fun mouseExit() {
+    isHover = false;
+    repaint();
+  }
+
+  override fun mouseEnter() {
+    isHover = true;
+    repaint();
   }
 
   fun isDragDropDst(): Bool {

@@ -79,7 +79,7 @@ struct Main
     pages.add(new PercentTest { .name = "Percent"; });
 
     pages.add(null);
-    pages.add(new DecodeTest { .name = "DecodeHiml"; });
+    pages.add(new DecodeTest { .name = "DecodeHiML"; });
     pages.add(new GraphicsTest { .name = "Graphics"; });
     init();
   }

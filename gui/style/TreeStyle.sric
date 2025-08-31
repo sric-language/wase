@@ -4,12 +4,13 @@ import waseGraphics::*;
 virtual struct TreeItemStyle : WidgetStyle
 {
   var dropColor : Color = Color { .rgba = 0x807455ff; };
+  var hoverColor : Color = Color { .rgba = 0xf8f8f8ff; };
   var arrowSize: Int = 10;
   var arrowLineWidth: Int = 1;
   var indent :Int= 40;
   
   fun new() {
-    background = Color { .rgba = 0xe9f9ffff; };
+    background = Color { .rgba = 0xeff8efff; };
   }
   
   override fun doPaint(widget: * Widget , g:& Graphics)
@@ -27,6 +28,11 @@ virtual struct TreeItemStyle : WidgetStyle
 
     if (item.isSelected()) {
       g.setColor(background);
+      g.fillRect(0, 0, widget.width, widget.height);
+    }
+
+    if (item.isHover) {
+      g.setColor(hoverColor);
       g.fillRect(0, 0, widget.width, widget.height);
     }
 
