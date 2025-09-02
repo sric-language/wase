@@ -202,6 +202,7 @@ abstract struct ListAdapter
     } else {
       item = new ListItem;
       item.view = newView(type);
+      item.view.isTransient = true;
       item.type = type;
     }
     //item.data = move data;

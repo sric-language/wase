@@ -221,6 +221,7 @@ struct TreeItem : Pane
     tree.model.initView(this);
     //this.layout.offsetX = tree.indent * level;
     mouseAware = true;
+    isTransient = true;
   }
 
   

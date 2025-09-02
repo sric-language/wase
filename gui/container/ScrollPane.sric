@@ -69,8 +69,8 @@ virtual struct ScrollPane : ContentPane
   {
     isCliped = true;
     //scroll bar
-    hbar = new ScrollBar { .setVertical(false); .barSize = this.barSize; .layout.ignored = true; };
-    vbar = new ScrollBar { .setVertical(true); .barSize = this.barSize; .layout.ignored = true; };
+    hbar = new ScrollBar { .setVertical(false); .barSize = this.barSize; .layout.ignored = true; .isTransient = true; };
+    vbar = new ScrollBar { .setVertical(true); .barSize = this.barSize; .layout.ignored = true; .isTransient = true; };
 
     //var self_ = this;
     hbar.onPosChanged = fun (oldVal: Float32, newVal: Float32)

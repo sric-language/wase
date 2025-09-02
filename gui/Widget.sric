@@ -59,6 +59,12 @@ reflect abstract struct Widget {
     var focusable: Bool = false;
     var onFocusChanged: fun(f: Bool) = null;
 
+    protected var isTransient: Bool = false;
+
+    fun _isTransient(): Bool {
+        return isTransient;
+    }
+
     fun setVisible(v: Bool) {
         visible = v;
     }

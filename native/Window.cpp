@@ -66,10 +66,3 @@ void waseGraphics::fireTimeEvents() SC_NOTHROW {
     _eventTimer.fireTimeEvents();
 }
 
-void waseGraphics::Window::paint(Graphics& g) SC_NOTHROW {
-    if (view() != nullptr) {
-        g.save();
-        view()->onPaint(g);
-        g.restore();
-    }
-}

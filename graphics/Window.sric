@@ -60,23 +60,31 @@ abstract struct TextInput {
 }
 
 
-extern struct Window {
-    fun view() : * View;
+abstract struct Window {
+    abstract fun view() : * View;
 
-    fun repaint(dirty : & Rect);
+    abstract fun repaint(dirty : & Rect);
 
-    fun size() : Size;
+    abstract fun size() : Size;
 
-    fun hasFocus() : Bool;
+    abstract fun hasFocus() : Bool;
 
-    fun focus();
+    abstract fun focus();
 
-    fun textInput(inputType : Int) : own* TextInput;
+    abstract fun textInput(inputType : Int) : own* TextInput;
 
-    fun fileDialog(isOpen : Bool, accept : raw* const Int8);
+    abstract fun fileDialog(isOpen : Bool, accept : raw* const Int8);
 
-    fun displayKeyboard(display : Bool);
+    abstract fun displayKeyboard(display : Bool);
 
-    static fun open(view: own* View, name: raw* const Int8): Int;
-    static fun getCur(): * Window;
+    fun paint(g: &Graphics) {
+        //if (view() != null) {
+            g.save();
+            view().onPaint(g);
+            g.restore();
+        //}
+    }
+
+    extern static fun open(view: own* View, name: raw* const Int8): Int;
+    extern static fun getCur(): * Window;
 }
