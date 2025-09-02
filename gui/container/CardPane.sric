@@ -1,6 +1,6 @@
 import sric::*;
 import waseGraphics::*;
-import cstd::*;
+
 
 /**
 ** lays out child elements as a stack of cards

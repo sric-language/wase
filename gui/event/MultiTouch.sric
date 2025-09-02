@@ -1,7 +1,7 @@
 
 import sric::*;
 import waseGraphics::*;
-import cstd::*;
+
 
 struct MultiTouchState : GestureState {
   var x0 :Int= 0;

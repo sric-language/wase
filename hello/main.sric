@@ -1,4 +1,4 @@
-import cstd::*;
+
 import sric::*;
 import waseGui::*;
 import waseGraphics::*;

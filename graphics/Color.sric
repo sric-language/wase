@@ -1,5 +1,5 @@
 import sric::*;
-import cstd::*;
+
 
 externc fun sscanf(buf:raw*const Int8, format:raw*const Int8, args: ...): Int;
 

@@ -1,6 +1,6 @@
 
 import sric::*;
-import cstd::*;
+
 
 fun toRadians(degree : Float) : Float {
     return degree * (M_PI / 180.0);

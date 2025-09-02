@@ -1,6 +1,6 @@
 import sric::*;
 import waseGraphics::*;
-import cstd::*;
+
 
 abstract struct WidgetGroup : Widget {
 

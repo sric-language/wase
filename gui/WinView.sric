@@ -1,6 +1,6 @@
 import sric::*;
 import waseGraphics::*;
-import cstd::*;
+
 
 //@#include "Window.h"
 struct WinView : View {

@@ -1,7 +1,7 @@
 import sric::*;
 import waseGui::*;
 import waseGraphics::*;
-import cstd::*;
+
 
 struct CtxMenuTest : BasePage
 {

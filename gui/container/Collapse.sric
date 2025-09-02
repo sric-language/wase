@@ -1,6 +1,6 @@
 import sric::*;
 import waseGraphics::*;
-import cstd::*;
+
 
 
 virtual struct Collapse : ContentPane, PropertyAnimTarget {

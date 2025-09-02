@@ -1,5 +1,5 @@
 import sric::*;
-import cstd::*;
+
 
 extern fun getScreenScale() : Float32;
 extern fun getAutoScale() : Bool;
