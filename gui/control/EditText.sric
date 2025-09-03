@@ -196,17 +196,8 @@ struct EditText : Widget
         case Key::Left:
           var n = caret.byteOffset;
           if (n > 0 && n <= text.size()) {
-            --n;
-            while (n >= 0) {
-              var ch = text[n];
-              if ((ch & 0xC0) == 0x80) {
-                --n;
-                continue;
-              }
-              else {
-                break;
-              }
-            }
+            n = text.preCharPos(n);
+            if (n < 0) n = 0;
             caret.byteOffset = n;
           }
         }
@@ -255,34 +246,24 @@ struct EditText : Widget
     super.doPaint(clip, g);
   }
 
-  protected fun posXOffsetToByte(g: &Graphics, posXOffset: Int, text: const &String): Int {
+  protected fun posXOffsetToByte(g: &Graphics, posXOffset: Int, line: const &String): Int {
     if (posXOffset <= 0) {
       return 0;
     }
     var start = 0;
     var end = 0;
-    for (; end<=text.size();) {
+    while (end < line.size()) {
         //t := line[start..<end];
         var lw = 0f;
         unsafe {
-            lw = g.textWidth(text.c_str() + start, end-start);
+            lw = g.textWidth(line.c_str() + start, end-start);
         }
         if (lw > posXOffset && (end-1>start)) {
             end = end - 1;
             break;
         }
 
-        ++end;
-        //utf8
-        while (end<=text.size()) {
-          var ch = text[end-1];
-          if ((ch & 0xC0) == 0x80) {
-            ++end;
-          }
-          else {
-            break;
-          }
-        }
+        end = line.nextCharPos(end);
     }
     return end;
   }

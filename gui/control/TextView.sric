@@ -70,7 +70,7 @@ struct TextView : Widget
     //lines := Str[,]
     var start = 0;
     var end = 0;
-    for (; end<=line.size();) {
+    while (end < line.size()) {
         //t := line[start..<end];
         var lw = 0f;
         unsafe {
@@ -83,17 +83,7 @@ struct TextView : Widget
             start = end;
         }
 
-        ++end;
-        //utf8
-        while (end<=line.size()) {
-          var ch = line[end-1];
-          if ((ch & 0xC0) == 0x80) {
-            ++end;
-          }
-          else {
-            break;
-          }
-        }
+        end = line.nextCharPos(end);
     }
     if (start < line.size()) {
         var t0 = line.substr(start);

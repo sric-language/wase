@@ -68,10 +68,13 @@ public:
     }
 
     sric::OwnPtr<TextInput> textInput(int inputType) SC_NOTHROW {
+    #if 1
         _textInput = sric::new_<Win32TextInput>();
         _textInput->init(this->hWnd, inputType);
         return _textInput.share();
-        //return sric::OwnPtr<TextInput>();
+    #else
+        return sric::OwnPtr<TextInput>();
+    #endif
     }
 
     void fileDialog(bool isOpen, const char* accept) SC_NOTHROW {
