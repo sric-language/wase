@@ -1,6 +1,36 @@
 import sric::*;
 import waseGraphics::*;
 
+//@SimpleSerial
+reflect struct ImageRes {
+  //@Transient
+  var image: own*? Image;
+  readonly var uri: String;
+
+  fun toString() : String {
+    return uri.copy();
+  }
+
+  fun fromString(str: String): Bool {
+    uri = move str;
+    return true;
+  }
+
+  fun setUri(s: String) {
+    if (uri != s) {
+      uri = move s;
+      image = null;
+    }
+  }
+
+  fun loadImage(g: &Graphics) {
+    if (uri.size() > 0 && image == null) {
+      image = g.createImage();
+      image.load(uri.c_str());
+    }
+  }
+}
+
 struct ImageView : Widget
 {
   //@Transient

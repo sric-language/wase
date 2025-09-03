@@ -47,16 +47,17 @@ struct EditTextStyle : WidgetStyle
     var x = left;
     var y = top;
 
+    var passwordText: String;
+    if (lab.isPassword()) {
+      passwordText = lab.makePasswordText();
+    }
+
     if (!lab.text.isEmpty()) {
       //g.brush = fontColor
       g.setColor(fontColor);
       //str := lab.text;
       if (lab.isPassword()) {
-        var buf: String;
-        for (var i=0; i<lab.text.size(); ++i) {
-          buf.add("*");
-        }
-        g.drawText(x, y+offset, buf.c_str(), buf.size());
+        g.drawText(x, y+offset, passwordText.c_str(), passwordText.size());
       }
       else if (lab.lines.size() <= 1) {
         g.drawText(x, y+offset, lab.text.c_str(), lab.text.size());
@@ -78,9 +79,16 @@ struct EditTextStyle : WidgetStyle
       var xOffset = 1f;
       if (lab.text.size() > 0)
       {
-        var t = lab.text.substr(0, lab.caret.offset);
-        xOffset = g.textWidth(t.c_str(), t.size());
+        if (lab.isPassword()) {
+          var t = passwordText.substr(0, lab.caret.byteOffset);
+          xOffset = g.textWidth(t.c_str(), t.size());
+        }
+        else if (lab.lines.size() <= 1) {
+          var t = lab.text.substr(0, lab.caret.byteOffset);
+          xOffset = g.textWidth(t.c_str(), t.size());
+        }
       }
+      g.strokeWidth(2);
       g.drawLine(x+xOffset, y, x+xOffset, y+lineh);
     }
   }

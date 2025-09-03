@@ -16,8 +16,7 @@ reflect virtual struct WidgetStyle {
     var disableColor : Color = Color { .rgba = 0xb0b0b0ff; };
     var rippleColor : Color = Color { .rgba = 0x999999ff; };
     //@Transient
-    var backgroundImage: own*? Image;
-    var backgroundImageUri: String;
+    var backgroundImage: ImageRes;
 
     var lineWidth : Int = 2;
     var font : Font;
@@ -27,11 +26,19 @@ reflect virtual struct WidgetStyle {
     //private var fontSizeCache: Int = 0;
 
     fun paint(widget: *Widget, g: &Graphics) {
-        if (!backgroundImageUri.isEmpty() && backgroundImage == null) {
-            backgroundImage = g.createImage();
-            backgroundImage.load(backgroundImageUri.c_str());
-        }
         doPaint(widget, g);
+    }
+
+    protected fun drawBackgroundImage(widget: *Widget, g: &Graphics) {
+        if (!backgroundImage.uri.isEmpty()) {
+            backgroundImage.loadImage(g);
+        }
+        if (backgroundImage.image != null && backgroundImage.image.isReady()) {
+            var src = Rect {.x = 0 ; .y = 0; .w = backgroundImage.image.width(); .h = backgroundImage.image.height(); };
+            var dst = Rect {.x = 0; .y = 0; .w = widget.width; .h = widget.height; };
+        //    echo("src$src,dst$dst")
+            g.drawImageEx(backgroundImage.image, src, dst);
+        }
     }
     
     protected virtual fun doPaint(widget: *Widget, g: &Graphics) {}

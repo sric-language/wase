@@ -70,10 +70,13 @@ struct RoundButtonStyle : WidgetStyle
 
 virtual struct FlatButtonStyle : LabelStyle
 {
+  var underline: Bool = false;
+
   fun new() {
     fontColor = color;//Color(0x5577CC)
     font.bold = true;
     background = Color { .rgba = 0xf2f2f2ff; };
+    rippleColor = Color { .rgba = 0xe8e8e8ff; };
   }
   
   override fun doPaint(widget: * Widget , g:& Graphics)
@@ -90,5 +93,12 @@ virtual struct FlatButtonStyle : LabelStyle
         g.globalAlpha(1);
     }
     super.doPaint(widget, g);
+
+    if (underline) {
+      g.strokeWidth(this.lineWidth);
+      g.setColor(color);
+      var y = btn.height - this.lineWidth;
+      g.drawLine(0, y, btn.width, y);
+    }
   }
 }

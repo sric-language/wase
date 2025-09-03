@@ -4,32 +4,67 @@ import waseGraphics::*;
 
 struct IconButtonStyle : WidgetStyle
 {
-  var selectedColor: Color = Color { .rgba = 0x666666ff; };
+  var selectedColor: Color = Color { .rgba = 0xe9e9e9ff; };
   
   fun new() {
     background = Color { .rgba = 0xf2f2f2ff; };
   }
 
+  fun drawIcon(widget: *Widget , g:& Graphics, icon: *Image, iconSize: Size, iconPosition: Direction) {
+      if (!icon.isReady()) {
+        return;
+      }
+      var src = Rect {.x = 0 ; .y = 0; .w = icon.width(); .h = icon.height(); };
+      var size: Size = uninit;
+      if (iconSize.w == 0 && iconSize.h == 0) {
+        size.w = icon.width();
+        size.h = icon.height();
+      }
+      else {
+        size = iconSize;
+      }
+      var dst = Rect { .x = widget.paddingLeft(); .y = widget.paddingTop(); .w = size.w; .h = size.h; };
+      switch (iconPosition) {
+        case Direction::Left:
+          dst { .y = widget.height*0.5-size.h*0.5; };
+        case Direction::Top:
+          dst { .x = widget.width*0.5-size.w*0.5; };
+      }
+      g.drawImageEx(icon, src, dst);
+  }
+
   override fun doPaint(widget: *Widget , g:& Graphics)
   {
-    if (backgroundImage != null && backgroundImage.isReady()) {
-      var src = Rect {.x = 0 ; .y = 0; .w = backgroundImage.width(); .h = backgroundImage.height(); };
-      var dst = Rect {.x = 0; .y = 0; .w = widget.width; .h = widget.height; };
-  //    echo("src$src,dst$dst")
-      g.drawImageEx(backgroundImage, src, dst);
+    if (!backgroundImage.uri.isEmpty()) {
+      drawBackgroundImage(widget, g);
     }
 
     var btn = widget as * Button;
+    btn.icon.loadImage(g);
 
+    //draw icon
+    var hasCheckedIcon = false;
     if (btn is *ToggleButton) {
       var tb = btn as * ToggleButton;
+      tb.checkedIcon.loadImage(g);
       if (tb.checked) {
-        g.setColor(selectedColor);
-        var arc = roundRadius;
-        g.fillRoundRect(btn.paddingLeft(), btn.paddingTop(), widget.contentWidth(), widget.contentHeight(), arc);
+        if (tb.checkedIcon.image != null && tb.checkedIcon.image.isReady()) {
+          hasCheckedIcon = true;
+          drawIcon(widget, g, tb.checkedIcon.image, btn.iconSize, btn.iconPosition);
+        }
+        else {
+          g.setColor(selectedColor);
+          var arc = roundRadius;
+          g.fillRoundRect(0, 0, widget.width, widget.height, arc);
+        }
       }
     }
 
+    if (!hasCheckedIcon && btn.icon.image != null) {
+      drawIcon(widget, g, btn.icon.image, btn.iconSize, btn.iconPosition);
+    }
+
+    //draw mouse down mask
     if (btn.state == Button::mouseDown) {
         g.setColor(background);
         g.globalAlpha(100/255.0);
@@ -37,34 +72,7 @@ struct IconButtonStyle : WidgetStyle
         g.globalAlpha(1.0);
     }
 
-    if (!btn.iconUri.isEmpty() && btn.icon == null) {
-      btn.icon = g.createImage();
-      btn.icon.load(btn.iconUri.c_str());
-    }
-
-    var vAlign: Align = Align::Center;
-    if (btn.icon != null && btn.icon.isReady()) {
-      //    echo("src$src,dst$dst")
-      var src = Rect {.x = 0 ; .y = 0; .w = btn.icon.width(); .h = btn.icon.height(); };
-      var size: Size = uninit;
-      if (btn.iconSize.w == 0 && btn.iconSize.h == 0) {
-        size.w = btn.icon.width();
-        size.h = btn.icon.height();
-      }
-      else {
-        size = btn.iconSize;
-      }
-      var dst = Rect { .x = widget.paddingLeft(); .y = widget.paddingTop(); .w = size.w; .h = size.h; };
-      switch (btn.iconPosition) {
-        case Direction::Left:
-          dst { .y = widget.height*0.5-size.h*0.5; };
-        case Direction::Top:
-          dst { .x = widget.width*0.5-size.w*0.5; };
-          vAlign = Align::End;
-      }
-      g.drawImageEx(btn.icon, src, dst);
-    }
-    
+    //draw ripple
     if (btn.rippleSize > 0.0) {
         g.setColor(rippleColor);
         var r = (btn.rippleSize * (100+btn.width)) as Int;
@@ -76,6 +84,13 @@ struct IconButtonStyle : WidgetStyle
         g.globalAlpha(1.0);
     }
 
+    //draw text
+    var vAlign: Align = Align::Center;
+    switch (btn.iconPosition) {
+        case Direction::Left:
+        case Direction::Top:
+          vAlign = Align::End;
+    }
     drawText(widget, g, btn.text, btn.textAlign, vAlign);
   }
 }

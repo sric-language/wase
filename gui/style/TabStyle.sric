@@ -20,5 +20,7 @@ struct TabItemHighlightStyle : FlatButtonStyle
     font.bold = false;
     fontSize = 30;
     background = Color { .rgba = 0xe0e0e0ff; };
+    underline = true;
+    lineWidth = 4;
   }
 }

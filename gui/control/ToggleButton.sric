@@ -9,6 +9,8 @@ virtual struct ToggleButton : Button
 
   protected var animPostion : Float = 0.0;
 
+  var checkedIcon: ImageRes;
+
   fun setChecked(s: Bool, fire: Bool = true){
       if (onChecked != null && fire) {
         onChecked(s);
@@ -60,6 +62,9 @@ virtual struct ToggleButton : Button
 
   protected override fun prefContentSize(g: &Graphics, hintsWidth :Int= -1,  hintsHeight :Int= -1): Size {
     var size = super.prefContentSize(g, hintsWidth, hintsHeight);
+    if (iconSize.w != 0 || iconSize.h != 0) {
+      return size;
+    }
     return Size { .w = size.w+(size.h*2); .h = (size.h*1.3f) as Int; } ;
   }
 

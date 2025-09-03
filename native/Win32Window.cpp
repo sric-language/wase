@@ -71,6 +71,7 @@ public:
         _textInput = sric::new_<Win32TextInput>();
         _textInput->init(this->hWnd, inputType);
         return _textInput.share();
+        //return sric::OwnPtr<TextInput>();
     }
 
     void fileDialog(bool isOpen, const char* accept) SC_NOTHROW {
@@ -305,7 +306,51 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
             //fireTimeEvents();
         }
         break;
+    case WM_CHAR:
+        {
+            uint32_t codepoint = (WCHAR) wParam;
+            KeyEvent key;
+            key.keyChar = codepoint;
+            key.type = KeyEventType::Typed;
+            key.key = (Key)0;
 
+            g_window->view()->onKeyEvent(key);
+        }
+        break;
+    case WM_KEYDOWN:
+    case WM_SYSKEYDOWN:
+    case WM_KEYUP:
+    case WM_SYSKEYUP:
+        {
+            KeyEvent key;
+            key.keyChar = 0;
+            key.type =  (HIWORD(lParam) & KF_UP) ? KeyEventType::Release : KeyEventType::Press;
+            switch (wParam) {
+            case VK_BACK:
+                key.key = Key::Backspace;
+                break;
+            case VK_RETURN:
+                key.key = Key::Enter;
+                break;
+            case VK_LEFT:
+                key.key = Key::Left;
+                break;
+            case VK_RIGHT:
+                key.key = Key::Right;
+                break;
+            case VK_UP:
+                key.key = Key::Up;
+                break;
+            case VK_DOWN:
+                key.key = Key::Down;
+                break;
+            default:
+                key.key = (Key)wParam;
+                break;
+            }
+            g_window->view()->onKeyEvent(key);
+        }
+        break;
     }//switch
     
     return DefWindowProc(hwnd, msg, wParam, lParam);

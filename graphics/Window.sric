@@ -71,7 +71,7 @@ abstract struct Window {
 
     abstract fun focus();
 
-    abstract fun textInput(inputType : Int) : own* TextInput;
+    abstract fun textInput(inputType : Int) : own*? TextInput;
 
     abstract fun fileDialog(isOpen : Bool, accept : raw* const Int8);
 

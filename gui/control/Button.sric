@@ -24,17 +24,12 @@ virtual struct Button : Label, PropertyAnimTarget {
   //@Transient
   readonly var state : Int = mouseOut;
   
-  //@Transient
-  var icon: own*? Image;
-  readonly var iconUri: String;
+  var icon: ImageRes;
+  var iconSize: Size;
   var iconPosition: Direction = Direction::Left;
-  var iconSize : Size;
 
   fun setIconUri(s: String) {
-    if (iconUri != s) {
-      iconUri = move s;
-      icon = null;
-    }
+    icon.setUri(move s);
   }
 
   fun setState(s: Int) {
@@ -170,6 +165,9 @@ virtual struct Button : Label, PropertyAnimTarget {
   protected override fun prefContentSize(g: &Graphics, hintsWidth : Int = -1, hintsHeight : Int = -1): Size {
     var size = super.prefContentSize(g, hintsWidth, hintsHeight);
     if (iconSize.w != 0 || iconSize.h != 0) {
+      if (text.size() == 0) {
+        return iconSize;
+      }
       switch (iconPosition) {
         case Direction::Left:
           fallthrough;

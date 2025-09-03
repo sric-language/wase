@@ -26,13 +26,13 @@ virtual struct TreeItemStyle : WidgetStyle
     var right =  left + widget.contentWidth();
     var vcenter = (top + bottom) / 2;
 
-    if (item.isSelected()) {
-      g.setColor(background);
+    if (item.isHover) {
+      g.setColor(hoverColor);
       g.fillRect(0, 0, widget.width, widget.height);
     }
 
-    if (item.isHover) {
-      g.setColor(hoverColor);
+    if (item.isSelected()) {
+      g.setColor(background);
       g.fillRect(0, 0, widget.width, widget.height);
     }
 

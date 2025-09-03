@@ -106,8 +106,9 @@ struct TextView : Widget
     if (sizeCacheWidth == hintsWidth) return sizeCache;
     sizeCacheWidth = hintsWidth;
 
-    g.setFont(getStyle().font);
-    g.setFontSize(getStyle().fontSize);
+    var style = getStyle();
+    g.setFont(style.font);
+    g.setFontSize(style.fontSize);
     var metric: FontMetrics;
     g.fontMetrics(metric);
 

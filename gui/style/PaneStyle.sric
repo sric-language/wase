@@ -47,13 +47,8 @@ virtual struct PaneStyle : WidgetStyle
 
     g.globalAlpha(alpha);
     
-    if (backgroundImage != null) {
-      var iw = backgroundImage.width();
-      var ih = backgroundImage.height();
-      var src = Rect{ .x = 0; .y= 0; .w = iw; .h = ih; };
-      var dst = Rect{ .x = 0; .y= 0; .w = widget.width; .h = widget.height; };
-  //    echo("src$src,dst$dst")
-      g.drawImageEx(backgroundImage, src, dst);
+    if (!backgroundImage.uri.isEmpty()) {
+        drawBackgroundImage(widget, g);
     }
     else if (fill){
         g.setColor(background);

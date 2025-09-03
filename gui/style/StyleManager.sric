@@ -31,7 +31,11 @@ struct StyleManager {
         idMap["ResizePane"] = new ResizePaneStyle;
 
 
-        idMap["collapseTitle"] = new RoundButtonStyle { .roundRadius =0; .fill = false; .stroke = true; .fontColor.rgba = 0x33b5e5ff; };
+        idMap["collapseTitle"] = new RoundButtonStyle {
+            .color = Color { .rgba = 0xf1f5f9ff; };
+            .outlineColor = Color { .rgba = 0xd8dee4ff; };
+            .overColor = .color.lighter();
+            .roundRadius = 0; .stroke = false; .fontColor.rgba = 0x0a0a0aff; };
 
         idMap["menuItem"] = new MenuItemStyle;
         idMap["menuPane"] = new PaneStyle { .shadow = 0; .roundRadius = 0; .stroke = true; .fill = true; 

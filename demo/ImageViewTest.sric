@@ -19,10 +19,20 @@ struct ImageViewTest : BasePage
         .padding = Insets{ .initAll(50); };
         .layout.width = Layout::wrapContent;
       },
-
-      new Button {
+      new ToggleButton {
         .setText("Image Button");
         .setIconUri("res/image.png");
+        .setStyle("iconButton");
+        .iconSize = Size {.w=40; .h=40; };
+        .iconPosition = Direction::Top;
+        .onClick = fun(w:*Widget) { Toast::showText("hello world"); };
+        .padding = Insets{ .initAll(50); };
+        .layout.width = Layout::wrapContent;
+      },
+      new ToggleButton {
+        .setText("");
+        .setIconUri("res/image.png");
+        .checkedIcon.setUri("res/image.png");
         .setStyle("iconButton");
         .iconSize = Size {.w=40; .h=40; };
         .iconPosition = Direction::Top;

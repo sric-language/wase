@@ -6,7 +6,8 @@ struct Caret
   var visible :Bool = false;
   
   // offset of line
-  var offset :Int = 0;
+  var byteOffset :Int = 0;
+  protected var posXOffset :Int = -1;
 }
 
 
@@ -40,7 +41,7 @@ struct EditText : Widget
         onTextChange(text, t);
       }
       text = move t;
-      caret.offset = text.size();
+      caret.byteOffset = text.size();
       if (t.contains("\n")) {
         lines = t.split("\n");
       }
@@ -168,26 +169,122 @@ struct EditText : Widget
 
   override fun keyEvent( e: &KeyEvent)
   {
-    if (e.key == Key::Backspace)
-    {
-      if (e.type == KeyEventType::Press)
-      {
-        if (text.size() > 0)
-        {
-          text = text.substr(0, text.size()-1);
-          repaint();
+
+    if (e.type == KeyEventType::Press) {
+        switch (e.key) {
+        case Key::Backspace:
+          if (text.size() > 0)
+          {
+            if (caret.byteOffset >= text.size()) {
+              text = text.substr(0, text.size()-1);
+              caret.byteOffset = text.size();
+            }
+            else {
+              var n = 0;
+              text.getCharAt(caret.byteOffset, &n);
+              text = text.substr(0, caret.byteOffset-n) + text.substr(caret.byteOffset, text.size()-caret.byteOffset);
+              caret.byteOffset = caret.byteOffset-n;
+            }
+            
+          }
+        case Key::Right:
+          if (caret.byteOffset < text.size()) {
+            var n = 0;
+            text.getCharAt(caret.byteOffset, &n);
+            caret.byteOffset += n;
+          }
+        case Key::Left:
+          var n = caret.byteOffset;
+          if (n > 0 && n <= text.size()) {
+            --n;
+            while (n >= 0) {
+              var ch = text[n];
+              if ((ch & 0xC0) == 0x80) {
+                --n;
+                continue;
+              }
+              else {
+                break;
+              }
+            }
+            caret.byteOffset = n;
+          }
         }
-      }
-      return;
+        caret.visible = true;
+        repaint();
+        return;
     }
+    else if (e.type == KeyEventType::Typed) {
+      if (e.keyChar < 32) return;
 
-    if (e.type != KeyEventType::Typed) return;
+      if (caret.byteOffset >= text.size()) {
+        text = text + String::fromChar(e.keyChar);
+        caret.byteOffset = text.size();
+      }
+      else {
+        var str = String::fromChar(e.keyChar);
+        text = text.substr(0, caret.byteOffset) +str+ text.substr(caret.byteOffset, text.size()-caret.byteOffset);
+        caret.byteOffset = caret.byteOffset+str.size();
+      }
+      caret.visible = true;
+      repaint();
+    }
+  }
 
-    if (e.keyChar < 32) return;
+  fun makePasswordText() : String {
+    var buf: String;
+    for (var i=0; i<text.size(); ++i) {
+      buf.add("*");
+    }
+    return buf;
+  }
 
-    //TODO
-    //text += e.keyChar;
-    repaint();
+  protected override fun doPaint(clip: &Rect, g: &Graphics) {
+    if (caret.posXOffset != -1) {
+      var style = getStyle();
+      g.setFont(style.font);
+      g.setFontSize(style.fontSize);
+      if (isPassword()) {
+        caret.byteOffset = posXOffsetToByte(g, caret.posXOffset, makePasswordText());
+      }
+      else {
+        caret.byteOffset = posXOffsetToByte(g, caret.posXOffset, text);
+      }
+      caret.posXOffset = -1;
+    }
+    super.doPaint(clip, g);
+  }
+
+  protected fun posXOffsetToByte(g: &Graphics, posXOffset: Int, text: const &String): Int {
+    if (posXOffset <= 0) {
+      return 0;
+    }
+    var start = 0;
+    var end = 0;
+    for (; end<=text.size();) {
+        //t := line[start..<end];
+        var lw = 0f;
+        unsafe {
+            lw = g.textWidth(text.c_str() + start, end-start);
+        }
+        if (lw > posXOffset && (end-1>start)) {
+            end = end - 1;
+            break;
+        }
+
+        ++end;
+        //utf8
+        while (end<=text.size()) {
+          var ch = text[end-1];
+          if ((ch & 0xC0) == 0x80) {
+            ++end;
+          }
+          else {
+            break;
+          }
+        }
+    }
+    return end;
   }
 
   protected override fun gestureEvent( e: &GestureEvent)
@@ -196,6 +293,11 @@ struct EditText : Widget
     {
       focus();
       e.consumed = true;
+
+      var posXOffset = e.relativeX - this.x - this.paddingLeft();
+      this.caret.posXOffset = posXOffset;
+      caret.visible = true;
+      repaint();
     }
   }
 }

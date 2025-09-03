@@ -18,8 +18,13 @@ struct Timer
   fun start()
   {
     canceled = false;
-    //var self_ = this;
-    setTimeout(period, fun(){ this.timeOut(); });
+    var selfWeak = toWeak(refToOwn(this));
+    setTimeout(period, fun() {
+      var self = selfWeak.lock();
+      if (self != null) {
+        self.timeOut();
+      }
+    });
   }
 
   fun cancel()
@@ -30,8 +35,13 @@ struct Timer
   private fun timeOut()
   {
     if (canceled) return;
-    //var self_ = this;
-    setTimeout(period, fun(){ this.timeOut(); });
+    var selfWeak = toWeak(refToOwn(this));
+    setTimeout(period, fun() {
+      var self = selfWeak.lock();
+      if (self != null) {
+        self.timeOut();
+      }
+    });
     onTimeOut();
   }
 
