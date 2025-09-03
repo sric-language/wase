@@ -25,13 +25,13 @@ struct CheckBoxStyle : WidgetStyle
     //g.brush = this.background
     //g.fillRect(x-r, y-r, size, size)
     g.setColor(outlineColor);
-    g.strokeWidth(4);
+    g.lineWidth(4);
 
     g.drawRect(x-r, y-r, size, size);
     if (btn.checked)
     {
       r = (r * btn.animPostion) as Int;
-      g.strokeWidth(6);
+      g.lineWidth(6);
       g.setColor(color);
       //g.drawLine(x-(r*0.6f).toInt, y-(r*0.15f).toInt, x, y+(r/2f).toInt)
       //g.drawLine(x+(r*1.1f).toInt, y-(r*1.1f).toInt, x, y+(r/2f).toInt)

@@ -11,7 +11,7 @@ struct ProgressViewStyle : WidgetStyle {
 
     var width = (8);
     g.setColor(color);
-    g.strokeWidth(width);
+    g.lineWidth(width);
     
     var elapsed = 0;
     if (p.time == 0) {

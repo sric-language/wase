@@ -14,14 +14,14 @@ protected struct ColorLine : Widget {
         var h = this.contentHeight();
         var ox = this.paddingLeft();
         var oy = this.paddingTop();
-        g.strokeWidth(step+1.0);
+        g.lineWidth(step+1.0);
         for (var i = 0; i<w; i+=step) {
             var v = i  * 360.0 / w;
             g.setColor(Color::makeHsv(v, 1.0, 1.0));
             g.drawLine(ox+i, oy, ox+i, h);
         }
 
-        g.strokeWidth(2);
+        g.lineWidth(2);
         g.setColor(Color::black);
         var x = (value / 360.0 * w) as Int;
         g.drawLine(ox+x, oy, ox+x, h);
@@ -56,7 +56,7 @@ protected struct ColorRect : Widget {
 
         var hstep = step / 2;
 
-        g.strokeWidth(1.0);
+        g.lineWidth(1.0);
         for (var i = 0; i<w; i+=step) {
             var vx = i / (w as Float);
             for (var j = 0; j<h; j+=step) {
@@ -66,7 +66,7 @@ protected struct ColorRect : Widget {
             }
         }
 
-        g.strokeWidth(1.0);
+        g.lineWidth(1.0);
         g.setColor(Color::black);
         var x = (valueX * w) as Int;
         var y = (valueY * h) as Int;

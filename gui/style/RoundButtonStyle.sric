@@ -60,7 +60,7 @@ struct RoundButtonStyle : WidgetStyle
     if (lineWidth > 0 && stroke) {
         g.setColor(outlineColor);
         var lw = lineWidth;
-        g.strokeWidth(lw);
+        g.lineWidth(lw);
         g.drawRoundRect(offsetR, offsetR, width-lw, height-lw, arc);
     }
 
@@ -95,7 +95,7 @@ virtual struct FlatButtonStyle : LabelStyle
     super.doPaint(widget, g);
 
     if (underline) {
-      g.strokeWidth(this.lineWidth);
+      g.lineWidth(this.lineWidth);
       g.setColor(color);
       var y = btn.height - this.lineWidth;
       g.drawLine(0, y, btn.width, y);

@@ -146,7 +146,7 @@ public:
         nvgFillColor(vg, toNVColor(color));
     }
 
-    void strokeWidth(float size) SC_NOTHROW {
+    void lineWidth(float size) SC_NOTHROW {
         nvgStrokeWidth(vg, size);
     }
     void setPen(Pen& pen) SC_NOTHROW {

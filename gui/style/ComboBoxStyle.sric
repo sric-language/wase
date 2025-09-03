@@ -15,7 +15,7 @@ struct ComboBoxStyle : WidgetStyle {
 
     g.setColor(color);
     //var lWidth = (lineWidth);
-    //g.strokeWidth(lWidth);
+    //g.lineWidth(lWidth);
 
     var top = widget.paddingTop();
     var left = widget.paddingLeft();

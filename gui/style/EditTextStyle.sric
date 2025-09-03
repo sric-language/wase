@@ -17,7 +17,7 @@ struct EditTextStyle : WidgetStyle
     var left = widget.paddingLeft();
 
     g.setColor(outlineColor);
-    g.strokeWidth(lineWidth);
+    g.lineWidth(lineWidth);
 
     var lWidth = lineWidth;
     var lineLeft = lWidth;
@@ -88,7 +88,7 @@ struct EditTextStyle : WidgetStyle
           xOffset = g.textWidth(t.c_str(), t.size());
         }
       }
-      g.strokeWidth(2);
+      g.lineWidth(2);
       g.drawLine(x+xOffset, y, x+xOffset, y+lineh);
     }
   }

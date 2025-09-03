@@ -33,7 +33,7 @@ virtual struct PaneStyle : WidgetStyle
             g.globalAlpha(alpha);
             var a = (i*2);
             //g.pen = Pen { width = a; cap = capRound }
-            g.strokeWidth(a);
+            g.lineWidth(a);
             var shift = a / 6;
             //echo("draw $a, $alpha")
             var r = arc + a / 2;
@@ -60,7 +60,7 @@ virtual struct PaneStyle : WidgetStyle
       if (stroke) {
         g.setColor(outlineColor);
         var lw = (lineWidth);
-        g.strokeWidth(lw);
+        g.lineWidth(lw);
         g.drawRoundRect(x, y, w-lw, h-lw, arc);
       }
     }

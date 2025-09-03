@@ -68,7 +68,7 @@ struct Canvas : Widget {
       canvas.drawImage(image4, 0, 600);
 
       //canvas.pen = Pen { it.width = 4 }
-      canvas.strokeWidth(2.0);
+      canvas.lineWidth(2.0);
       canvas.setColor(Color { .rgba = 0xff0000ff; });
       canvas.drawLine(0, 300, 600, 300);
       canvas.drawLine(300, 0, 300, 600);
@@ -80,7 +80,7 @@ struct Canvas : Widget {
       var lineh = metric.height;
       var offset = metric.ascent;
 
-      canvas.strokeWidth(2.0);
+      canvas.lineWidth(2.0);
       canvas.drawLine(250, 300+lineh, 250+canvas.textWidth("Hi", -1), 300+lineh);
 
       canvas.setColor(Color { .rgba = 0x00ff00ff; });

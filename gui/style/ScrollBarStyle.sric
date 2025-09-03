@@ -77,7 +77,7 @@ struct SliderBarStyle : WidgetStyle
     var size = bar.vertical ? widget.width : widget.height;
 
     g.setColor(outlineColor);
-    g.strokeWidth(width);
+    g.lineWidth(width);
 
     if (bar.vertical) {
       g.drawLine(cx, top, cx, top + widget.contentHeight());

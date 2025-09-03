@@ -185,7 +185,7 @@ abstract struct Graphics {
 
     abstract fun setColor(color : Color);
 
-    abstract fun strokeWidth(size : Float32);
+    abstract fun lineWidth(size : Float32);
 
     abstract fun setPen(pen : & Pen);
 

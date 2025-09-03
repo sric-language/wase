@@ -69,7 +69,7 @@ struct SpinnerStyle : WidgetStyle
       }
 
         g.setColor(outlineColor);
-        g.strokeWidth(lineWidth);
+        g.lineWidth(lineWidth);
 
       var px = cx - cWidth/2;
       var py = (top + (lab.contentHeight()/2.0) - (lineHeight/2.0) + 1) as Int;

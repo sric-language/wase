@@ -192,7 +192,7 @@ public:
         plutovg_canvas_set_rgba(vg, color.r(), color.g(), color.b(), color.a());
     }
 
-    void strokeWidth(float size) SC_NOTHROW {
+    void lineWidth(float size) SC_NOTHROW {
         plutovg_canvas_set_line_width(vg, size);
     }
     void setPen(Pen& pen) SC_NOTHROW {

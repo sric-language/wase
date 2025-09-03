@@ -18,7 +18,7 @@ virtual struct TreeItemStyle : WidgetStyle
     var item = widget as * TreeItem;
     g.setColor(color);
     //var lWidth = (lineWidth);
-    //g.strokeWidth(lWidth);
+    //g.lineWidth(lWidth);
 
     var top = widget.paddingTop();
     var left = widget.paddingLeft() + item.level * indent;
@@ -52,7 +52,7 @@ virtual struct TreeItemStyle : WidgetStyle
   }
 
   fun drawArrow(g:& Graphics, cx: Float32, cy: Float32, item: *TreeItem) {
-    g.strokeWidth(arrowLineWidth);
+    g.lineWidth(arrowLineWidth);
     var pa = g.beginPath();
     var s = arrowSize * 0.5;
     if (item.expanded) {
