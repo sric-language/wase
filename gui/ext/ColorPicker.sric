@@ -7,21 +7,23 @@ import waseGraphics::*;
 
 protected struct ColorLine : Widget {
     var value: Float = 180.0;
-    var step: Int = (5);
+    var step: Int = 6;
 
     protected override fun doPaint( clip: &Rect,  g: &Graphics) {
         var w = this.contentWidth();
         var h = this.contentHeight();
         var ox = this.paddingLeft();
         var oy = this.paddingTop();
+
+        var hstep = step / 2;
         g.lineWidth(step+1.0);
         for (var i = 0; i<w; i+=step) {
             var v = i  * 360.0 / w;
             g.setColor(Color::makeHsv(v, 1.0, 1.0));
-            g.drawLine(ox+i, oy, ox+i, h);
+            g.drawLine(ox+i+hstep, oy, ox+i+hstep, h);
         }
 
-        g.lineWidth(2);
+        g.lineWidth(4);
         g.setColor(Color::black);
         var x = (value / 360.0 * w) as Int;
         g.drawLine(ox+x, oy, ox+x, h);
@@ -46,7 +48,7 @@ protected struct ColorRect : Widget {
     var valueX: Float = 1.0;
     var valueY: Float = 1.0;
     var colorLine: *? ColorLine;
-    var step : Int = (8);
+    var step : Int = 28;
 
     protected override fun doPaint(clip: &Rect,  g: &Graphics) {
         var w = this.contentWidth();
@@ -56,21 +58,22 @@ protected struct ColorRect : Widget {
 
         var hstep = step / 2;
 
-        g.lineWidth(1.0);
-        for (var i = 0; i<w; i+=step) {
+        //g.lineWidth(1.0);
+        for (var i = 0; i <= w-hstep; i+=step) {
             var vx = i / (w as Float);
-            for (var j = 0; j<h; j+=step) {
+            for (var j = 0; j <= h-hstep; j+=step) {
                 var vy = j / (h as Float);
                 g.setColor(Color::makeHsv(colorLine.value, vx, vy));
-                g.fillRect(ox+i-hstep, oy+j-hstep, step+1, step+1);
+                g.fillRect(ox+i, oy+j, step+1, step+1);
             }
         }
 
-        g.lineWidth(1.0);
+        g.lineWidth(3.0);
+        g.compositeOperation(CompositeOperation::Xor);
         g.setColor(Color::black);
         var x = (valueX * w) as Int;
         var y = (valueY * h) as Int;
-        var offsize = (7);
+        var offsize = 9;
         g.drawRect(ox+x-offsize, oy+y-offsize, offsize+offsize, offsize+offsize);
     }
 

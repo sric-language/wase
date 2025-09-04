@@ -30,10 +30,10 @@ trait View {
 
 abstract struct TextInput {
     static var inputTypeText: const Int = 1;
-    static var inputTypeIntNumber: const Int = 2;
-    static var inputTypeFloatNumber: const Int = 3;
-    static var inputTypePassword: const Int = 4;
-    static var inputTypeMultiLine: const Int = 5;
+    static var inputTypeIntNumber: const Int = 4;
+    static var inputTypeFloatNumber: const Int = 5;
+    static var inputTypePassword: const Int = 2;
+    static var inputTypeMultiLine: const Int = 3;
 
     var onTextChange : fun(s: raw*const Int8);
 

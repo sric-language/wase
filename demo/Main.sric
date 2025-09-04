@@ -16,8 +16,11 @@ abstract struct BasePage {
                 .margin = Insets{ .init(40, 0, 0, 0); };
                 .padding = Insets{ .initAll(8); };
                 new Button {
-                  .setText("<");
-                  .setStyle("flatButton");
+                  .setText("");
+                  .setStyle("iconButton");
+                  .setIconUri("res/return.png");
+                  .iconSize = Size {.w=40; .h=40; };
+                  .layout.width = Layout::wrapContent;
                   .rippleEnable = false;
                   .textAlign = Align::Begin;
                   .onClick = fun(w:*Widget) { this.pop(); };
@@ -60,7 +63,7 @@ struct Main
     pages.add(new BubbleViewTest { .name = "BubbleView"; });
     pages.add(new ImageViewTest { .name = "ImageView"; });
     pages.add(new DialogTest { .name = "Dialog"; });
-    pages.add(new CardTest { .name = "Card"; });
+    pages.add(new CardTest { .name = "Cards"; });
     pages.add(new AccordionTest { .name = "AccordionText"; });
 
     pages.add(null);

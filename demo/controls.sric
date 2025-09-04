@@ -12,7 +12,7 @@ struct SliderBarTest : BasePage
       new SliderBar {
         .setCurPos(50f);
         .onPosChanged = fun(from : Float32, to : Float32) {
-          (Frame::cur().findById("label") as *Label).setText(String::format("%f", to));
+          (Frame::cur().findById("label") as *Label).setText(String::format("%d", to as Int));
         };
       },;
     };

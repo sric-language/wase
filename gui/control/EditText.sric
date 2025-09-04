@@ -37,13 +37,15 @@ struct EditText : Widget
   
   fun setText(t: String, fire: Bool = true)
   {
+      t.replace("\r\n", "\n");
+
       if (fire && onTextChange != null) {
         onTextChange(text, t);
       }
       text = move t;
       caret.byteOffset = text.size();
-      if (t.contains("\n")) {
-        lines = t.split("\n");
+      if (text.contains("\n")) {
+        lines = text.split("\n");
       }
       else {
         lines.clear();
