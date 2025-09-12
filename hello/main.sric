@@ -1,16 +1,16 @@
 
-import sric::*;
-import waseGui::*;
-import waseGraphics::*;
-import serial::*;
+import sric::*
+import waseGui::*
+import waseGraphics::*
+import serial::*
 
 fun main(): Int {
-    printf("Hello World\n");
+    printf("Hello World\n")
 
-    var frame = new Frame;
-    frame.loadView("res/view.himl");
-    frame.loadStyle("res/style.himl");
+    var frame = new Frame
+    frame.loadView("res/view.himl")
+    frame.loadStyle("res/style.himl")
     frame.show();
 
-    return 0;
+    return 0
 }

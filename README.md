@@ -1,7 +1,7 @@
 
 Sric/C++ cross-platform GUI library.
 
-- Supported platforms: Windows, WebAssembly.
+- Supported platforms: Windows, WebAssembly. Possible to run on Linux and MacOS but not tested.
 - Support GPU or CPU render backend.
 
 [Online Demo](https://sric.fun/wase/run.html)
@@ -38,13 +38,11 @@ fun main(): Int {
     var frame = new Frame {
         new Button {
            .setText("Button");
-           .onClick(fun(w:*Widget){
-               Toast::showText("Hello World");
-           });
-        },;
-    };
-    frame.show();
-    return 0;
+           .onClick = fun(w:* Widget) { Toast::showText("hello world") }
+        },
+    }
+    frame.show()
+    return 0
 }
 ```
 
@@ -69,7 +67,7 @@ waseGui::VBox
 
 ## Build
 
-1. [Install Sric](https://sric.fun/book/Start.html)
+1. [Install Sric](https://sric.fun)
 2. [Third-party dependencies](https://gitee.com/chunquedong/third-party)
 3. Build Wase
 ```
