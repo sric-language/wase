@@ -37,7 +37,7 @@ protected struct ColorLine : Widget {
             var ox = this.paddingLeft();
 
             value = (e.relativeX-x-ox) * 360.0 / w;
-            value = clamp(value, 0.0, 360.0);
+            value = clamp(value, 0.0f, 360.0f);
             (parent as * ColorPicker).update();
             e.consumed = true;
         }
@@ -86,8 +86,8 @@ protected struct ColorRect : Widget {
             var oy = this.paddingTop();
             valueX = (e.relativeX - x - ox) / (w as Float);
             valueY = (e.relativeY - y - oy) / (h as Float);
-            valueX = clamp(valueX, 0.0, 1.0);
-            valueY = clamp(valueY, 0.0, 1.0);
+            valueX = clamp(valueX, 0.0f, 1.0f);
+            valueY = clamp(valueY, 0.0f, 1.0f);
             (parent as * ColorPicker).update();
             e.consumed = true;
         }

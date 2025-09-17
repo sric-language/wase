@@ -112,7 +112,7 @@ reflect struct Color {
         var s: Float32;
         var v: Float32;
         decHsv(&h, &s, &v);
-        v = min(max((v + percentage), 0f), 1f);
+        v = min(max((v + percentage) as Float, 0f), 1f);
         return makeHsv(h, s, v);
     }
 
