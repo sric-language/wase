@@ -7,6 +7,8 @@ NVGcolor toNVColor(Color color) {
     return nvgRGBA(color.ir(), color.ig(), color.ib(), color.ia());
 }
 
+NVGcontext* getCurrentNanoVgContext();
+
 class NanovgImage : public Image {
     int w = 0;
     int h = 0;
@@ -48,7 +50,9 @@ public:
         nvgUpdateImage(vg, image, data);
     }
     virtual ~NanovgImage() SC_NOTHROW {
-        nvgDeleteImage(vg, image);
+        if (vg == getCurrentNanoVgContext()) {
+            nvgDeleteImage(vg, image);
+        }
         image = 0;
     }
     bool isReady() SC_NOTHROW {

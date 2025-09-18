@@ -120,6 +120,10 @@ sric::OwnPtr<GlfwWindow> g_window;
 
 int openWindow(const char* title, int w, int h, sric::OwnPtr<waseGraphics::View> view);
 
+NVGcontext* getCurrentNanoVgContext() {
+	if (g_window.isNull()) return nullptr;
+	return g_window->vg;
+}
 
 int Window::open(sric::OwnPtr<waseGraphics::View> view, const char* name) SC_NOTHROW {
 	if (!g_window.isNull()) {
@@ -429,6 +433,7 @@ int openWindow(const char* title, int w, int h, sric::OwnPtr<waseGraphics::View>
             break;
     }
 
+	g_window->vg = nullptr;
 	nvgDeleteGLES3(vg);
 	glfwTerminate();
 #endif
