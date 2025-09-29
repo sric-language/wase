@@ -56,7 +56,7 @@ struct DownState : GestureState {
     lastY = e.y;
 
     var self_ : WeakPtr$<DownState> = toWeak(rawToOwn(this));
-    setTimeout(machine.longPressTimeLimit, fun(){
+    setTimeout(machine.longPressTimeLimit, fun() mut {
       var _self = self_.lock();
       //echo("check longPress ${longPressValid} ${machine.currentState === this}")
       if (_self != null && _self.machine.currentState == _self && _self.longPressValid) {
@@ -70,7 +70,7 @@ struct DownState : GestureState {
       
     });
     
-    setTimeout(machine.shortPressTimeLimit, fun(){
+    setTimeout(machine.shortPressTimeLimit, fun() mut {
         var _self = self_.lock();
         if (_self != null && _self.shortPressValid) {
           var ge: GestureEvent;
@@ -139,7 +139,7 @@ struct OneClickState : GestureState {
     e.consumed = true;
 
     var self_ : WeakPtr$<OneClickState> = toWeak(rawToOwn(this));
-    setTimeout(machine.doubleClickTimeLimt, fun(){
+    setTimeout(machine.doubleClickTimeLimt, fun() mut {
       var _self = self_.lock();
       if (_self != null) {
         if (_self.machine.currentState == _self && _self.valid) {
@@ -182,7 +182,7 @@ struct TwoDownState : GestureState {
   override fun onEnter(e: &MotionEvent) {
     valid = true;
     var self_ : WeakPtr$<TwoDownState> = toWeak(rawToOwn(this));
-    setTimeout(machine.longPressTimeLimit, fun(){
+    setTimeout(machine.longPressTimeLimit, fun() mut {
       var _self = self_.lock();
       if (_self != null) {
         if (_self.machine.currentState == _self && _self.valid) {
