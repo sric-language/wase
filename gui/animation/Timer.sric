@@ -20,7 +20,7 @@ struct Timer
     canceled = false;
     var selfWeak = toWeak(refToOwn(this));
     setTimeout(period, fun() {
-      var self = selfWeak.lock();
+      var self: own*? Timer = selfWeak.lock();
       if (self != null) {
         self.timeOut();
       }

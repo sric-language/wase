@@ -138,11 +138,11 @@ reflect struct Color {
 
     fun fromString(str: String): Bool {
         if (str.size() == 8+1) {
-            var i = sscanf(str.c_str(), "#%08X", &rgba);
+            var i = sscanf(str.c_str(), "#%08X", &rgba as raw* UInt32);
             return i != 0;
         }
         else if (str.size() == 6+1) {
-            var i = sscanf(str.c_str(), "#%06X", &rgba);
+            var i = sscanf(str.c_str(), "#%06X", &rgba as raw* UInt32);
             rgba = (rgba << 8) | 0xFF;
             return i != 0;
         }
