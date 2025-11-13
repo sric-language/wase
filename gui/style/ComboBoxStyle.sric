@@ -36,3 +36,47 @@ struct ComboBoxStyle : WidgetStyle {
     drawText(widget, g, btn.text, btn.textAlign);
   }
 }
+
+struct RoundComboBoxStyle : WidgetStyle {
+
+  var markSize: Int = 17;
+
+  fun new()
+  {
+    color = Color { .rgba = 0x232323ff; };
+    outlineColor = Color { .rgba = 0x858585ff; };
+    roundRadius = 20;
+  }
+
+  override fun doPaint(widget: *Widget , g:& Graphics)
+  {
+    var btn = widget as * Button;
+
+    var top = widget.paddingTop();
+    var left = widget.paddingLeft();
+    var bottom = top + widget.contentHeight();
+    var right =  left + widget.contentWidth();
+
+    //draw round rect outline
+    g.setColor(outlineColor);
+    g.lineWidth(lineWidth);
+    var lineWidth2 = lineWidth + lineWidth;
+    var round: Int = (widget.height - lineWidth)/2;
+    g.drawRoundRect(lineWidth, lineWidth, widget.width-lineWidth2, widget.height-lineWidth2, round);
+
+    //draw triangle
+    g.setColor(color);
+    var pa = g.beginPath();
+    var cornerSize = markSize / 2;
+    var cy = top + widget.contentHeight()/2-cornerSize*0.58;
+    var cx = right - cornerSize*1.732;
+    pa.moveTo(cx-cornerSize, cy);
+    pa.lineTo(cx+cornerSize, cy);
+    pa.lineTo(cx, cy+cornerSize*1.732);
+    pa.close();
+    g.fillPath(pa);
+
+    //draw text
+    drawText(widget, g, btn.text, btn.textAlign);
+  }
+}

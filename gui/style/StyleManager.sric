@@ -17,7 +17,7 @@ struct StyleManager {
         idMap["RadioButton"] = new RadioButtonStyle;
         idMap["ScrollBar"] = new ScrollBarStyle;
         idMap["SliderBar"] = new SliderBarStyle;
-        idMap["ComboBox"] = new ComboBoxStyle;
+        idMap["ComboBox"] = new RoundComboBoxStyle;
         //idMap["MenuItem"] = new MenuItemStyle;
         idMap["Menu"] = new MenuStyle;
         idMap["Toast"] = new ToastStyle;

@@ -114,7 +114,9 @@ void Win32TextInput::setStyle(waseGraphics::Font& font, float fontSize, waseGrap
 }
 void Win32TextInput::setText(const char* text) SC_NOTHROW {
     std::string localStr = UTF8ToLocal(text);
-    SetWindowText(textInputHandle, localStr.c_str());
+    sric::String str = localStr;
+    str.replace("\n", "\r\n");
+    SetWindowText(textInputHandle, str.c_str());
 }
 void Win32TextInput::setType(int lineNum, bool editable) SC_NOTHROW {
     if (textInputHandle != 0) {
