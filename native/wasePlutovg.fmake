@@ -1,0 +1,12 @@
+name = wasePlutovg
+summary = sric GUI library
+outType = lib
+version = 1.0
+depends = jsonc 2.0, sric 1.0, plutovg 1.0, waseGraphics 1.0, waseGui 1.0, serial 1.0
+srcDirs = ./
+incDirs = ./,nanovg/
+//extIncDirs = ../../sric/output/
+defines = NVGSWU_GL3,PLUTOVG_BUILD_STATIC
+gcc.extConfigs.cppflags = -std=c++17
+win32.extLibs = opengl32,gdi32,winmm
+win32.excludeSrc = .*(Glfw|Nanovg).*

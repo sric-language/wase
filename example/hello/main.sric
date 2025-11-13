@@ -10,7 +10,10 @@ fun main(): Int {
     var frame = new Frame
     frame.loadView("res/view.himl")
     frame.loadStyle("res/style.himl")
-    frame.show();
 
+    frame.findById("button").onClick = fun(w:* Widget) {
+        Toast::showText("hello world")
+    }
+    frame.show();
     return 0
 }
