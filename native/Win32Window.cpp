@@ -8,8 +8,6 @@
 #include <windowsx.h>
 using namespace waseGraphics;
 
-std::string LocalToUTF8(const std::string& localStr);
-
 extern float g_screenScle;
 extern bool g_autoScale;
 
@@ -382,9 +380,11 @@ int openWindow(const char* title, int w, int h) {
         return -1;
     }
 
+    std::string localTitle = UTF8ToLocal(title);
+
     HWND hwnd = CreateWindow(
         "waseWindowClass",
-        title,
+        localTitle.c_str(),
         WS_OVERLAPPEDWINDOW,
         CW_USEDEFAULT,
         CW_USEDEFAULT,

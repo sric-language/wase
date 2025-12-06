@@ -44,14 +44,25 @@ void EventTimer::fireTimeEvents() {
             timeEvent.callback();
         }
     }
+
+    if (onFrame) {
+        onFrame();
+    }
 }
 
 float g_screenScle = 1;
 bool g_autoScale = true;
-EventTimer _eventTimer;
+EventTimer* EventTimer::_cur = nullptr;
+
+EventTimer* EventTimer::getCur() {
+    if (!EventTimer::_cur) {
+        EventTimer::_cur = new EventTimer();
+    }
+    return EventTimer::_cur;
+}
 
 void waseGraphics::setTimeout(int64_t timeMillis, std::function<void()> callback) SC_NOTHROW {
-    _eventTimer.setTimeout(timeMillis, callback);
+    EventTimer::getCur()->setTimeout(timeMillis, callback);
 }
 
 float waseGraphics::getScreenScale() SC_NOTHROW {
@@ -63,6 +74,6 @@ bool waseGraphics::getAutoScale() SC_NOTHROW {
 }
 
 void waseGraphics::fireTimeEvents() SC_NOTHROW {
-    _eventTimer.fireTimeEvents();
+    EventTimer::getCur()->fireTimeEvents();
 }
 

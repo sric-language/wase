@@ -7,6 +7,8 @@
 #include <windows.h>
 #include <windowsx.h>
 
+std::string LocalToUTF8(const std::string& localStr);
+std::string UTF8ToLocal(const std::string& utf8Str);
 
 #define ID_INPUTEDIT 1001
 

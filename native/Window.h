@@ -23,7 +23,11 @@ class EventTimer {
 
     std::priority_queue<TimeEvent, std::vector<TimeEvent>, std::less<TimeEvent> > _timeEvents;     // Contains the scheduled time events.
     std::mutex _scheduleLock;
+
+    static EventTimer* _cur;
 public:
+    static EventTimer* getCur();
+    std::function<void()> onFrame;
 
     void setTimeout(int64_t timeMillis, std::function<void()> callback);
 

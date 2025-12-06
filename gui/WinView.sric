@@ -150,8 +150,13 @@ struct WinView : View {
     }
 
     fun getPrefSize(hintsWidth : Int, hintsHeight : Int) : Size {
+        var w = -1;
+        var h = -1;
+        w = curFrame.layout.prefWidth(hintsWidth, hintsHeight, hintsWidth);
+        h = curFrame.layout.prefHeight(hintsWidth, hintsHeight, hintsHeight);
+
         //var result = curFrame.prefSize(g, hintsWidth, hintsHeight);
-        var result = Size { .w = 1366; .h = 768; };
+        var result = Size { .w = w; .h = h; };
         return result;
     }
 
