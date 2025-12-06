@@ -24,6 +24,7 @@ struct BubbleViewTest : BasePage
     var model = new BubbleListAdapter;
     for (var i=0; i<100; ++i) { model.list.add(String::format("item%d", i)); }
     return new ListView {
+      .setSelectMode(0);
       .setModel(move model);
       .refreshTip = new ProgressView {
         .layout.hAlign = Align::Center;

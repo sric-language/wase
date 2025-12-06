@@ -106,3 +106,22 @@ struct ResizePaneStyle : PaneStyle {
     }
   }
 }
+
+struct ListViewStyle : WidgetStyle {
+  var highlightColor : Color = Color { .rgba = 0xcdcdcdff; };
+
+  override fun doPaint(widget: *Widget , g:& Graphics) {
+    super.doPaint(widget, g);
+    var p = widget as * ListView;
+    if (p.selIndex != -1) {
+      if (p.selIndex >= p._viewportBeginItem && p.selIndex < p._viewportEndItem) {
+        g.setColor(highlightColor);
+        var view = p.getView(p.selIndex);
+        if (view == null) return;
+        var x = widget.paddingLeft();
+        var w = widget.contentWidth();
+        g.fillRect(x, view.y, w, view.height);
+      }
+    }
+  }
+}

@@ -29,6 +29,7 @@ struct StyleManager {
         idMap["Table"] = new TableStyle;
         idMap["TreeItem"] = new TreeItemStyle;
         idMap["ResizePane"] = new ResizePaneStyle;
+        idMap["ListView"] = new ListViewStyle;
 
 
         idMap["collapseTitle"] = new RoundButtonStyle {

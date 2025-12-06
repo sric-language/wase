@@ -133,7 +133,7 @@ struct ScaleAnimChannel : TweenAnimChannel {
       var dscale = scale / lastScale;
       var x = widget.width /2.0f;
       var y = widget.height /2.0f;
-      var lastScale = scale;
+      lastScale = scale;
 
       if (widget.transformValid) {
         widget.transform = Transform2D::makeTranslate(x, y) *
@@ -141,7 +141,7 @@ struct ScaleAnimChannel : TweenAnimChannel {
                           Transform2D::makeTranslate(-x, -y) *
                           widget.transform;
       }
-      //echo("x$x,y$y, scale:$scale, dscale:$dscale")
+      //printf("x %f,y %f, scale:%f, dscale:%f\n", x, y, scale, dscale);
       //widget.transform.matrix = Transform2D.makeScale(0f, 100f, scale, scale)
     }
   }
