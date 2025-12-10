@@ -14,7 +14,12 @@ struct ComboBox : Button
         onSelect(val);
       }
       selIndex = val;
-      this.setText(items[val].copy());
+      if (selIndex != -1) {
+        this.setText(items[val].copy());
+      }
+      else {
+        setText("");
+      }
       if (fire) {
         eventListeners.fire(EventType::SelectChanged, this);
       }

@@ -12,7 +12,7 @@ abstract struct WidgetGroup : Widget {
         }
     }
 
-    fun _onDeserialize() {
+    virtual fun _onDeserialize() {
         for (var i=0; i<children.size(); ++i) {
             children[i].setParent(this);
         }
@@ -227,6 +227,9 @@ abstract struct WidgetGroup : Widget {
             {
                 if (localClip.intersects((*t).bounds())) {
                     g.save();
+                    if (isCliped && !(*t).layout.ignored) {
+                        g.clip(this.paddingLeft(), this.paddingTop(), this.contentWidth(), this.contentHeight());
+                    }
                     g.transform(Transform2D::makeTranslate((*t).x, (*t).y));
                     (*t).paint(localClip, g);
                     g.restore();

@@ -26,6 +26,13 @@ virtual struct ContentPane : Pane {
   protected fun doAdd(child: own* Widget) {
     super.add(move child);
   }
+
+  override fun _onDeserialize() {
+      super._onDeserialize();
+      if (children.size() > 0) {
+        _content = children[0];
+      }
+  }
 }
 
 virtual struct ScrollPane : ContentPane
@@ -108,6 +115,14 @@ virtual struct ScrollPane : ContentPane
     padding = Insets{.init(0, 8, 8, 0);};
     focusable = true;
     dragAware = true;
+  }
+
+  override fun _onDeserialize() {
+      super._onDeserialize();
+      hbar.setParent(null);
+      vbar.setParent(null);
+      doAdd(share$<ScrollBar>(hbar));
+      doAdd(share$<ScrollBar>(vbar));
   }
 
   protected virtual fun onViewportChanged() {}
