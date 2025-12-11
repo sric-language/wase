@@ -1,10 +1,10 @@
 name = wasePlutovg
-summary = sric GUI library
+summary = wase GUI plutovg-backend
 outType = lib
 version = 1.0
 depends = jsonc 2.0, sric 1.0, plutovg 1.0, waseGraphics 1.0, waseGui 1.0, serial 1.0
-srcDirs = ./
-incDirs = ./,nanovg/
+srcDirs = ./,../,../windows/
+incDirs = ./,../,../nanovg/,../windows/
 //extIncDirs = ../../sric/output/
 defines = NVGSWU_GL3,PLUTOVG_BUILD_STATIC
 gcc.extConfigs.cppflags = -std=c++17

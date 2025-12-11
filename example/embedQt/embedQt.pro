@@ -1,4 +1,6 @@
 QT = core
+QT += gui
+QT += widgets
 
 CONFIG += c++17 cmdline
 
@@ -11,8 +13,6 @@ CONFIG(debug, debug|release) {
 } else {
     DEFINES += NDEBUG
 }
-DEFINES += NVGSWU_GL3
-DEFINES += PLUTOVG_BUILD_STATIC
 
 SOURCES += \
         main.cpp
@@ -31,25 +31,22 @@ CONFIG(debug, debug|release) {
 INCLUDEPATH += \
   $$FMAKE_REP_LIB/jsonc/include \
   $$FMAKE_REP_LIB/sric/include \
-  $$FMAKE_REP_LIB/plutovg/include \
   $$FMAKE_REP_LIB/waseGraphics/include \
   $$FMAKE_REP_LIB/waseGui/include \
-  $$FMAKE_REP_LIB/wasePlutovg/include \
+  $$FMAKE_REP_LIB/waseQt/include \
   $$FMAKE_REP_LIB/serial/include \
 
 LIBS += -L$${FMAKE_REP_LIB}/jsonc/lib
 LIBS += -L$${FMAKE_REP_LIB}/sric/lib
-LIBS += -L$${FMAKE_REP_LIB}/plutovg/lib
 LIBS += -L$${FMAKE_REP_LIB}/waseGraphics/lib
 LIBS += -L$${FMAKE_REP_LIB}/waseGui/lib
-LIBS += -L$${FMAKE_REP_LIB}/wasePlutovg/lib
+LIBS += -L$${FMAKE_REP_LIB}/waseQt/lib
 LIBS += -L$${FMAKE_REP_LIB}/serial/lib
 
 LIBS += -lwaseGui
 LIBS += -lwaseGraphics
-LIBS += -lwasePlutovg
+LIBS += -lwaseQt
 LIBS += -lserial
-LIBS += -lplutovg
 LIBS += -lsric
 LIBS += -ljsonc
 

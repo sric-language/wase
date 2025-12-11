@@ -85,7 +85,7 @@ public:
     }
     void arcTo(float x1, float y1, float x2, float y2, float radius) SC_NOTHROW {
         //TODO radius to angle
-        plutovg_canvas_arc_to(vg, x1, y1, radius, true, true, x2, y2);
+        //plutovg_canvas_arc_to(vg, x1, y1, radius, true, true, x2, y2);
     }
     void arc(float cx, float cy, float radius, float startAngle, float arcAngle) SC_NOTHROW {
         plutovg_canvas_arc(vg, cx, cy, radius, (startAngle), (startAngle+arcAngle), true);

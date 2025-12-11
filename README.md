@@ -1,8 +1,9 @@
 
 Sric/C++ cross-platform GUI library.
 
-- Supported platforms: Windows, WebAssembly. Possible to run on Linux and MacOS but not tested.
-- Support GPU or CPU render backend.
+- Cross-platforms: Windows, WebAssembly. Possible to run on Linux and MacOS
+- Support GPU or CPU render backend
+- Optional Qt integration
 
 [Online Demo](https://sric.fun/wase/run.html)
 
@@ -74,4 +75,8 @@ waseGui::VBox
 sh build.sh
 sh build_debug.sh
 sh build_wasm.sh
+```
+4. Build Qt-backend
+```
+fan fmake native/qt/waseQt.fmake -debug
 ```
