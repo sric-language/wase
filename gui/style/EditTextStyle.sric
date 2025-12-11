@@ -29,7 +29,7 @@ struct EditTextStyle : WidgetStyle
 
     var metric: FontMetrics;
     g.fontMetrics(metric);
-    var lineh = metric.height;
+    var lineh = metric.lineHeight;
 
     // g.drawLine(lineLeft, bottom, right-lWidth, bottom);
     // var upSize = (lineh * 0.3f) as Int;

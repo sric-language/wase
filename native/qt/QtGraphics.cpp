@@ -31,11 +31,11 @@ public:
     bool loadMem(unsigned char* data, int ndata) SC_NOTHROW {
         return image.loadFromData(data, ndata);
     }
-    void initData(int w, int h, const unsigned char* data) SC_NOTHROW {
+    void initFromRgba(int w, int h, const unsigned char* data) SC_NOTHROW {
         QImage timage(data, w, h, QImage::Format_RGBA8888);
         image = QPixmap::fromImage(timage);
     }
-    void updateData(const unsigned char* data) SC_NOTHROW {
+    void updateRgba(const unsigned char* data) SC_NOTHROW {
         QImage timage(data, width(), height(), QImage::Format_RGBA8888);
         image = QPixmap::fromImage(timage);
     }
@@ -144,7 +144,7 @@ public:
     }
 
     void compositeOperation(CompositeOperation op) SC_NOTHROW {
-        QPainter::CompositionMode p = QPainter::CompositionMode_Clear;
+        QPainter::CompositionMode p = QPainter::CompositionMode_SourceOver;
         switch (op)
         {
         case waseGraphics::CompositeOperation::SourceOver:
@@ -172,10 +172,10 @@ public:
             p = QPainter::CompositionMode_DestinationAtop;
             break;
         case waseGraphics::CompositeOperation::Lighter:
-            p = QPainter::CompositionMode_Lighten;
+            p = QPainter::CompositionMode_Plus;
             break;
         case waseGraphics::CompositeOperation::Copy:
-            p = QPainter::CompositionMode_Overlay;
+            p = QPainter::CompositionMode_Source;
             break;
         case waseGraphics::CompositeOperation::Xor:
             p = QPainter::QPainter::CompositionMode_Xor;
@@ -304,7 +304,7 @@ public:
         QFontMetrics qmetrics(font);
         metric.ascent = qmetrics.ascent();
         metric.descent = -qmetrics.descent();
-        metric.height = qmetrics.lineSpacing();
+        metric.lineHeight = qmetrics.lineSpacing();
         metric.leading = qmetrics.leading();
     }
     float textWidth(const char* str, int size = -1) SC_NOTHROW {

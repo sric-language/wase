@@ -36,9 +36,9 @@ trait Image {
 
     abstract fun loadMem(data : raw* UInt8, ndata : Int) : Bool;
 
-    abstract fun initData(w : Int, h : Int, data : raw* const UInt8);
+    abstract fun initFromRgba(w : Int, h : Int, data : raw* const UInt8);
 
-    abstract fun updateData(data : raw* const UInt8);
+    abstract fun updateRgba(data : raw* const UInt8);
 
     abstract fun isReady(): Bool;
 }
@@ -139,7 +139,7 @@ trait GraphicsPath {
 
     abstract fun cubicTo(cx1 : Float32, cy1 : Float32, cx2 : Float32, cy2 : Float32, x : Float32, y : Float32);
 
-    abstract fun arcTo(x1 : Float32, y1 : Float32, x2 : Float32, y2 : Float32, radius : Float32);
+    //abstract fun arcTo(x1 : Float32, y1 : Float32, x2 : Float32, y2 : Float32, radius : Float32);
 
     abstract fun arc( cx: Float32, cy: Float32, radius: Float32, startAngle: Float32, arcAngle: Float32);
 
@@ -155,7 +155,7 @@ struct Font {
 struct FontMetrics {
     var ascent: Float;
     var descent: Float;
-    var height: Float;
+    var lineHeight: Float;
     var leading: Float;
 }
 

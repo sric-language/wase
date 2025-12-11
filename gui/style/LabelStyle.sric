@@ -60,7 +60,7 @@ struct TextViewStyle : WidgetStyle {
 
     var metric: FontMetrics;
     g.fontMetrics(metric);
-    var lineh = metric.height;
+    var lineh = metric.lineHeight;
 
     var offset = metric.ascent;
     y += offset as Int;

@@ -40,13 +40,13 @@ public:
         }
         return image != 0;
     }
-    void initData(int w, int h, const unsigned char* data) SC_NOTHROW {
+    void initFromRgba(int w, int h, const unsigned char* data) SC_NOTHROW {
         image = nvgCreateImageRGBA(vg, w, h, imageFlags, data);
         if (image) {
             nvgImageSize(vg, image, &w, &h);
         }
     }
-    void updateData(const unsigned char* data) SC_NOTHROW {
+    void updateRgba(const unsigned char* data) SC_NOTHROW {
         nvgUpdateImage(vg, image, data);
     }
     virtual ~NanovgImage() SC_NOTHROW {
@@ -211,7 +211,7 @@ public:
         nvgTextMetrics(vg, &ascender, &descender, &lineh);
         metric.ascent = ascender;
         metric.descent = descender;
-        metric.height = lineh;
+        metric.lineHeight = lineh;
         metric.leading = lineh - ascender - descender;
     }
     float textWidth(const char* str, int size = -1) SC_NOTHROW {

@@ -77,7 +77,7 @@ struct Canvas : Widget {
 
       var metric: FontMetrics;
       canvas.fontMetrics(metric);
-      var lineh = metric.height;
+      var lineh = metric.lineHeight;
       var offset = metric.ascent;
 
       canvas.lineWidth(2.0);

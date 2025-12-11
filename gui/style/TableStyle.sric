@@ -44,7 +44,7 @@ virtual struct TableStyle : WidgetStyle
     // get num of cols
     var numCols = tab.model.numCols();
     var fontOffset = metric.ascent as Int;
-    fontOffset += ((rowHeight - metric.height) / 2) as Int;
+    fontOffset += ((rowHeight - metric.lineHeight) / 2) as Int;
 
     var bottomLine = top+tab.contentHeight();
     var rightLine = left+tab.contentWidth();

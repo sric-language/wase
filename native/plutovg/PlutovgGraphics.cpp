@@ -41,7 +41,7 @@ public:
         }
         return image != NULL;
     }
-    void initData(int w, int h, const unsigned char* data) SC_NOTHROW {
+    void initFromRgba(int w, int h, const unsigned char* data) SC_NOTHROW {
         int stride = w * 4;
         image = plutovg_surface_create_for_data((unsigned char*)data, w, h, stride);
         if (image) {
@@ -49,7 +49,7 @@ public:
             h = plutovg_surface_get_height(image);
         }
     }
-    void updateData(const unsigned char* data) SC_NOTHROW {
+    void updateRgba(const unsigned char* data) SC_NOTHROW {
         //nvgUpdateImage(vg, image, data);
     }
     virtual ~PlutovgImage() SC_NOTHROW {
@@ -133,7 +133,7 @@ public:
     }
 
     void compositeOperation(CompositeOperation op) SC_NOTHROW {
-        plutovg_operator_t p = PLUTOVG_OPERATOR_CLEAR;
+        plutovg_operator_t p = PLUTOVG_OPERATOR_SRC_OVER;
         switch (op)
         {
         case waseGraphics::CompositeOperation::SourceOver:
@@ -161,7 +161,7 @@ public:
             p = PLUTOVG_OPERATOR_DST_ATOP;
             break;
         case waseGraphics::CompositeOperation::Lighter:
-            p = PLUTOVG_OPERATOR_CLEAR;
+            //p = PLUTOVG_OPERATOR_CLEAR;
             break;
         case waseGraphics::CompositeOperation::Copy:
             p = PLUTOVG_OPERATOR_SRC;
@@ -280,7 +280,7 @@ public:
         plutovg_canvas_font_metrics(vg, &ascender, &descender, &lineGap, &rect);
         metric.ascent = ascender;
         metric.descent = descender;
-        metric.height = std::max(rect.h, (ascender - descender + lineGap));
+        metric.lineHeight = std::max(rect.h, (ascender - descender + lineGap));
         metric.leading = lineGap;
     }
     float textWidth(const char* str, int size = -1) SC_NOTHROW {

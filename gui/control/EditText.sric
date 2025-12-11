@@ -132,7 +132,7 @@ struct EditText : Widget
     var metric: FontMetrics;
     g.fontMetrics(metric);
     var w = g.textWidth(text.c_str(), text.size());
-    var h = metric.height;
+    var h = metric.lineHeight;
 
     if (lines.size() > 0) {
         h *= lines.size();

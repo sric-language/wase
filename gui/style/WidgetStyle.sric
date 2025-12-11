@@ -55,7 +55,7 @@ reflect virtual struct WidgetStyle {
 
         var metric: FontMetrics;
         g.fontMetrics(metric);
-        var lineh = metric.height;
+        var lineh = metric.lineHeight;
 
         var offset = metric.ascent;
         var y: Float32 = top;

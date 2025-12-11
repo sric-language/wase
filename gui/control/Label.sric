@@ -23,7 +23,7 @@ virtual struct Label : Widget {
         var metric: FontMetrics;
         g.fontMetrics(metric);
         var w = g.textWidth(text.c_str(), text.size())+3;
-        var h = metric.height;
+        var h = metric.lineHeight;
         var sizeCache = Size{.w=w as Int; .h = h as Int;};
         return sizeCache;
     }

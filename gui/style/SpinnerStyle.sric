@@ -26,7 +26,7 @@ struct SpinnerStyle : WidgetStyle
     g.setFontSize(fontSize);
     var metric: FontMetrics;
     g.fontMetrics(metric);
-    var lineh = metric.height;
+    var lineh = metric.lineHeight;
 
     var fontOffset = metric.ascent;
     cy += (fontOffset/2.0) as Int;

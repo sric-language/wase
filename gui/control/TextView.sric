@@ -108,7 +108,7 @@ struct TextView : Widget
        var lw = g.textWidth(lines[i].c_str(), lines[i].size())+3;
        w = max(w, lw);
     }
-    var h = metric.height * lines.size();
+    var h = metric.lineHeight * lines.size();
 
     //echo("prefSize:($w, $h), hintsWidth:$hintsWidth, $lines")
     sizeCache = Size{.w = w as Int; .h = h as Int; };
