@@ -33,6 +33,12 @@ struct ComboBox : Button
     style = "ComboBox";
   }
 
+  protected override fun prefContentSize(g: &Graphics, hintsWidth :Int= -1,  hintsHeight :Int= -1): Size {
+    var size = super.prefContentSize(g, hintsWidth, hintsHeight);
+    size.w += (size.h*2);
+    return size;
+  }
+
   fun show()
   {
     //var self_ = this;
