@@ -159,8 +159,9 @@ virtual struct ScrollPane : ContentPane
     {
       hbar.enabled = false;
       hbar.setVisible(false);
-      setOffsetX(0);
       hbar.max = hbar.viewport;
+      hbar.setCurPos(0, false);
+      setOffsetX(0);
     }
     else
     {
@@ -179,8 +180,9 @@ virtual struct ScrollPane : ContentPane
     {
       vbar.enabled = false;
       vbar.setVisible(false);
-      //offsetY = 0
       vbar.max = vbar.viewport;
+      vbar.setCurPos(0, false);
+      setOffsetY(0);
     }
     else
     {
