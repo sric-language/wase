@@ -237,7 +237,7 @@ int Window::open(sric::OwnPtr<waseGraphics::View> view, const char* name) SC_NOT
         localApp = std::unique_ptr<QCoreApplication>(new QApplication (argc, NULL));
     }
 
-    g_screenScle = QGuiApplication::primaryScreen()->devicePixelRatio();;
+    g_screenScle = 1;//QGuiApplication::primaryScreen()->devicePixelRatio();
     g_autoScale = false;
 
     auto size = view->getPrefSize(1024, 768);
