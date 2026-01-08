@@ -9,3 +9,5 @@ fan fmake native/plutovg/wasePlutovg.fmake
 
 fan fmake native/plutovg/demoWin.fmake
 fan fmake native/opengl/demoNanovg.fmake
+
+sric viewer/module.scm -fmake

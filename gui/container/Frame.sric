@@ -268,8 +268,9 @@ struct Frame : Pane {
         return t;
     }
 
-    fun loadView(fileName: raw* const Int8) {
+    fun loadView(fileName: raw* const Int8) : Bool {
         var view = loadViewFile(fileName);
+        if (view == null) return false;
         if (view is own* Frame) {
             (view as *Frame).show(false);
         }
@@ -277,31 +278,39 @@ struct Frame : Pane {
             this.removeAll();
             this.add(move view);
         }
+        this.relayout();
+        return true;
     }
 
-    static fun loadViewFile(fileName: raw* const Int8): own* Widget {
+    static fun loadViewFile(fileName: raw* const Int8): own*? Widget {
         var stream = FileStream::open(fileName, "rb");
+        if (stream == null) return null;
         var str = stream.readAllStr();
 
         unsafe {
             var decoder: Decoder;
             var p = decoder.decode(str);
-            var obj: raw* Widget = unsafeCast$<raw*Widget>(p);
+            var obj: raw*? Widget = unsafeCast$<raw*Widget>(p);
+            if (obj == null) return null
             return rawToOwn(obj);
         }
     }
 
-    fun loadStyle(fileName: raw* const Int8) {
+    fun loadStyle(fileName: raw* const Int8): Bool {
         var stream2 = FileStream::open(fileName, "rb");
+        if (stream2 == null) return false;
         var str2 = stream2.readAllStr();
         unsafe {
             var decoder2: Decoder;
             var p = decoder2.decodeMap(str2);
+            if (p.size() == 0) return false;
             p.eachWhile(fun(v: const &  own*Void , k: const &  String): Bool{
                 var obj: raw* WidgetStyle = unsafeCast$<raw*WidgetStyle>(v);
                 this.styleManager.idMap.set(k.copy(), rawToOwn(obj));
                 return true;
             });
         }
+        resetStyle();
+        return true;
     }
 }
