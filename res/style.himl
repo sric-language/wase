@@ -1,6 +1,11 @@
 
 
-Button = waseGui::RoundButtonStyle {
+myButton = waseGui::RoundButtonStyle {
     color = #C71585
+    fill = false
+    stroke = true
+    fontColor = #ef4d4dff
+    outlineColor = #ef4d4dff
+    roundRadius = 40
 }
 

@@ -120,7 +120,9 @@ struct Frame : Pane {
         //renderCacheDirty = true;
         //convert dirty coordinate system to realative to parent
         //if (dirty != null) dirty = Rect(dirty.x + x, dirty.y + y, dirty.w, dirty.h)
-        view.repaint();
+        if (view != null) {
+            view.repaint();
+        }
     }
 
     override fun relayout(dirty: Int = 1) {
@@ -173,7 +175,9 @@ struct Frame : Pane {
         }
         
         if (w != null) {
-            view.host().focus();
+            if (view != null) {
+                view.host().focus();
+            }
             focusWidget.setFocusState(true);
         }
     }
@@ -194,7 +198,12 @@ struct Frame : Pane {
         w.mouseEnter();
     }
 
-    override fun focused(): Bool { return view.host().hasFocus(); }
+    override fun focused(): Bool {
+        if (view == null) {
+            return false;
+        }
+        return view.host().hasFocus();
+    }
 
     fun isFocusedWidiget(w: *? Widget): Bool {
         if (!focused()) return false;
@@ -311,6 +320,7 @@ struct Frame : Pane {
             });
         }
         resetStyle();
+        repaint();
         return true;
     }
 }

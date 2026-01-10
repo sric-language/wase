@@ -9,6 +9,7 @@ waseGui::VBox
 
   waseGui::Button {
     id = button
-    text = "Push Button"
+    style = myButton
+    text = "Push Button2"
   }
 }
