@@ -16,7 +16,7 @@ extern "C" {
   }
 }
 
-extern float lastXScale;
+extern float g_screenScle;
 
 void WebTextInput::init(int type) SC_NOTHROW {
     this->type = type;
@@ -26,14 +26,14 @@ void WebTextInput::close() SC_NOTHROW {
     editTextRemove();
 }
 void WebTextInput::setPos(int x, int y, int w, int h) SC_NOTHROW {
-    float scale = 1.0 / lastXScale;
+    float scale = 1.0 / g_screenScle;
     this->x = x * scale;
     this->y = y * scale;
     this->w = w * scale;
     this->h = h * scale;
 }
 void WebTextInput::setStyle(waseGraphics::Font& font, float fontSize, waseGraphics::Color textColor, waseGraphics::Color backgroundColor) SC_NOTHROW {
-    float scale = 1.0 / lastXScale;
+    float scale = 1.0 / g_screenScle;
     this->fontSize = fontSize * scale;
 }
 void WebTextInput::setText(const char* text) SC_NOTHROW {
