@@ -126,6 +126,9 @@ public:
         if (defaultFont != -1) {
             nvgAddFallbackFontId(vg, defaultFont, defaultFont);
         }
+        else {
+            printf("ERROR: load default font file fail\n");
+        }
     }
 
     void compositeOperation(CompositeOperation op) SC_NOTHROW {

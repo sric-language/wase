@@ -150,7 +150,7 @@ virtual struct ListView : ScrollPane
     model.flush();
   }
 
-  protected override fun postGestureEvent(e: &GestureEvent) {
+  protected override fun dispatchGestureEvent(e: &GestureEvent) {
       if (e.type == GestureEvent::click && e.button != ButtonType::Right) {
         if (_viewportBeginItem != -1 && selectMode != 0) {
           for (var i = _viewportBeginItem; i < _viewportEndItem; ++i)
@@ -168,7 +168,7 @@ virtual struct ListView : ScrollPane
           }
         }
       }
-      super.postGestureEvent(e);
+      super.dispatchGestureEvent(e);
   }
 }
 

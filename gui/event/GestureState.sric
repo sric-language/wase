@@ -63,7 +63,7 @@ struct DownState : GestureState {
         var ge: GestureEvent;
         makeEvent(e, GestureEvent::longPress, ge);
         _self.machine.onGestureEvent(ge);
-        e.consumed = true;
+        e.consumed = ge.consumed;
         _self.longPressValid = false;
         _self.machine.onFinished(e);
       }
@@ -110,7 +110,7 @@ struct DownState : GestureState {
       //echo(distance)
       if (distance > 30f) {
         var ns = new DragState { .init(machine); };
-        e.consumed = true;
+        //e.consumed = true;
         shortPressValid = false;
         longPressValid = false;
         machine.setCurrentState(move ns, e);
@@ -136,7 +136,7 @@ struct OneClickState : GestureState {
     makeEvent(e, GestureEvent::click, ge);
     ge.button = e.button;
     machine.onGestureEvent(ge);
-    e.consumed = true;
+    e.consumed = ge.consumed;
 
     var self_ : WeakPtr$<OneClickState> = toWeak(rawToOwn(this));
     setTimeout(machine.doubleClickTimeLimt, fun() mut {
@@ -164,7 +164,7 @@ struct OneClickState : GestureState {
       //echo(distance)
       if (distance > 30f) {
         var ns = new DragState{ .init(machine); };
-        e.consumed = true;
+        //e.consumed = true;
         valid = false;
         machine.setCurrentState(move ns, e);
       }
@@ -190,7 +190,7 @@ struct TwoDownState : GestureState {
           makeEvent(e, GestureEvent::longPress, ge);
           ge.flag = 1;
           machine.onGestureEvent(ge);
-          e.consumed = true;
+          e.consumed = ge.consumed;
           _self.valid = false;
           machine.onFinished(e);
         }
@@ -205,7 +205,7 @@ struct TwoDownState : GestureState {
       var ge: GestureEvent;
       makeEvent(e, GestureEvent::doubleClick, ge);
       machine.onGestureEvent(ge);
-      e.consumed = true;
+      e.consumed = ge.consumed;
       machine.onFinished(e);
     } else if (e.type == MotionEventType::TouchMove) {
       valid = false;
@@ -255,7 +255,7 @@ struct DragState : GestureState {
     ge.speedX = lastSpeedX;
     ge.speedY = lastSpeedY;
     machine.onGestureEvent(ge);
-    e.consumed = true;
+    e.consumed = ge.consumed;
     machine.onFinished(e);
   }
 
@@ -283,7 +283,7 @@ struct DragState : GestureState {
         ge.flag = 1;
       }
       machine.onGestureEvent(ge);
-      e.consumed = true;
+      e.consumed = ge.consumed;
 
     } else if (e.type == MotionEventType::Release
         || e.type == MotionEventType::Cancel) {

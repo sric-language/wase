@@ -38,7 +38,7 @@ reflect abstract struct Widget {
     var clickAnimation: Bool = true;
     var dragAware: Bool = false;
     var mouseAware: Bool = false;
-    var consumeEvent: Bool = true;
+    //var consumeEvent: Bool = true;
 
     readonly var visible : Bool = true;
     var enabled: Bool = true;
@@ -118,7 +118,7 @@ reflect abstract struct Widget {
         }
     }
 
-    protected virtual fun postGestureEvent(e: &GestureEvent) {
+    protected virtual fun dispatchGestureEvent(e: &GestureEvent) {
         if (!this.enabled)
             return;
         if (!contains(e.relativeX, e.relativeY))
@@ -126,7 +126,7 @@ reflect abstract struct Widget {
         gestureEvent(e);
     }
 
-    protected virtual fun postMotionEvent(e: &MotionEvent) {
+    protected virtual fun dispatchMotionEvent(e: &MotionEvent) {
         if (!this.enabled)
             return;
         if (!contains(e.relativeX, e.relativeY))

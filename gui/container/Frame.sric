@@ -11,16 +11,33 @@ struct ModalLayer : Pane {
         layout.height = Layout::matchParent;
         this.level = level;
         if (level > 1) backgroundAlpha = 0.5;
-        if (level == 0) consumeEvent = false;
+        //if (level == 0) consumeEvent = false;
+    }
+
+    protected override fun onDrag(e: &GestureEvent) {
+        super.onDrag(e);
+        if (e.consumed) return;
+        if (level > 0) {
+            e.consumed = true;
+        }
+    }
+
+    protected override fun motionEvent(e: &MotionEvent) {
+        super.motionEvent(e);
+        if (e.consumed) return;
+        if (level > 0) {
+            e.consumed = true;
+        }
     }
     
     protected override fun gestureEvent( e: &GestureEvent) {
         super.gestureEvent(e);
         if (e.consumed) return;
+        if (level > 0) {
+            e.consumed = true;
+        }
         if (e.type == GestureEvent::click) {
-            if (level > 1) return;
-            else {
-                if (level > 0) e.consumed = true;
+            if (level <= 1) {
                 this.detach();
             }
         }
@@ -224,7 +241,7 @@ struct Frame : Pane {
         e.relativeY = py;
     }
 
-    protected override fun postMotionEvent(e:&MotionEvent ) {
+    protected override fun dispatchMotionEvent(e:&MotionEvent ) {
         //fire mouse out event
         if (mouseHoverWidget != null) {
             var ap = Coord{.x=e.x;.y= e.y;};
@@ -235,14 +252,14 @@ struct Frame : Pane {
             }
         }
         
-        super.postMotionEvent(e);
+        super.dispatchMotionEvent(e);
     }
 
-    protected override fun postGestureEvent( e:&GestureEvent) {
+    protected override fun dispatchGestureEvent( e:&GestureEvent) {
         if (e.type == GestureEvent::drop) {
             //e.data = dragFocusWidget;
         }
-        super.postGestureEvent(e);
+        super.dispatchGestureEvent(e);
     }
 
     override fun keyEvent(e:&KeyEvent ) {

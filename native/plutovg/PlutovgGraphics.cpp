@@ -130,6 +130,9 @@ public:
         if (defaultFont != NULL) {
             plutovg_canvas_set_font_face(vg, defaultFont);
         }
+        else {
+            printf("ERROR: load default font file fail\n");
+        }
     }
 
     void compositeOperation(CompositeOperation op) SC_NOTHROW {

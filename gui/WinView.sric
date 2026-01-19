@@ -39,7 +39,7 @@ struct WinView : View {
                     this.curFrame.onDrag(e);
                     if (e.type != GestureEvent::drop) return;
                 }
-                this.curFrame.postGestureEvent(e);
+                this.curFrame.dispatchGestureEvent(e);
             }
         };
     }
@@ -123,7 +123,7 @@ struct WinView : View {
         e.relativeX = e.x;
         e.relativeY = e.y;
         //update(g);
-        if (oldFrame == null) curFrame.postMotionEvent(e);
+        if (oldFrame == null) curFrame.dispatchMotionEvent(e);
         //if (!e.consumed) {
         gesture.onEvent(e);
         //}

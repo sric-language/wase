@@ -152,16 +152,16 @@ abstract struct WidgetGroup : Widget {
     abstract protected override fun prefContentSize(g: &Graphics, hintsWidth: Int = -1, hintsHeight: Int = -1): Size;
 
 
-    protected override fun postGestureEvent(e: &GestureEvent) {
+    protected override fun dispatchGestureEvent(e: &GestureEvent) {
         var px = e.relativeX;
         var py = e.relativeY;
         for (var i=children.size()-1; i>=0 && i<children.size(); --i) {
-            if (children[i].enabled && !e.consumed) {
+            if (children[i].enabled) {
                 e.relativeX = px - this.x;
                 e.relativeY = py - this.y;
                 if (children[i].contains(e.relativeX, e.relativeY)) {
-                    children[i].postGestureEvent(e);
-                    if (children[i].consumeEvent) break;
+                    children[i].dispatchGestureEvent(e);
+                    if (e.consumed) break;
                 }
             }
         }
@@ -172,16 +172,16 @@ abstract struct WidgetGroup : Widget {
         this.gestureEvent(e);
     }
 
-    protected override fun postMotionEvent(e: &MotionEvent) {
+    protected override fun dispatchMotionEvent(e: &MotionEvent) {
         var px = e.relativeX;
         var py = e.relativeY;
         for (var i=children.size()-1; i>=0 && i<children.size(); --i) {
-            if (children[i].enabled && !e.consumed) {
+            if (children[i].enabled) {
                 e.relativeX = px - this.x;
                 e.relativeY = py - this.y;
                 if (children[i].contains(e.relativeX, e.relativeY)) {
-                    children[i].postMotionEvent(e);
-                    if (children[i].consumeEvent) break;
+                    children[i].dispatchMotionEvent(e);
+                    if (e.consumed) break;
                 }
             }
         }
