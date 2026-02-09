@@ -4,10 +4,10 @@ sric graphics/module.scm -fmake -debug
 sric gui/module.scm -fmake -debug
 sric demo/module.scm
 
-fan fmake native/opengl/waseNanovg.fmake -debug
-fan fmake native/plutovg/wasePlutovg.fmake -debug
+fmake native/opengl/waseNanovg.fmake -debug
+fmake native/plutovg/wasePlutovg.fmake -debug
 
-fan fmake native/plutovg/demoWin.fmake -debug -G
-fan fmake native/opengl/demoNanovg.fmake -debug -G
+fmake native/plutovg/demoWin.fmake -debug -G
+fmake native/opengl/demoNanovg.fmake -debug -G
 
 sric viewer/module.scm -fmake -debug

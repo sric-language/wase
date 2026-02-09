@@ -78,5 +78,5 @@ sh build_wasm.sh
 ```
 4. Build Qt-backend
 ```
-fan fmake native/qt/waseQt.fmake -debug
+fmake native/qt/waseQt.fmake -debug
 ```

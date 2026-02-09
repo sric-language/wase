@@ -63,7 +63,7 @@ struct StyleManager {
         idMap["bubbleBR"] = new BubbleStyle { .position = BubbleStyle::bottomRight; };
     }
 
-    fun find(widget: &Widget): * WidgetStyle {
+    fun find(widget: *Widget): * WidgetStyle {
         var s = idMap.getPtr(widget.style);
         if (s != null) return *s;
         return defStyle;

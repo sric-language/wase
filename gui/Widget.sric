@@ -324,7 +324,7 @@ reflect abstract struct Widget {
             return inlineStyle;
         }
         if (styleCache == null) {
-            styleCache = getRootView().findStyle(*this);
+            styleCache = getRootView().findStyle(this);
         }
         return styleCache;
     }

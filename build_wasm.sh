@@ -8,7 +8,7 @@ sric demo/module.scm
 # fan fmake ../sric/output/sric.fmake -c emcc 
 # fan fmake ../sric/output/serial.fmake -c emcc 
 
-fan fmake ../sric/output/waseGraphics.fmake -c emcc 
-fan fmake ../sric/output/waseGui.fmake -c emcc 
-fan fmake native/wasm/demoWasm.fmake -c emcc
-fan fmake native/wasm/waseWasm.fmake -c emcc
+fmake ../sric/output/waseGraphics.fmake -c emcc 
+fmake ../sric/output/waseGui.fmake -c emcc 
+fmake native/wasm/demoWasm.fmake -c emcc
+fmake native/wasm/waseWasm.fmake -c emcc

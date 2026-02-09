@@ -188,7 +188,9 @@ protected struct ListItemPool {
     var item = activesMap.getPtr(pos);
     if (item != null) {
       (*item).mode = mode;
-      return share(*item);
+      unsafe {
+        return share(*item);
+      }
     }
     return null;
   }

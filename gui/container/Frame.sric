@@ -81,7 +81,7 @@ struct Frame : Pane {
     //@Transient
     var animManager: AnimManager;
 
-    fun findStyle(widget: & Widget): *WidgetStyle {
+    fun findStyle(widget: * Widget): *WidgetStyle {
         return styleManager.find(widget);
     }
 
