@@ -3,8 +3,11 @@ import waseGraphics::*;
 
 virtual struct Dialog : VBox
 {  
-  virtual fun show( parent : * Widget = Frame::cur())
+  virtual fun show( parent : *? Widget)
   {
+    if (parent == null) {
+        parent = Frame::cur();
+    }
     var root = parent.getRootView();
     var overlayer = root.topOverlayer(2);
     overlayer.add(rawToOwn(this));

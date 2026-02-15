@@ -18,7 +18,7 @@ struct Timer
   fun start()
   {
     canceled = false;
-    var selfWeak = toWeak(refToOwn(this));
+    var selfWeak : WeakPtr$<Timer> = toWeak(refToOwn(this));
     setTimeout(period, fun() {
       var self: own*? Timer = selfWeak.lock();
       if (self != null) {
@@ -35,7 +35,7 @@ struct Timer
   private fun timeOut()
   {
     if (canceled) return;
-    var selfWeak = toWeak(refToOwn(this));
+    var selfWeak : WeakPtr$<Timer> = toWeak(refToOwn(this));
     setTimeout(period, fun() {
       var self = selfWeak.lock();
       if (self != null) {

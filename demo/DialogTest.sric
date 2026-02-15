@@ -11,14 +11,14 @@ struct DialogTest : BasePage
       new Button {
         .setText("Alert");
         .onClick = fun(w:*Widget) {
-          new AlertDialog { .init("HI", "OK", "Cancel"); }.show();
+          new AlertDialog { .init("HI", "OK", "Cancel"); }.show(null);
         };
       },
       new Button {
         .setText("Alert2");
         .onClick = fun(w:*Widget) {
           var a = new AlertDialog{ .init("HI", ""); };
-          a.show();
+          a.show(null);
           var _a = a as *AlertDialog;
           setTimeout(3000, fun(){
             printf("close\n");
@@ -33,19 +33,19 @@ struct DialogTest : BasePage
             items.add("ABC");
             items.add("1234");
             items.add("5678");
-            new ActionDialog{ .init("HI", move items, "Cancel"); }.show();
+            new ActionDialog{ .init("HI", move items, "Cancel"); }.show(null);
         };
       },
       new Button {
         .setText("Time");
         .onClick = fun(w:*Widget) {
-          new TimeDialog{ .init("OK", "Cancel");}.show();
+          new TimeDialog{ .init("OK", "Cancel");}.show(null);
         };
       },
       new Button {
         .setText("Date");
         .onClick = fun(w:*Widget) {
-          new DateDialog{ .init("OK", "Cancel");}.show();
+          new DateDialog{ .init("OK", "Cancel");}.show(null);
         };
       },
       new Button {

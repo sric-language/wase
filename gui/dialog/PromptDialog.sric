@@ -70,7 +70,7 @@ virtual struct PromptDialog : Dialog
   
   protected override fun animType(): Int { return 1; }
   
-  virtual fun show( parent : * Widget = Frame::cur()) {
+  virtual fun show( parent : *? Widget) {
     super.show(parent);
     editText.focus();
   }
