@@ -1,2 +1,4 @@
 build/
 native/temp/
+native/ios/waseIOS.xcodeproj/project.xcworkspace/xcuserdata
+native/ios/waseIOS.xcodeproj/xcuserdata

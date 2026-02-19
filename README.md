@@ -1,7 +1,7 @@
 
 Sric/C++ cross-platform GUI library.
 
-- Cross-platforms: Windows, WebAssembly. Possible to run on Linux and MacOS
+- Cross-platforms: Windows, WebAssembly, iOS, Linux/MacOS(by Qt-backend)
 - Support GPU or CPU render backend
 - Optional Qt integration
 

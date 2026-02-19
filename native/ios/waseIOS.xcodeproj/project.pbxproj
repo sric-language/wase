@@ -1,0 +1,532 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		32FA3C772F47264900282A12 /* waseGraphics.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 32FA3C752F47264900282A12 /* waseGraphics.cpp */; };
+		32FA3C782F47264900282A12 /* serial.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 32FA3C722F47264900282A12 /* serial.cpp */; };
+		32FA3C792F47264900282A12 /* waseDemo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 32FA3C742F47264900282A12 /* waseDemo.cpp */; };
+		32FA3C7A2F47264900282A12 /* waseGui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 32FA3C762F47264900282A12 /* waseGui.cpp */; };
+		32FA3C7B2F47264900282A12 /* sric.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 32FA3C732F47264900282A12 /* sric.cpp */; };
+		32FA3C872F47269500282A12 /* jencoder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 32FA3C812F47269500282A12 /* jencoder.cpp */; };
+		32FA3C882F47269500282A12 /* jcompress.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 32FA3C7F2F47269500282A12 /* jcompress.cpp */; };
+		32FA3C892F47269500282A12 /* jparser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 32FA3C832F47269500282A12 /* jparser.cpp */; };
+		32FA3C8A2F47269500282A12 /* HimlParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 32FA3C7D2F47269500282A12 /* HimlParser.cpp */; };
+		32FA3C8B2F47269500282A12 /* jvalue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 32FA3C862F47269500282A12 /* jvalue.cpp */; };
+		32FA3C8D2F4726BB00282A12 /* Window.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 32FA3C8C2F4726BB00282A12 /* Window.cpp */; };
+		32FA3CB12F47271000282A12 /* Buffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 32FA3C922F47271000282A12 /* Buffer.cpp */; };
+		32FA3CB22F47271000282A12 /* Promise.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 32FA3C9E2F47271000282A12 /* Promise.cpp */; };
+		32FA3CB32F47271000282A12 /* Logger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 32FA3C9A2F47271000282A12 /* Logger.cpp */; };
+		32FA3CB42F47271000282A12 /* Refable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 32FA3CA02F47271000282A12 /* Refable.cpp */; };
+		32FA3CB52F47271000282A12 /* reflection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 32FA3CA42F47271000282A12 /* reflection.cpp */; };
+		32FA3CB62F47271000282A12 /* Str.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 32FA3CA92F47271000282A12 /* Str.cpp */; };
+		32FA3CB72F47271000282A12 /* FileSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 32FA3C982F47271000282A12 /* FileSystem.cpp */; };
+		32FA3CB82F47271000282A12 /* FileStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 32FA3C962F47271000282A12 /* FileStream.cpp */; };
+		32FA3CB92F47271000282A12 /* util.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 32FA3CB02F47271000282A12 /* util.cpp */; };
+		32FA3CBA2F47271000282A12 /* RefCount.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 32FA3CA22F47271000282A12 /* RefCount.cpp */; };
+		32FA3CBB2F47271000282A12 /* Stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 32FA3CAB2F47271000282A12 /* Stream.cpp */; };
+		32FA3CBC2F47271000282A12 /* System.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 32FA3CAD2F47271000282A12 /* System.cpp */; };
+		32FA3D042F474F0700282A12 /* res in Resources */ = {isa = PBXBuildFile; fileRef = 32FA3D032F474EE100282A12 /* res */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		32FA3C302F470BB800282A12 /* waseIOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = waseIOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		32FA3C6F2F4725A800282A12 /* libwaseGraphics.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libwaseGraphics.a; path = ../../../../../fmakeRepo/gcc/debug/waseGraphics/lib/libwaseGraphics.a; sourceTree = "<group>"; };
+		32FA3C722F47264900282A12 /* serial.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = serial.cpp; path = "/Users/yangjiandong/workspace/sric-dev/sric/output/serial.cpp"; sourceTree = "<absolute>"; };
+		32FA3C732F47264900282A12 /* sric.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = sric.cpp; path = "/Users/yangjiandong/workspace/sric-dev/sric/output/sric.cpp"; sourceTree = "<absolute>"; };
+		32FA3C742F47264900282A12 /* waseDemo.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = waseDemo.cpp; path = "/Users/yangjiandong/workspace/sric-dev/sric/output/waseDemo.cpp"; sourceTree = "<absolute>"; };
+		32FA3C752F47264900282A12 /* waseGraphics.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = waseGraphics.cpp; path = "/Users/yangjiandong/workspace/sric-dev/sric/output/waseGraphics.cpp"; sourceTree = "<absolute>"; };
+		32FA3C762F47264900282A12 /* waseGui.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = waseGui.cpp; path = "/Users/yangjiandong/workspace/sric-dev/sric/output/waseGui.cpp"; sourceTree = "<absolute>"; };
+		32FA3C7C2F47269500282A12 /* HimlParser.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = HimlParser.hpp; path = /Users/yangjiandong/workspace/fe/jsonc/jsonc/HimlParser.hpp; sourceTree = "<absolute>"; };
+		32FA3C7D2F47269500282A12 /* HimlParser.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = HimlParser.cpp; path = /Users/yangjiandong/workspace/fe/jsonc/jsonc/HimlParser.cpp; sourceTree = "<absolute>"; };
+		32FA3C7E2F47269500282A12 /* jcompress.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = jcompress.hpp; path = /Users/yangjiandong/workspace/fe/jsonc/jsonc/jcompress.hpp; sourceTree = "<absolute>"; };
+		32FA3C7F2F47269500282A12 /* jcompress.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = jcompress.cpp; path = /Users/yangjiandong/workspace/fe/jsonc/jsonc/jcompress.cpp; sourceTree = "<absolute>"; };
+		32FA3C802F47269500282A12 /* jencoder.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = jencoder.hpp; path = /Users/yangjiandong/workspace/fe/jsonc/jsonc/jencoder.hpp; sourceTree = "<absolute>"; };
+		32FA3C812F47269500282A12 /* jencoder.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = jencoder.cpp; path = /Users/yangjiandong/workspace/fe/jsonc/jsonc/jencoder.cpp; sourceTree = "<absolute>"; };
+		32FA3C822F47269500282A12 /* jparser.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = jparser.hpp; path = /Users/yangjiandong/workspace/fe/jsonc/jsonc/jparser.hpp; sourceTree = "<absolute>"; };
+		32FA3C832F47269500282A12 /* jparser.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = jparser.cpp; path = /Users/yangjiandong/workspace/fe/jsonc/jsonc/jparser.cpp; sourceTree = "<absolute>"; };
+		32FA3C842F47269500282A12 /* jsonc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = jsonc.h; path = /Users/yangjiandong/workspace/fe/jsonc/jsonc/jsonc.h; sourceTree = "<absolute>"; };
+		32FA3C852F47269500282A12 /* jvalue.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = jvalue.hpp; path = /Users/yangjiandong/workspace/fe/jsonc/jsonc/jvalue.hpp; sourceTree = "<absolute>"; };
+		32FA3C862F47269500282A12 /* jvalue.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = jvalue.cpp; path = /Users/yangjiandong/workspace/fe/jsonc/jsonc/jvalue.cpp; sourceTree = "<absolute>"; };
+		32FA3C8C2F4726BB00282A12 /* Window.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = Window.cpp; path = ../Window.cpp; sourceTree = SOURCE_ROOT; };
+		32FA3C8E2F47271000282A12 /* Array.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Array.h; path = "/Users/yangjiandong/workspace/sric-dev/sric/runtime/sric/Array.h"; sourceTree = "<absolute>"; };
+		32FA3C8F2F47271000282A12 /* Atomic.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Atomic.h; path = "/Users/yangjiandong/workspace/sric-dev/sric/runtime/sric/Atomic.h"; sourceTree = "<absolute>"; };
+		32FA3C902F47271000282A12 /* AutoPtr.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AutoPtr.h; path = "/Users/yangjiandong/workspace/sric-dev/sric/runtime/sric/AutoPtr.h"; sourceTree = "<absolute>"; };
+		32FA3C912F47271000282A12 /* Buffer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Buffer.h; path = "/Users/yangjiandong/workspace/sric-dev/sric/runtime/sric/Buffer.h"; sourceTree = "<absolute>"; };
+		32FA3C922F47271000282A12 /* Buffer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = Buffer.cpp; path = "/Users/yangjiandong/workspace/sric-dev/sric/runtime/sric/Buffer.cpp"; sourceTree = "<absolute>"; };
+		32FA3C932F47271000282A12 /* common.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = common.h; path = "/Users/yangjiandong/workspace/sric-dev/sric/runtime/sric/common.h"; sourceTree = "<absolute>"; };
+		32FA3C942F47271000282A12 /* DArray.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DArray.h; path = "/Users/yangjiandong/workspace/sric-dev/sric/runtime/sric/DArray.h"; sourceTree = "<absolute>"; };
+		32FA3C952F47271000282A12 /* FileStream.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = FileStream.h; path = "/Users/yangjiandong/workspace/sric-dev/sric/runtime/sric/FileStream.h"; sourceTree = "<absolute>"; };
+		32FA3C962F47271000282A12 /* FileStream.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = FileStream.cpp; path = "/Users/yangjiandong/workspace/sric-dev/sric/runtime/sric/FileStream.cpp"; sourceTree = "<absolute>"; };
+		32FA3C972F47271000282A12 /* FileSystem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = FileSystem.h; path = "/Users/yangjiandong/workspace/sric-dev/sric/runtime/sric/FileSystem.h"; sourceTree = "<absolute>"; };
+		32FA3C982F47271000282A12 /* FileSystem.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = FileSystem.cpp; path = "/Users/yangjiandong/workspace/sric-dev/sric/runtime/sric/FileSystem.cpp"; sourceTree = "<absolute>"; };
+		32FA3C992F47271000282A12 /* Logger.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Logger.h; path = "/Users/yangjiandong/workspace/sric-dev/sric/runtime/sric/Logger.h"; sourceTree = "<absolute>"; };
+		32FA3C9A2F47271000282A12 /* Logger.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = Logger.cpp; path = "/Users/yangjiandong/workspace/sric-dev/sric/runtime/sric/Logger.cpp"; sourceTree = "<absolute>"; };
+		32FA3C9B2F47271000282A12 /* Optional.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Optional.h; path = "/Users/yangjiandong/workspace/sric-dev/sric/runtime/sric/Optional.h"; sourceTree = "<absolute>"; };
+		32FA3C9C2F47271000282A12 /* OwnPtr.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = OwnPtr.h; path = "/Users/yangjiandong/workspace/sric-dev/sric/runtime/sric/OwnPtr.h"; sourceTree = "<absolute>"; };
+		32FA3C9D2F47271000282A12 /* Promise.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Promise.h; path = "/Users/yangjiandong/workspace/sric-dev/sric/runtime/sric/Promise.h"; sourceTree = "<absolute>"; };
+		32FA3C9E2F47271000282A12 /* Promise.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = Promise.cpp; path = "/Users/yangjiandong/workspace/sric-dev/sric/runtime/sric/Promise.cpp"; sourceTree = "<absolute>"; };
+		32FA3C9F2F47271000282A12 /* Refable.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Refable.h; path = "/Users/yangjiandong/workspace/sric-dev/sric/runtime/sric/Refable.h"; sourceTree = "<absolute>"; };
+		32FA3CA02F47271000282A12 /* Refable.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = Refable.cpp; path = "/Users/yangjiandong/workspace/sric-dev/sric/runtime/sric/Refable.cpp"; sourceTree = "<absolute>"; };
+		32FA3CA12F47271000282A12 /* RefCount.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = RefCount.h; path = "/Users/yangjiandong/workspace/sric-dev/sric/runtime/sric/RefCount.h"; sourceTree = "<absolute>"; };
+		32FA3CA22F47271000282A12 /* RefCount.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = RefCount.cpp; path = "/Users/yangjiandong/workspace/sric-dev/sric/runtime/sric/RefCount.cpp"; sourceTree = "<absolute>"; };
+		32FA3CA32F47271000282A12 /* reflection.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = reflection.h; path = "/Users/yangjiandong/workspace/sric-dev/sric/runtime/sric/reflection.h"; sourceTree = "<absolute>"; };
+		32FA3CA42F47271000282A12 /* reflection.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = reflection.cpp; path = "/Users/yangjiandong/workspace/sric-dev/sric/runtime/sric/reflection.cpp"; sourceTree = "<absolute>"; };
+		32FA3CA52F47271000282A12 /* RefPtr.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = RefPtr.h; path = "/Users/yangjiandong/workspace/sric-dev/sric/runtime/sric/RefPtr.h"; sourceTree = "<absolute>"; };
+		32FA3CA62F47271000282A12 /* ScChannel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ScChannel.h; path = "/Users/yangjiandong/workspace/sric-dev/sric/runtime/sric/ScChannel.h"; sourceTree = "<absolute>"; };
+		32FA3CA72F47271000282A12 /* ScThread.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ScThread.h; path = "/Users/yangjiandong/workspace/sric-dev/sric/runtime/sric/ScThread.h"; sourceTree = "<absolute>"; };
+		32FA3CA82F47271000282A12 /* Str.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Str.h; path = "/Users/yangjiandong/workspace/sric-dev/sric/runtime/sric/Str.h"; sourceTree = "<absolute>"; };
+		32FA3CA92F47271000282A12 /* Str.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = Str.cpp; path = "/Users/yangjiandong/workspace/sric-dev/sric/runtime/sric/Str.cpp"; sourceTree = "<absolute>"; };
+		32FA3CAA2F47271000282A12 /* Stream.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Stream.h; path = "/Users/yangjiandong/workspace/sric-dev/sric/runtime/sric/Stream.h"; sourceTree = "<absolute>"; };
+		32FA3CAB2F47271000282A12 /* Stream.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = Stream.cpp; path = "/Users/yangjiandong/workspace/sric-dev/sric/runtime/sric/Stream.cpp"; sourceTree = "<absolute>"; };
+		32FA3CAC2F47271000282A12 /* System.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = System.h; path = "/Users/yangjiandong/workspace/sric-dev/sric/runtime/sric/System.h"; sourceTree = "<absolute>"; };
+		32FA3CAD2F47271000282A12 /* System.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = System.cpp; path = "/Users/yangjiandong/workspace/sric-dev/sric/runtime/sric/System.cpp"; sourceTree = "<absolute>"; };
+		32FA3CAE2F47271000282A12 /* UniqPtr.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = UniqPtr.h; path = "/Users/yangjiandong/workspace/sric-dev/sric/runtime/sric/UniqPtr.h"; sourceTree = "<absolute>"; };
+		32FA3CAF2F47271000282A12 /* util.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = util.h; path = "/Users/yangjiandong/workspace/sric-dev/sric/runtime/sric/util.h"; sourceTree = "<absolute>"; };
+		32FA3CB02F47271000282A12 /* util.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = util.cpp; path = "/Users/yangjiandong/workspace/sric-dev/sric/runtime/sric/util.cpp"; sourceTree = "<absolute>"; };
+		32FA3D032F474EE100282A12 /* res */ = {isa = PBXFileReference; lastKnownFileType = folder; name = res; path = "/Users/yangjiandong/workspace/sric-dev/wase/res"; sourceTree = "<absolute>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		32FA3C472F470BB900282A12 /* Exceptions for "waseIOS" folder in "waseIOS" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 32FA3C2F2F470BB800282A12 /* waseIOS */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		32FA3C322F470BB800282A12 /* waseIOS */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				32FA3C472F470BB900282A12 /* Exceptions for "waseIOS" folder in "waseIOS" target */,
+			);
+			path = waseIOS;
+			sourceTree = "<group>";
+		};
+		32FA3CE12F4749DD00282A12 /* code */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = code;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		32FA3C2D2F470BB800282A12 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		32FA3C272F470BB800282A12 = {
+			isa = PBXGroup;
+			children = (
+				32FA3D032F474EE100282A12 /* res */,
+				32FA3CE12F4749DD00282A12 /* code */,
+				32FA3C322F470BB800282A12 /* waseIOS */,
+				32FA3C6E2F4725A800282A12 /* Frameworks */,
+				32FA3C312F470BB800282A12 /* Products */,
+				32FA3C712F4725F000282A12 /* deps */,
+			);
+			sourceTree = "<group>";
+		};
+		32FA3C312F470BB800282A12 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				32FA3C302F470BB800282A12 /* waseIOS.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		32FA3C6E2F4725A800282A12 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				32FA3C6F2F4725A800282A12 /* libwaseGraphics.a */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		32FA3C712F4725F000282A12 /* deps */ = {
+			isa = PBXGroup;
+			children = (
+				32FA3C8E2F47271000282A12 /* Array.h */,
+				32FA3C8F2F47271000282A12 /* Atomic.h */,
+				32FA3C902F47271000282A12 /* AutoPtr.h */,
+				32FA3C912F47271000282A12 /* Buffer.h */,
+				32FA3C922F47271000282A12 /* Buffer.cpp */,
+				32FA3C932F47271000282A12 /* common.h */,
+				32FA3C942F47271000282A12 /* DArray.h */,
+				32FA3C952F47271000282A12 /* FileStream.h */,
+				32FA3C962F47271000282A12 /* FileStream.cpp */,
+				32FA3C972F47271000282A12 /* FileSystem.h */,
+				32FA3C982F47271000282A12 /* FileSystem.cpp */,
+				32FA3C992F47271000282A12 /* Logger.h */,
+				32FA3C9A2F47271000282A12 /* Logger.cpp */,
+				32FA3C9B2F47271000282A12 /* Optional.h */,
+				32FA3C9C2F47271000282A12 /* OwnPtr.h */,
+				32FA3C9D2F47271000282A12 /* Promise.h */,
+				32FA3C9E2F47271000282A12 /* Promise.cpp */,
+				32FA3C9F2F47271000282A12 /* Refable.h */,
+				32FA3CA02F47271000282A12 /* Refable.cpp */,
+				32FA3CA12F47271000282A12 /* RefCount.h */,
+				32FA3CA22F47271000282A12 /* RefCount.cpp */,
+				32FA3CA32F47271000282A12 /* reflection.h */,
+				32FA3CA42F47271000282A12 /* reflection.cpp */,
+				32FA3CA52F47271000282A12 /* RefPtr.h */,
+				32FA3CA62F47271000282A12 /* ScChannel.h */,
+				32FA3CA72F47271000282A12 /* ScThread.h */,
+				32FA3CA82F47271000282A12 /* Str.h */,
+				32FA3CA92F47271000282A12 /* Str.cpp */,
+				32FA3CAA2F47271000282A12 /* Stream.h */,
+				32FA3CAB2F47271000282A12 /* Stream.cpp */,
+				32FA3CAC2F47271000282A12 /* System.h */,
+				32FA3CAD2F47271000282A12 /* System.cpp */,
+				32FA3CAE2F47271000282A12 /* UniqPtr.h */,
+				32FA3CAF2F47271000282A12 /* util.h */,
+				32FA3CB02F47271000282A12 /* util.cpp */,
+				32FA3C8C2F4726BB00282A12 /* Window.cpp */,
+				32FA3C7C2F47269500282A12 /* HimlParser.hpp */,
+				32FA3C7D2F47269500282A12 /* HimlParser.cpp */,
+				32FA3C7E2F47269500282A12 /* jcompress.hpp */,
+				32FA3C7F2F47269500282A12 /* jcompress.cpp */,
+				32FA3C802F47269500282A12 /* jencoder.hpp */,
+				32FA3C812F47269500282A12 /* jencoder.cpp */,
+				32FA3C822F47269500282A12 /* jparser.hpp */,
+				32FA3C832F47269500282A12 /* jparser.cpp */,
+				32FA3C842F47269500282A12 /* jsonc.h */,
+				32FA3C852F47269500282A12 /* jvalue.hpp */,
+				32FA3C862F47269500282A12 /* jvalue.cpp */,
+				32FA3C722F47264900282A12 /* serial.cpp */,
+				32FA3C732F47264900282A12 /* sric.cpp */,
+				32FA3C742F47264900282A12 /* waseDemo.cpp */,
+				32FA3C752F47264900282A12 /* waseGraphics.cpp */,
+				32FA3C762F47264900282A12 /* waseGui.cpp */,
+			);
+			path = deps;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		32FA3C2F2F470BB800282A12 /* waseIOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 32FA3C482F470BB900282A12 /* Build configuration list for PBXNativeTarget "waseIOS" */;
+			buildPhases = (
+				32FA3C2C2F470BB800282A12 /* Sources */,
+				32FA3C2D2F470BB800282A12 /* Frameworks */,
+				32FA3C2E2F470BB800282A12 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				32FA3C322F470BB800282A12 /* waseIOS */,
+				32FA3CE12F4749DD00282A12 /* code */,
+			);
+			name = waseIOS;
+			packageProductDependencies = (
+			);
+			productName = waseIOS;
+			productReference = 32FA3C302F470BB800282A12 /* waseIOS.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		32FA3C282F470BB800282A12 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastUpgradeCheck = 2620;
+				TargetAttributes = {
+					32FA3C2F2F470BB800282A12 = {
+						CreatedOnToolsVersion = 26.2;
+						LastSwiftMigration = 2620;
+					};
+				};
+			};
+			buildConfigurationList = 32FA3C2B2F470BB800282A12 /* Build configuration list for PBXProject "waseIOS" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 32FA3C272F470BB800282A12;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 32FA3C312F470BB800282A12 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				32FA3C2F2F470BB800282A12 /* waseIOS */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		32FA3C2E2F470BB800282A12 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				32FA3D042F474F0700282A12 /* res in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		32FA3C2C2F470BB800282A12 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				32FA3C872F47269500282A12 /* jencoder.cpp in Sources */,
+				32FA3C882F47269500282A12 /* jcompress.cpp in Sources */,
+				32FA3C892F47269500282A12 /* jparser.cpp in Sources */,
+				32FA3C8D2F4726BB00282A12 /* Window.cpp in Sources */,
+				32FA3C8A2F47269500282A12 /* HimlParser.cpp in Sources */,
+				32FA3C8B2F47269500282A12 /* jvalue.cpp in Sources */,
+				32FA3C772F47264900282A12 /* waseGraphics.cpp in Sources */,
+				32FA3C782F47264900282A12 /* serial.cpp in Sources */,
+				32FA3C792F47264900282A12 /* waseDemo.cpp in Sources */,
+				32FA3C7A2F47264900282A12 /* waseGui.cpp in Sources */,
+				32FA3C7B2F47264900282A12 /* sric.cpp in Sources */,
+				32FA3CB12F47271000282A12 /* Buffer.cpp in Sources */,
+				32FA3CB22F47271000282A12 /* Promise.cpp in Sources */,
+				32FA3CB32F47271000282A12 /* Logger.cpp in Sources */,
+				32FA3CB42F47271000282A12 /* Refable.cpp in Sources */,
+				32FA3CB52F47271000282A12 /* reflection.cpp in Sources */,
+				32FA3CB62F47271000282A12 /* Str.cpp in Sources */,
+				32FA3CB72F47271000282A12 /* FileSystem.cpp in Sources */,
+				32FA3CB82F47271000282A12 /* FileStream.cpp in Sources */,
+				32FA3CB92F47271000282A12 /* util.cpp in Sources */,
+				32FA3CBA2F47271000282A12 /* RefCount.cpp in Sources */,
+				32FA3CBB2F47271000282A12 /* Stream.cpp in Sources */,
+				32FA3CBC2F47271000282A12 /* System.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		32FA3C492F470BB900282A12 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				HEADER_SEARCH_PATHS = (
+					../../../sric/output,
+					../../../sric/runtime,
+					../,
+				);
+				INFOPLIST_FILE = waseIOS/Info.plist;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.chunquedong.waseIOS;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		32FA3C4A2F470BB900282A12 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				HEADER_SEARCH_PATHS = (
+					../../../sric/output,
+					../../../sric/runtime,
+					../,
+				);
+				INFOPLIST_FILE = waseIOS/Info.plist;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.chunquedong.waseIOS;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		32FA3C4B2F470BB900282A12 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		32FA3C4C2F470BB900282A12 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		32FA3C2B2F470BB800282A12 /* Build configuration list for PBXProject "waseIOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				32FA3C4B2F470BB900282A12 /* Debug */,
+				32FA3C4C2F470BB900282A12 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		32FA3C482F470BB900282A12 /* Build configuration list for PBXNativeTarget "waseIOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				32FA3C492F470BB900282A12 /* Debug */,
+				32FA3C4A2F470BB900282A12 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 32FA3C282F470BB800282A12 /* Project object */;
+}
