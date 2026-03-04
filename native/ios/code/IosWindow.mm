@@ -8,7 +8,7 @@
 
 using namespace waseGraphics;
 
-extern float g_screenScle;
+extern float g_screenScale;
 extern bool g_autoScale;
 
 UIViewController *g_controller;
@@ -93,7 +93,7 @@ int Window::open(sric::OwnPtr<waseGraphics::View> view, const char* name) SC_NOT
     }
     
     float desityScale = [[UIScreen mainScreen] scale];
-    g_screenScle = desityScale;
+    g_screenScale = desityScale;
     g_autoScale = true;
     
     g_window = sric::new_<IosWindow>();

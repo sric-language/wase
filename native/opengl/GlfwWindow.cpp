@@ -37,7 +37,7 @@
 
 using namespace waseGraphics;
 
-extern float g_screenScle;
+extern float g_screenScale;
 extern bool g_autoScale;
 
 #ifdef _WIN32
@@ -419,7 +419,7 @@ int openWindow(const char* title, int w, int h, sric::OwnPtr<waseGraphics::View>
 	glfwSetTime(0);
 
 	getContentScale(window);
-	g_screenScle = lastXScale;
+	g_screenScale = lastXScale;
 	g_autoScale = isMobile();
 
 

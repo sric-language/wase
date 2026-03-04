@@ -50,7 +50,7 @@ void EventTimer::fireTimeEvents() {
     }
 }
 
-float g_screenScle = 1;
+float g_screenScale = 1;
 bool g_autoScale = true;
 EventTimer* EventTimer::_cur = nullptr;
 
@@ -66,7 +66,7 @@ void waseGraphics::setTimeout(int64_t timeMillis, std::function<void()> callback
 }
 
 float waseGraphics::getScreenScale() SC_NOTHROW {
-    return g_screenScle;
+    return g_screenScale;
 }
 
 bool waseGraphics::getAutoScale() SC_NOTHROW {

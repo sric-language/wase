@@ -8,7 +8,7 @@
 
 #include "QtTextInput.h"
 
-extern float g_screenScle;
+extern float g_screenScale;
 extern bool g_autoScale;
 
 QtWindow::~QtWindow() {
@@ -237,7 +237,7 @@ int Window::open(sric::OwnPtr<waseGraphics::View> view, const char* name) SC_NOT
         localApp = std::unique_ptr<QCoreApplication>(new QApplication (argc, NULL));
     }
 
-    g_screenScle = 1;//QGuiApplication::primaryScreen()->devicePixelRatio();
+    g_screenScale = 1;//QGuiApplication::primaryScreen()->devicePixelRatio();
     g_autoScale = false;
 
     auto size = view->getPrefSize(1024, 768);

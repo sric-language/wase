@@ -11,7 +11,7 @@
 #define MIN(a, b)  ((a) < (b) ? (a) : (b))
 #define PI 3.14159265358979323846
 
-extern float g_screenScle;
+extern float g_screenScale;
 
 using namespace waseGraphics;
 
@@ -353,7 +353,7 @@ public:
     }
     
     void setFontSize(float size) SC_NOTHROW {
-        //fontSize = size / g_screenScle;
+        //fontSize = size / g_screenScale;
         fontSize = size;
         CGContextSetFontSize(vg, fontSize);
         

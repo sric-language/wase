@@ -8,7 +8,7 @@
 #include <windowsx.h>
 using namespace waseGraphics;
 
-extern float g_screenScle;
+extern float g_screenScale;
 extern bool g_autoScale;
 
 class Win32Window : public Window
@@ -361,7 +361,7 @@ WNDCLASS wndClass;
 
 
 int openWindow(const char* title, int w, int h) {
-    g_screenScle = 1;
+    g_screenScale = 1;
     g_autoScale = false;
 
     HINSTANCE hInstance = GetModuleHandle(NULL);

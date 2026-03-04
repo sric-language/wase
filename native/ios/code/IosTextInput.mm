@@ -3,7 +3,7 @@
 #include "IosTextInput.h"
 #include "IosWindow.h"
 
-extern float g_screenScle;
+extern float g_screenScale;
 
 using namespace waseGraphics;
 
@@ -131,7 +131,7 @@ void IosTextInput::close() SC_NOTHROW {
 }
 
 void IosTextInput::setPos(int x, int y, int w, int h) SC_NOTHROW {
-    float desityScale = g_screenScle;
+    float desityScale = g_screenScale;
     
     textView.frame = CGRectMake(x/desityScale, y/desityScale, w/desityScale, h/desityScale);
 }
@@ -139,7 +139,7 @@ void IosTextInput::setStyle(waseGraphics::Font& font, float fontSize, waseGraphi
 
     [textView setBackgroundColor:[UIColor colorWithRed:backgroundColor.r() green:backgroundColor.g() blue:backgroundColor.b() alpha:backgroundColor.a()]];
     
-    float desityScale = g_screenScle;
+    float desityScale = g_screenScale;
     
     int r = textColor.ir();
     int g = textColor.ig();
